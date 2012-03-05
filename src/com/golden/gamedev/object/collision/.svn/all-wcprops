@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/collision
+END
+PreciseCollisionGroup.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/collision/PreciseCollisionGroup.java
+END
+CollisionBounds.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/collision/CollisionBounds.java
+END
+CollisionGroup.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/collision/CollisionGroup.java
+END
+CollisionRect.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/collision/CollisionRect.java
+END
+BasicCollisionGroup.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/collision/BasicCollisionGroup.java
+END
+AdvanceCollisionGroup.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/collision/AdvanceCollisionGroup.java
+END
+CollisionShape.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/collision/CollisionShape.java
+END
+package.html
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/2/trunk/GTGE/src/com/golden/gamedev/object/collision/package.html
+END

@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object
+END
+Background.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/Background.java
+END
+GameFont.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/GameFont.java
+END
+Timer.java
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/Timer.java
+END
+SpriteGroup.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/SpriteGroup.java
+END
+AdvanceSpriteGroup.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/AdvanceSpriteGroup.java
+END
+CollisionManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/CollisionManager.java
+END
+Sprite.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/Sprite.java
+END
+PlayField.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/PlayField.java
+END
+AnimatedSprite.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/AnimatedSprite.java
+END
+GameFontManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/!svn/ver/25/trunk/GTGE/src/com/golden/gamedev/object/GameFontManager.java
+END
+package.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/2/trunk/GTGE/src/com/golden/gamedev/object/package.html
+END
