@@ -25,7 +25,7 @@ public class GameObject extends GameResource {
         mainEvents = new ArrayList<MainEvent>();
     }
 
-    public MainEvent getMainEvent(int index) {
+    public MainEvent getMainEvent(byte index) {
         for (MainEvent e : mainEvents) {
             if (e.mainEvent == index) {
                 return e;

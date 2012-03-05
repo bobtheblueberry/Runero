@@ -103,12 +103,12 @@ public class Event {
     public static final byte EV_ALARM11 = 11;
     
     public MainEvent parent;
-    public int type;
+    public byte type;
     public int collisionId; // for collision events
     public Instance collisionObject = null; // Object collided with in collision events 
     public ArrayList<Action> actions;
     
-    public Event(MainEvent parent, int type) {
+    public Event(MainEvent parent, byte type) {
         this.parent = parent;
         this.type = type;
         actions = new ArrayList<Action>();

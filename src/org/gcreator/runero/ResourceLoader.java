@@ -20,6 +20,7 @@ import org.gcreator.runero.res.GameRoom.Tile;
 import org.gcreator.runero.res.GameSprite.BBMode;
 import org.gcreator.runero.res.GameSprite.MaskShape;
 import org.lateralgm.resources.library.RLibAction;
+import org.lateralgm.resources.library.RLibManager;
 
 public class ResourceLoader {
 
@@ -117,8 +118,8 @@ public class ResourceLoader {
             String line;
             while ((line = r.readLine()) != null) {
                 String[] evt = line.split(",");
-                int a = Integer.parseInt(evt[0]);
-                int b = Integer.parseInt(evt[1]);
+                byte a = Byte.parseByte(evt[0]);
+                byte b = Byte.parseByte(evt[1]);
                 MainEvent e = o.getMainEvent(a);
                 Event ev = new Event(e, b);
                 String[] actions = r.readLine().split(",");
@@ -292,9 +293,9 @@ public class ResourceLoader {
     private Action loadAction(String file) throws IOException {
         File f = new File(actionFolder, "a_" + file + ".dat");
         BufferedReader r = new BufferedReader(new FileReader(f));
-        RLibAction a = new RLibAction();
-        a.parentId = Integer.parseInt(r.readLine());
-        a.id = Integer.parseInt(r.readLine());
+        int parentId = Integer.parseInt(r.readLine());
+        int id = Integer.parseInt(r.readLine());
+        RLibAction a = RLibManager.getLibAction(parentId, id);
         // Done of Lib stuff
         // Load Action
         Action act = new Action(a);

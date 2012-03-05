@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import org.gcreator.runero.gml.FunctionLibrary;
+import org.gcreator.runero.gml.ReturnValue;
 import org.gcreator.runero.gml.Variable;
 
 /*
@@ -49,18 +50,19 @@ lengthdir_x(len,dir)
 lengthdir_y(len,dir)
 */
 
-@SuppressWarnings("unused")
 public class MathLibrary extends FunctionLibrary {
 
+    public static MathLibrary lib = new MathLibrary();
     private static long seed = 0;
     private static Random random = new Random(seed);
+    
+    private MathLibrary() {}
 
-    @Override
-    public Variable getFunction(String fn, Variable... args) {
+    public ReturnValue getFunction(String fn, Variable... args) {
         // Check to see if some dumbo gave us strings
         // they are only allowed for min, max, is_real, and is_string
-        if (args.length > 1 && !fn.equals("min") && !fn.equals("max") &&
-                !fn.equals("is_real") && !fn.equals("is_string") && !fn.equals("choose"))
+        if (args.length > 1 && !fn.equals("min") && !fn.equals("max") && !fn.equals("is_real")
+                && !fn.equals("is_string") && !fn.equals("choose"))
             for (Variable v : args) {
                 if (!v.isReal) {
                     System.err.println("Math Library given String for function " + fn);
@@ -68,14 +70,17 @@ public class MathLibrary extends FunctionLibrary {
                 }
             }
         char c = fn.charAt(0);
-        double arg0 = args[0].realVal;
-        double arg1 = 0, arg2 = 0, arg3 = 0;
-        if (args.length > 1) {
-            arg1 = args[1].realVal;
-            if (args.length > 2) {
-                arg2 = args[2].realVal;
-                if (args.length > 3)
-                    arg3 = args[3].realVal;
+        // random_get_seed() and randomize() does not have an argument
+        double arg0 = 0, arg1 = 0, arg2 = 0, arg3 = 0;
+        if (args.length > 0) {
+            arg0 = args[0].realVal;
+            if (args.length > 1) {
+                arg1 = args[1].realVal;
+                if (args.length > 2) {
+                    arg2 = args[2].realVal;
+                    if (args.length > 3)
+                        arg3 = args[3].realVal;
+                }
             }
         }
         switch (c) {
@@ -158,73 +163,91 @@ public class MathLibrary extends FunctionLibrary {
             break;
         case 'm':
             if (fn.equals("max")) {
-
+                if (args[0].isString) {
+                    return maxStr(args);
+                } else {
+                    return Variable.Real(max(getReals(args)));
+                }
             }
             if (fn.equals("min")) {
-
+                if (args[0].isString) {
+                    return minStr(args);
+                } else {
+                    return Variable.Real(min(getReals(args)));
+                }
             }
             if (fn.equals("mean")) {
-
+                return Variable.Real(mean(arg0));
             }
             if (fn.equals("median")) {
-
+                return Variable.Real(median(arg0));
             }
             break;
         case 'p':
             if (fn.equals("point_direction")) {
-
+                return Variable.Real(point_direction(arg0, arg1, arg2, arg3));
             }
             if (fn.equals("point_distance")) {
-
+                return Variable.Real(point_distance(arg0, arg1, arg2, arg3));
             }
             if (fn.equals("power")) {
-
+                return Variable.Real(power(arg0, arg1));
             }
             break;
         case 'r':
             if (fn.equals("random")) {
-
+                return Variable.Real(random(arg0));
             }
             if (fn.equals("radtodeg")) {
-
+                return Variable.Real(radtodeg(arg0));
             }
             if (fn.equals("random_get_seed")) {
-
+                return Variable.Real(Double.longBitsToDouble(random_get_seed()));
             }
             if (fn.equals("random_set_seed")) {
-
+                random_set_seed(Double.doubleToLongBits(arg0));
+                return ReturnValue.SUCCESS;
             }
             if (fn.equals("randomize")) {
-
+                randomize();
+                return ReturnValue.SUCCESS;
             }
             if (fn.equals("round")) {
-
+                return Variable.Real(round(arg0));
             }
             break;
         case 's':
             if (fn.equals("sign")) {
-
+                return Variable.Real(sign(arg0));
             }
             if (fn.equals("sin")) {
-
+                return Variable.Real(sin(arg0));
             }
             if (fn.equals("sqr")) {
-
+                return Variable.Real(sqr(arg0));
             }
             if (fn.equals("sqrt")) {
-
+                return Variable.Real(sqrt(arg0));
             }
             break;
         case 't':
             if (fn.equals("tan")) {
-
+                return Variable.Real(tan(arg0));
             }
             break;
         }
         return null;
     }
 
-    private boolean is_real(Variable var) {
+    private static double[] getReals(Variable... vars) {
+        double[] ds = new double[vars.length];
+        for (int i = 0; i < vars.length; i++) {
+            ds[i] = vars[i].realVal;
+        }
+        return ds;
+    }
+
+    private static boolean is_real(Variable var) {
         if (var == null || var.val == null)
             return false;
         try {
@@ -235,127 +258,126 @@ public class MathLibrary extends FunctionLibrary {
         return true;
     }
 
-    private boolean is_string(Variable val) {
+    private static boolean is_string(Variable val) {
         return val.isString;
     }
 
-    private double random(double d) {
+    private static double random(double d) {
         return random.nextDouble() * d;
     }
 
-    private void random_set_seed(int s) {
+    private static void random_set_seed(long s) {
         seed = s;
         random.setSeed(s);
     }
 
-    // WARNING: badly implemented function
-    private long random_get_seed() {
+    private static long random_get_seed() {
         return seed;
     }
 
-    private void randomize() {
+    private static void randomize() {
         seed = random.nextLong();
         random.setSeed(seed);
     }
 
-    private Variable choose(Variable... vals) {
+    private static Variable choose(Variable... vals) {
         int n = (int) (Math.random() * vals.length);
         return vals[n];
     }
 
-    private double abs(double d) {
+    private static double abs(double d) {
         return Math.abs(d);
     }
 
-    private double round(double d) {
+    private static double round(double d) {
         return Math.round(d);
     }
 
-    private double floor(double d) {
+    private static double floor(double d) {
         return Math.floor(d);
     }
 
-    private double ceil(double d) {
+    private static double ceil(double d) {
         return Math.ceil(d);
     }
 
-    private double sign(double d) {
+    private static double sign(double d) {
         return Math.signum(d);
     }
 
-    private double frac(double d) {
+    private static double frac(double d) {
         return d - Math.floor(d);
     }
 
-    private double sqrt(double d) {
+    private static double sqrt(double d) {
         return Math.sqrt(d);
     }
 
-    private double sqr(double d) {
+    private static double sqr(double d) {
         return d * d;
     }
 
-    private double exp(double d) {
+    private static double exp(double d) {
         return Math.exp(d);
     }
 
-    private double ln(double d) {
+    private static double ln(double d) {
         return Math.log(d);
     }
 
-    private double log2(double d) {
+    private static double log2(double d) {
         return Math.log(d) / Math.log(2);
     }
 
-    private double log10(double d) {
+    private static double log10(double d) {
         return Math.log10(d);
     }
 
-    private double logn(double n, double x) {
+    private static double logn(double n, double x) {
         return Math.log(n) / Math.log(x);
     }
 
-    private double sin(double d) {
+    private static double sin(double d) {
         return Math.sin(d);
     }
 
-    private double cos(double d) {
+    private static double cos(double d) {
         return Math.cos(d);
     }
 
-    private double tan(double d) {
+    private static double tan(double d) {
         return Math.tan(d);
     }
 
-    private double arcsin(double d) {
+    private static double arcsin(double d) {
         return Math.asin(d);
     }
 
-    private double arccos(double d) {
+    private static double arccos(double d) {
         return Math.acos(d);
     }
 
-    private double arctan(double d) {
+    private static double arctan(double d) {
         return Math.atan(d);
     }
 
-    private double arctan2(double y, double x) {
+    private static double arctan2(double y, double x) {
         return Math.atan2(y, x);
     }
 
-    private double degtorad(double d) {
+    private static double degtorad(double d) {
         return Math.toRadians(d);
     }
 
-    private double radtodeg(double d) {
+    private static double radtodeg(double d) {
         return Math.toDegrees(d);
     }
 
-    private double power(double x, double n) {
+    private static double power(double x, double n) {
         return Math.pow(x, n);
     }
 
-    private double min(double... vals) {
+    private static double min(double... vals) {
         double d = vals[0];
         for (double v : vals) {
             if (v < d)
@@ -364,7 +386,7 @@ public class MathLibrary extends FunctionLibrary {
         return d;
     }
 
-    private Variable minStr(Variable... vars) {
+    private static Variable minStr(Variable... vars) {
         Variable var = vars[0];
         for (Variable v : vars) {
             if (v.val.length() < var.val.length())
@@ -373,7 +395,7 @@ public class MathLibrary extends FunctionLibrary {
         return var;
     }
 
-    private double max(double... vals) {
+    private static double max(double... vals) {
         double d = vals[0];
         for (double v : vals) {
             if (v > d)
@@ -382,7 +404,7 @@ public class MathLibrary extends FunctionLibrary {
         return d;
     }
 
-    private Variable maxStr(Variable... vars) {
+    private static Variable maxStr(Variable... vars) {
         Variable var = vars[0];
         for (Variable v : vars) {
             if (v.val.length() > var.val.length())
@@ -391,7 +413,7 @@ public class MathLibrary extends FunctionLibrary {
         return var;
     }
 
-    private double mean(double... vals) {
+    private static double mean(double... vals) {
         double x = 0;
         for (double d : vals) {
             x += d;
@@ -399,7 +421,7 @@ public class MathLibrary extends FunctionLibrary {
         return x / vals.length;
     }
 
-    private double median(double... vals) {
+    private static double median(double... vals) {
         Arrays.sort(vals);
         if (vals.length % 2 == 0)
             return vals[(vals.length / 2) - 1];
@@ -407,22 +429,22 @@ public class MathLibrary extends FunctionLibrary {
             return vals[((vals.length - 1) / 2) - 1];
     }
 
-    private double point_distance(double x1, double y1, double x2, double y2) {
+    private static double point_distance(double x1, double y1, double x2, double y2) {
         return java.lang.Math.sqrt(sqr(Math.abs(x2 - x1)) + sqr(Math.abs(y2 - y1)));
     }
 
-    private double point_direction(double x1, double y1, double x2, double y2) {
+    private static double point_direction(double x1, double y1, double x2, double y2) {
         double basic = java.lang.Math.atan2((y2 - y1), (x2 - x1)) / Math.PI;
         if (y1 < y2)
             return abs(180 + 180 * (1 - basic));
         return abs(180 * basic);
     }
 
-    private double lendir_x(double len, double dir) {
+    private static double lendir_x(double len, double dir) {
         return Math.abs(cos(java.lang.Math.toRadians(dir)) * len);
     }
 
-    private double lendir_y(double len, double dir) {
+    private static double lendir_y(double len, double dir) {
         return Math.abs(sin(java.lang.Math.toRadians(dir)) * len);
     }
 }

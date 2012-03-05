@@ -10,8 +10,6 @@
 package org.lateralgm.resources.library;
 
 import static org.lateralgm.file.RGmStreamDecoder.mask;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,8 +21,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import javax.imageio.ImageIO;
 
 import org.gcreator.runero.event.Action;
 import org.gcreator.runero.event.Argument;
@@ -53,7 +49,7 @@ public final class RLibManager {
      * locations specified by preferences.
      */
     public static void autoLoad() {
-        autoLoad(new File("./lib"));
+        autoLoad(new File("src/org/lateralgm/resources/library/lib/"));
 
         if (codeAction == null)
             codeAction = makeCodeAction();
@@ -73,10 +69,11 @@ public final class RLibManager {
     public static TreeMap<String, InputStream> getLibs(File loc) {
         if (loc.exists()) {
             try {
-                if (loc.isDirectory())
+                if (loc.isDirectory()) 
                     return getDirLibs(loc);
                 if (!passFilter(loc.getName()))
                     return getZipLibs(new ZipFile(loc));
+                
 
                 // loc is a lib/lgl already...
                 TreeMap<String, InputStream> map = new TreeMap<String, InputStream>();

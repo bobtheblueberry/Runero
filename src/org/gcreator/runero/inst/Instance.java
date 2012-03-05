@@ -7,6 +7,7 @@ import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.event.Action;
 import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
+import org.gcreator.runero.gml.GmlInterpreter;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameSprite;
@@ -49,7 +50,7 @@ public class Instance {
     boolean visible;
     double x, y;
     double xstart, ystart;
-    double xpreivous, yprevious;
+    double xprevious, yprevious;
     
     int parentId; // not accessed directly in GML, must use function
     /*
@@ -102,22 +103,17 @@ public class Instance {
      * 
      * @param index main event index
      */
-    public void performEvent(int index) {
-        if (index == MainEvent.EV_STEP) {
-            step();
-        }
+    public void performEvent(Event event) {
+        byte index = event.parent.mainEvent;
         if (index == MainEvent.EV_DRAW) {
             if (!visible)
                 return;
-            boolean hasDraw = obj.hasEvent(index) && obj.getMainEvent(index).events.size() > 0;
-            if (!hasDraw)
-                draw();
         }
         if (obj.hasEvent(index)) {
             MainEvent me = obj.getMainEvent(index);
             for (Event e : me.events) {
                 for (Action a : e.actions) {
-                    a.performAction(this, e);
+                    GmlInterpreter.performAction(a, this, e);
                 }
             }
         }
@@ -141,7 +137,9 @@ public class Instance {
         motion_set(dir + this.direction, speed + this.speed);
     }
     
-    private void step() {
+    protected void move() {
+        xprevious = x;
+        yprevious = y;
         //Move with direction etc
         x += hspeed;
         y += vspeed;
@@ -149,7 +147,7 @@ public class Instance {
         //TODO: update sprite subimage
     }
     
-    private void draw() {
+    protected void draw() {
         //TODO: Draw  the sprite
         Graphics2D g = RuneroGame.room.graphics;
         if (g == null) {

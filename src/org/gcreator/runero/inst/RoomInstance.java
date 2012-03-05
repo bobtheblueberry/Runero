@@ -5,11 +5,11 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import org.gcreator.runero.RuneroGame;
+import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameRoom.StaticInstance;
-import org.gcreator.runero.script.GMLScript;
 
 public class RoomInstance {
 
@@ -23,7 +23,7 @@ public class RoomInstance {
             Instance i = new Instance(si);
             // do instance creation code
             if (si.creationCode != null) {
-                GMLScript.executeCode(i, si.creationCode);
+               // GMLScript.executeCode(i, si.creationCode);
             }
             instances.add(i);
         }
@@ -33,8 +33,38 @@ public class RoomInstance {
         this.room = room;
         loadInstances();
         if (room.creation_code != null) {
-            GMLScript.executeCode(room.creation_code);
+            //GMLScript.executeCode(room.creation_code);
         }
+        // Create Events
+        callInstEvent(MainEvent.EV_CREATE);
+    }
+    
+    public void callInstEvent(byte mainEvent) {
+        callInstEvent( mainEvent, (byte)0);
+    }
+    
+    public void callInstEvent(byte mainEvent, byte eventType) {
+        for (Instance i : instances) {
+            if (i.obj.hasEvent(mainEvent)) {
+                MainEvent me = i.obj.getMainEvent(mainEvent);
+                for (Event ev : me.events) {
+                    if (ev.type == eventType || mainEvent == MainEvent.EV_CREATE || 
+                            mainEvent == MainEvent.EV_DESTROY || mainEvent == MainEvent.EV_DRAW ) {
+                        i.performEvent(ev);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    public void step() {
+        
+        callInstEvent(MainEvent.EV_STEP, Event.EV_STEP_BEGIN);
+        callInstEvent(MainEvent.EV_STEP, Event.EV_STEP_NORMAL);
+        for (Instance i : instances) 
+            i.move();
+        callInstEvent(MainEvent.EV_STEP, Event.EV_STEP_END);
     }
 
     public Instance getInstance(int id) {
@@ -71,7 +101,11 @@ public class RoomInstance {
         
         // Draw instances
         for (Instance i : instances) {
-            i.performEvent(MainEvent.EV_DRAW);
+            if (i.obj.hasEvent(MainEvent.EV_DRAW)) {
+                i.performEvent(i.obj.getMainEvent(MainEvent.EV_DRAW).events.get(0));
+            } else {
+                i.draw();
+            }
         }
     }
 }

@@ -20,10 +20,10 @@ public class MainEvent implements Comparable<MainEvent> {
     public static final byte EV_KEYRELEASE = 10;
     public static final byte EV_TRIGGER = 11;
 
-    public int mainEvent;
+    public byte mainEvent;
     public ArrayList<Event> events;
 
-    public MainEvent(int n) {
+    public MainEvent(byte n) {
         mainEvent = n;
         events = new ArrayList<Event>();
     }
@@ -34,7 +34,7 @@ public class MainEvent implements Comparable<MainEvent> {
     
     @Override
     public int compareTo(MainEvent o) {
-        return Integer.valueOf(mainEvent).compareTo(o.mainEvent);
+        return Byte.valueOf(mainEvent).compareTo(o.mainEvent);
     }
 
 }

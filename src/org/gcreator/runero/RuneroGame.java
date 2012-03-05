@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.gcreator.runero.gml.GmlLibrary;
 import org.gcreator.runero.inst.RoomInstance;
 import org.gcreator.runero.res.*;
 
@@ -25,6 +26,7 @@ public class RuneroGame extends Game {
 
     public static RuneroGame game;
     public static RoomInstance room;
+    public static GmlLibrary library;
     
     public File GameFolder = new File("/home/serge/Develop/ENIGMA/enigma-dev/RuneroGame");
     
@@ -58,6 +60,7 @@ public class RuneroGame extends Game {
     public RuneroGame() {
         super();
         RuneroGame.game = this;
+        library = new GmlLibrary();
     }
     
     public void loadGame() throws IOException {
@@ -167,6 +170,7 @@ public class RuneroGame extends Game {
 
         // playfield update all things and check for collision
         playfield.update(elapsedTime);
+        room.step();
 
         // enemy sprite movement timer
         if (moveTimer.action(elapsedTime)) {

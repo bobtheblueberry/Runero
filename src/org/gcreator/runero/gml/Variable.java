@@ -1,7 +1,8 @@
 package org.gcreator.runero.gml;
 
-public class Variable {
+public class Variable extends ReturnValue {
 
+    
     public String val;
     public boolean isString = true;
     public boolean isReal = false;
@@ -10,6 +11,11 @@ public class Variable {
     public boolean isTrue() {
         return !isString && realVal == 1;
     }
+    
+    public Variable() {
+        super(Type.VARIABLE);
+    }
+    
     public static Variable Real(double val) {
         Variable v = new Variable();
         v.realVal = val;
