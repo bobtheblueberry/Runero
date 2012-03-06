@@ -442,10 +442,10 @@ public abstract class Game {
 			
 			elapsedTime = this.bsTimer.sleep();
 			
-			if (elapsedTime > 100) {
+			if (elapsedTime > 33) {
 				// the elapsedTime can't be lower than 100 (10 fps)
 				// it's a workaround so the movement is not too jumpy
-				elapsedTime = 100;
+				elapsedTime = 33;
 			}
 		}
 		
