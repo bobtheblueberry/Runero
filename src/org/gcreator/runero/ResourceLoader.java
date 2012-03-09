@@ -379,7 +379,7 @@ public class ResourceLoader {
             Action a = e.actions.get(i);
             if (a.lib.question) {
                 questionIndent(e, i, a);
-                i = a.repeatAction.actionEnd;
+                i = a.ifAction.actionEnd;
             } else if (a.lib.actionKind == Action.ACT_REPEAT) {
                 actionIndent(e, i);
                 i = a.repeatAction.actionEnd;
