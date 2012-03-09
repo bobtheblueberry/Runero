@@ -105,17 +105,17 @@ public class WindowedMode implements BaseGraphics {
 		// the active component where the game drawn
 		this.canvas = new Canvas(WindowedMode.CONFIG);
 		this.canvas.setIgnoreRepaint(true);
-		this.canvas.setSize(this.size);
+		this.canvas.setSize(this.size.width + 10, this.size.height);
 		
 		// frame title bar and border (frame insets) makes
 		// game screen smaller than requested size
 		// we must enlarge the frame by it's insets size
 	//	this.frame.setVisible(true);
 	//	Insets inset = this.frame.getInsets();
-	//	this.frame.setVisible(false);
+		//this.frame.setVisible(false);
 	//	this.frame.setSize(this.size.width + inset.left + inset.right,
-	//	        this.size.height + inset.top + inset.bottom);
-		this.frame.setSize(this.size);
+//		        this.size.height + inset.top + inset.bottom);
+	//	this.frame.setSize(this.size);
 		this.frame.add(this.canvas);
 		this.frame.pack();
 		this.frame.setLayout(null);

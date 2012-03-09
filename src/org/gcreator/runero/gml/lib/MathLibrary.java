@@ -429,11 +429,11 @@ public class MathLibrary extends FunctionLibrary {
             return vals[((vals.length - 1) / 2) - 1];
     }
 
-    private static double point_distance(double x1, double y1, double x2, double y2) {
+    public static double point_distance(double x1, double y1, double x2, double y2) {
         return java.lang.Math.sqrt(sqr(Math.abs(x2 - x1)) + sqr(Math.abs(y2 - y1)));
     }
 
-    private static double point_direction(double x1, double y1, double x2, double y2) {
+    public static double point_direction(double x1, double y1, double x2, double y2) {
         double basic = java.lang.Math.atan2((y2 - y1), (x2 - x1)) / Math.PI;
         if (y1 < y2)
             return abs(180 + 180 * (1 - basic));

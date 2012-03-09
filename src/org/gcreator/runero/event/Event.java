@@ -3,6 +3,8 @@ package org.gcreator.runero.event;
 import java.util.ArrayList;
 
 import org.gcreator.runero.inst.Instance;
+import org.gcreator.runero.res.GameObject;
+import org.gcreator.runero.res.GameTimeline;
 
 public class Event {
 
@@ -107,6 +109,8 @@ public class Event {
     public int collisionId; // for collision events
     public Instance collisionObject = null; // Object collided with in collision events 
     public ArrayList<Action> actions;
+    public GameObject object; // null for timeline events
+    public GameTimeline timeline; // null for object events
     
     public Event(MainEvent parent, byte type) {
         this.parent = parent;

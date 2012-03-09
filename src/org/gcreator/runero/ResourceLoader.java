@@ -1,22 +1,30 @@
 package org.gcreator.runero;
 
 import java.awt.Color;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.gcreator.runero.event.Action;
+import org.gcreator.runero.event.Action.BlockAction;
 import org.gcreator.runero.event.Argument;
 import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
-import org.gcreator.runero.res.*;
+import org.gcreator.runero.res.Code;
+import org.gcreator.runero.res.GameBackground;
+import org.gcreator.runero.res.GameInformation;
+import org.gcreator.runero.res.GameObject;
+import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameRoom.Tile;
+import org.gcreator.runero.res.GameSprite;
 import org.gcreator.runero.res.GameSprite.BBMode;
 import org.gcreator.runero.res.GameSprite.MaskShape;
 import org.lateralgm.resources.library.RLibAction;
@@ -35,15 +43,15 @@ public class ResourceLoader {
 
     public void loadResources() throws IOException {
         loadRooms();
-        Collections.sort(game.rooms);
         System.out.println("Loaded room data");
         loadBackgrounds();
-        Collections.sort(game.backgrounds);
         System.out.println("Loaded background data");
         loadObjects();
         System.out.println("Loaded object data");
         loadSprites();
         System.out.println("Loaded sprite data");
+        loadGameInfo();
+        System.out.println("Loaded Game info");
 
         // Load the images that are marked to preload
         for (Preloadable p : preloadables) {
@@ -59,7 +67,8 @@ public class ResourceLoader {
             BufferedReader r = new BufferedReader(new FileReader(f));
             GameSprite s = new GameSprite(r.readLine());
             s.setId(Integer.parseInt(r.readLine()));
-
+            s.width = Integer.parseInt(r.readLine());
+            s.height = Integer.parseInt(r.readLine());
             s.transparent = Boolean.parseBoolean(r.readLine());
             String shape = r.readLine();
             if (shape.equalsIgnoreCase("RECTANGLE")) {
@@ -104,7 +113,6 @@ public class ResourceLoader {
         File[] files = objDir.listFiles(new FileFilter(".dat"));
         game.objects = new ArrayList<GameObject>(files.length);
         for (File f : files) {
-
             BufferedReader r = new BufferedReader(new FileReader(f));
             GameObject o = new GameObject(r.readLine());
             o.setId(Integer.parseInt(r.readLine()));
@@ -122,6 +130,7 @@ public class ResourceLoader {
                 byte b = Byte.parseByte(evt[1]);
                 MainEvent e = o.getMainEvent(a);
                 Event ev = new Event(e, b);
+                ev.object = o;
                 String[] actions = r.readLine().split(",");
                 for (String ac : actions) {
                     if (ac.startsWith("#")) {
@@ -129,7 +138,9 @@ public class ResourceLoader {
                         ev.addAction(act);
                     }
                 }
+                indentEvent(ev);
                 e.addEvent(ev);
+                game.eventManager.addObject(o);
             }
             r.close();
             game.objects.add(o);
@@ -138,22 +149,29 @@ public class ResourceLoader {
 
     private void loadRooms() throws IOException {
         // First thing is to load rooms
-        game.room_map = new HashMap<Integer, String>();
+        ArrayList<Integer> rooms = new ArrayList<Integer>();
+        ArrayList<String> roomNames = new ArrayList<String>();
         File roomDir = new File(game.GameFolder, "rooms/");
-        File roomData = new File(roomDir, "rooms.dat");
+        File roomData = new File(roomDir, "rooms.lst");
 
         BufferedReader r = new BufferedReader(new FileReader(roomData));
         String line;
         while ((line = r.readLine()) != null) {
             String[] s = line.split(",");
-            game.room_map.put(Integer.parseInt(s[1]), s[0]);
+            // room_instruce,6
+            roomNames.add(s[0]);
+            rooms.add(Integer.parseInt(s[1]));
         }
         r.close();
+        int[] ro = new int[rooms.size()];
+        for (int i = 0; i < rooms.size(); i++)
+            ro[i] = rooms.get(0);
+        game.roomOrder = ro;
 
-        game.rooms = new ArrayList<GameRoom>(game.room_map.size());
-        for (int i = 0; i < game.room_map.size(); i++) {
+        game.rooms = new ArrayList<GameRoom>(game.roomOrder.length);
+        for (int i = 0; i < game.roomOrder.length; i++) {
             boolean hasCCode;
-            File rf = new File(roomDir, game.room_map.get(i) + ".dat");
+            File rf = new File(roomDir, roomNames.get(i) + ".dat");
             r = new BufferedReader(new FileReader(rf));
             GameRoom room = new GameRoom(r.readLine());
             room.setId(Integer.parseInt(r.readLine()));
@@ -246,16 +264,13 @@ public class ResourceLoader {
             if (r.readLine() != null) {
                 System.err.println("Error! Expected end of room file but there is still more data " + rf);
             }
-
             r.close();
-
             // load creation code
             if (hasCCode) {
                 room.creation_code = Code.load(roomDir, room.getName() + "_ccode.gml");
             } else {
                 room.creation_code = null;
             }
-
             game.rooms.add(room);
         }
     }
@@ -288,6 +303,40 @@ public class ResourceLoader {
         }
     }
 
+    private int read4(InputStream s) throws IOException {
+        int a = s.read();
+        int b = s.read();
+        int c = s.read();
+        int d = s.read();
+        return (a | (b << 8) | (c << 16) | (d << 24));
+    }
+
+    private void loadGameInfo() throws IOException {
+        File settingsFile = new File(game.GameFolder, "Game Information.dat");
+        GameInformation g = new GameInformation();
+        BufferedReader r = new BufferedReader(new FileReader(settingsFile));
+        g.backgroundColor = new Color(Integer.parseInt(r.readLine()));
+        g.caption = r.readLine();
+        g.left = Integer.parseInt(r.readLine());
+        g.top = Integer.parseInt(r.readLine());
+        g.width = Integer.parseInt(r.readLine());
+        g.height = Integer.parseInt(r.readLine());
+        g.mimicGameWindow = Boolean.parseBoolean(r.readLine());
+        g.showBorder = Boolean.parseBoolean(r.readLine());
+        g.allowResize = Boolean.parseBoolean(r.readLine());
+        g.stayOnTop = Boolean.parseBoolean(r.readLine());
+        g.pauseGame = Boolean.parseBoolean(r.readLine());
+        r.close();
+
+        File infoFile = new File(game.GameFolder, "Game Information.rtf");
+        BufferedInputStream in = new BufferedInputStream(new FileInputStream(infoFile));
+        byte data[] = new byte[read4(in)];
+        in.read(data);
+        g.text = new String(data, Charset.forName("ISO-8859-1"));
+        in.close();
+        RuneroGame.game.gameInfo = g;
+    }
+
     File actionFolder;
 
     private Action loadAction(String file) throws IOException {
@@ -317,6 +366,77 @@ public class ResourceLoader {
         act.not = Boolean.parseBoolean(r.readLine());
         r.close();
         return act;
+    }
+
+    /**
+     * Indents actions by blocks, if's, else's, and repeat's
+     * 
+     * @param e
+     *            the event to indent
+     */
+    private void indentEvent(Event e) {
+        for (int i = 0; i < e.actions.size(); i++) {
+            Action a = e.actions.get(i);
+            if (a.lib.question) {
+                questionIndent(e, i, a);
+                i = a.repeatAction.actionEnd;
+            } else if (a.lib.actionKind == Action.ACT_REPEAT) {
+                actionIndent(e, i);
+                i = a.repeatAction.actionEnd;
+            }
+        }
+    }
+
+    private void questionIndent(Event e, int index, Action a) {
+        a.ifAction = actionIndent(e, index);
+        
+        // look for else
+        int i = a.ifAction.actionEnd + 1;
+        if (i >= e.actions.size()) {
+            return;
+            // there is no else
+        }
+        Action actElse = e.actions.get(i);
+        if (actElse.lib.actionKind == Action.ACT_ELSE) {
+            a.elseAction = actionIndent(e, i);
+        }
+    }
+
+    private BlockAction actionIndent(Event e, int index) {
+        BlockAction qa = new BlockAction();
+        if (index + 1 >= e.actions.size()) {
+            qa.start = index + 1;
+        } else {
+            qa.isFake = true;
+            return qa;
+        }
+        Action next = e.actions.get(index + 1);
+        if (next.lib.actionKind != Action.ACT_BEGIN) {
+            qa.end = index + 1;
+        } else {
+            for (int i = index + 2; i < e.actions.size(); i++) {
+                Action a = e.actions.get(i);
+
+                if (a.lib.question) {
+                    questionIndent(e, i, a);
+                    i = a.ifAction.actionEnd;
+                } else if (a.lib.actionKind == Action.ACT_REPEAT) {
+                    a.repeatAction = actionIndent(e, i);
+                    i = a.ifAction.actionEnd;
+                }
+                if (a.lib.actionKind == Action.ACT_END) {
+                    if (i == index + 2)
+                        // empty block
+                        qa.isFake = true;
+
+                    qa.end = i - 1;
+                    qa.actionEnd = i;
+
+                    break;
+                }
+            }
+        }
+        return qa;
     }
 
     private static class FileFilter implements FilenameFilter {

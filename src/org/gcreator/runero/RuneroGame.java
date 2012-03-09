@@ -5,10 +5,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
+import org.gcreator.runero.event.EventManager;
 import org.gcreator.runero.gml.GmlLibrary;
 import org.gcreator.runero.inst.RoomInstance;
 import org.gcreator.runero.res.*;
@@ -27,10 +26,11 @@ public class RuneroGame extends Game {
     public static RuneroGame game;
     public static RoomInstance room;
     public static GmlLibrary library;
+    public EventManager eventManager;
     
     public File GameFolder = new File("/home/serge/Develop/ENIGMA/enigma-dev/RuneroGame");
     
-    public HashMap<Integer, String> room_map;
+    public int[] roomOrder;
     public ArrayList<GameRoom> rooms;
     public ArrayList<GameBackground> backgrounds;
     public ArrayList<GameObject> objects;
@@ -41,6 +41,7 @@ public class RuneroGame extends Game {
     public ArrayList<GameFontRes> fonts;
     public ArrayList<GameTimeline> timelines;
     
+    public GameInformation gameInfo;
     
     RuneroGameField playfield; // the game playfield
 
@@ -61,9 +62,10 @@ public class RuneroGame extends Game {
         super();
         RuneroGame.game = this;
         library = new GmlLibrary();
+        eventManager =  new EventManager();
     }
     
-    public void loadGame() throws IOException {
+    public void loadGame() {
 
         // make sure there is rooms
         if (rooms.size() < 1) {
@@ -71,9 +73,7 @@ public class RuneroGame extends Game {
             System.exit(1);
         }
         // Go to the first room
-        room = new RoomInstance(rooms.get(0));
-       
-        
+        room = new RoomInstance(this, rooms.get(3));
     }
     
     public GameBackground getBackground(int id) {
@@ -169,7 +169,7 @@ public class RuneroGame extends Game {
         // collision.checkCollision();
 
         // playfield update all things and check for collision
-        playfield.update(elapsedTime);
+  //      playfield.update(elapsedTime);
         room.step();
 
         // enemy sprite movement timer
@@ -225,7 +225,7 @@ public class RuneroGame extends Game {
     public void render(Graphics2D g) {
         room.graphics = g;
         room.render(g);
-        playfield.render(g);
+    //    playfield.render(g);
 
         // draw info text
         font.drawString(g, "ARROW KEY : MOVE", 10, 10);

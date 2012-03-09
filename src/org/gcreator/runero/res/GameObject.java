@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.gcreator.runero.event.MainEvent;
 
 public class GameObject extends GameResource {
-    
+
     public static final int OBJECT_SELF = -1;
     public static final int OBJECT_OTHER = -2;
     public static final int OBJECT_NONE = -100;
@@ -45,4 +45,7 @@ public class GameObject extends GameResource {
         return false;
     }
 
+    public ArrayList<MainEvent> getMainEvents() {
+        return mainEvents;
+    }
 }

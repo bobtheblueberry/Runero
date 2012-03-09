@@ -29,6 +29,7 @@ public class GameSprite extends GameResource implements Preloadable {
     public int x, y;
     public BBMode mode;
     public int left, right, top, bottom;
+    public int width, height;
     public ArrayList<SubImage> subImages;
     private boolean loaded = false;
 

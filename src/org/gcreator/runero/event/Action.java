@@ -14,9 +14,9 @@ public class Action {
     public static final int ACT_REPEAT = 5;
     public static final int ACT_VARIABLE = 6;
     public static final int ACT_CODE = 7;
-    public static final int ACT_PLACEHOLDER = 8;
-    public static final int ACT_SEPARATOR = 9;
-    public static final int ACT_LABEL = 10;
+    public static final int ACT_PLACEHOLDER = 8; // useless
+    public static final int ACT_SEPARATOR = 9; // useless
+    public static final int ACT_LABEL = 10; // useless
 
     public static final int EXEC_NONE = 0;
     public static final int EXEC_FUNCTION = 1;
@@ -28,10 +28,22 @@ public class Action {
 
     public final RLibAction lib;
     public ArrayList<Argument> arguments;
-    
+    public BlockAction ifAction; // used for Question actions
+    public BlockAction elseAction;
+    public BlockAction repeatAction; // used for Repeat actions
+
     public Action(RLibAction lib) {
         this.lib = lib;
         arguments = new ArrayList<Argument>();
     }
-    
+
+    public static class BlockAction {
+        public int start;
+        public int end;
+        public int actionEnd;
+        public boolean isFake; // shouldn't be, but it can happen
+                               // this happens when the question is the
+                               // last action in the event, or there is
+                               // an empty block after the question
+    }
 }
