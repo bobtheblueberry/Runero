@@ -1,0 +1,38 @@
+Unknown function or script: 
+Function name expected.
+Symbol ( expected.
+Symbol , or ) expected.
+Symbol ) expected.
+Wrong number of arguments to function or script.
+Variable name expected.
+Symbol , or ] expected.
+Symbol ] expected.
+Symbol ) expected.
+Unexpected symbol in expression.
+Assignment operator expected.
+Symbol : expected.
+Symbol : expected.
+Symbol { expected.
+Symbol } expected.
+Symbol ( expected.
+Symbol ) expected.
+Keyword until expected.
+Symbol } expected.
+Unexpected end of code reached.
+Program ends before end of the code.
+fnames
+ ERROR at line 
+ pos 
+: 
+Line:
+Goto Line
+Search string \"
+\" not found.
+Search string \"
+\" not found.
+%4d/%d: %3d
+
+INTERNAL ERROR: Adding too many global variables
+INTERNAL ERROR: Adding too many local variables
+non-existing variable
+non-existing variable

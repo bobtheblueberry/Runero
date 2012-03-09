@@ -1,0 +1,27 @@
+Secondly, there is a button labeled Creation code. Here you can type in a piece of code in GML (see later) that is executed when the room is created. This is useful to fill in certain variables for the room, create certain instances, etc. It is important to understand what exactly happens when you move to a particular room in the game. 
+
+First, in the current room (if any) all instances get a room-end event. Next the non-persistent instances are removed (no destroy event is generated!). 
+
+Next, for the new room the persistent instances from the previous room are added. 
+
+All new instances are created and their creation events are executed (if the room is not persistent or has not been visited before). 
+
+When this is the first room, for all instances the game-start event is generated. 
+
+Now the room creation code is executed. 
+
+Finally, all instances get a room-start event. 
+So, for example, the room-start events can use variables set by the creation code for the room and in the creation code you can refer to the instances (both new ones and persistent ones) in the room. 
+There is one further option. In the pop-up menu when you right click on an instance with the <Ctrl> key you can now indicate some creation code for the specific instance. This code is executed when the room is started, just before the creation event of the instance is executed. This is very useful to e.g. set certain parameters that are specific to the instance. 
+
+
+**** 
+    Begin step events
+    Alarm events
+    Keyboard, Key press, and Key release events
+    Mouse events
+    Normal step events
+    (now all instances are set to their new positions)
+    Collision events
+    End step events
+    Drawing events

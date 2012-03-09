@@ -1,0 +1,5 @@
+
+move_random
+show_message
+show_question
+event_inherited

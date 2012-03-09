@@ -1,0 +1,17 @@
+# New Timeline Action
+# Open Webpage is hidden, now is Splash Webpage
+action_splash_text
+action_splash_image
+action_splash_web
+action_splash_video
+action_splash_settings
+
+# Old timeline was action_set_timeline
+
+action_timeline_set
+action_timeline_speed
+action_timeline_start
+action_timeline_pause
+action_timeline_stop
+
+

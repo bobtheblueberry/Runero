@@ -1,0 +1,19 @@
+move_contact
+move_bounce
+
+Jump to random -- SOLID OBJECT CHECKING
+Paths
+**
+MOVE_CONTACT
+BOUNCE
+PATH
+PATH_END
+PATH_POSITION
+PATH_SPEED
+STEP_LINEAR
+STEP_POTENTIAL
+**
+
+Steps
+
+

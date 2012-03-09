@@ -1,0 +1,70 @@
+2a3,8
+> action_cd_pause
+> action_cd_play
+> action_cd_playing
+> action_cd_present
+> action_cd_resume
+> action_cd_stop
+5a12,13
+> action_create_object_motion
+> action_create_object_random
+6a15
+> action_draw_arrow
+9c18,20
+< action_draw_font
+---
+> action_draw_ellipse_gradient
+> action_draw_gradient_hor
+> action_draw_gradient_vert
+11d21
+< action_draw_highscore
+18a29
+> action_draw_text_transformed
+19a31
+> action_effect
+23c35
+< action_fill_color
+---
+> action_font
+25,26c37
+< action_highscore
+< action_highscore_add
+---
+> action_highscore_clear
+47d57
+< action_line_color
+57a68,80
+> action_partemit_burst
+> action_partemit_create
+> action_partemit_destroy
+> action_partemit_stream
+> action_partsyst_clear
+> action_partsyst_create
+> action_partsyst_destroy
+> action_parttype_color
+> action_parttype_create
+> action_parttype_gravity
+> action_parttype_life
+> action_parttype_secondary
+> action_parttype_speed
+58a82
+> action_path_end
+62a87,89
+> action_replace_background
+> action_replace_sound
+> action_replace_sprite
+77c104,105
+< action_set_sprite
+---
+> action_set_timeline
+> action_set_timeline_position
+79a108
+> action_show_video
+81a111
+> action_snapshot
+82a113,117
+> action_sprite_color
+> action_sprite_set
+> action_sprite_transform
+> action_webpage
+> action_wrap
