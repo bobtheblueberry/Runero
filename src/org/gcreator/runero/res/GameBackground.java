@@ -19,6 +19,7 @@ public class GameBackground extends GameResource implements Preloadable {
     public int vOffset;
     public int hSep;
     public int vSep;
+    
     public File imageFile;
     
     private ImageBackground bg = null;

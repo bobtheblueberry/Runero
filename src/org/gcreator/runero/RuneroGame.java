@@ -1,20 +1,21 @@
 package org.gcreator.runero;
 
 // JFC
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
+import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import org.gcreator.runero.event.EventManager;
 import org.gcreator.runero.gml.GmlLibrary;
+import org.gcreator.runero.gml.Variable;
 import org.gcreator.runero.inst.RoomInstance;
 import org.gcreator.runero.res.*;
 
 import com.golden.gamedev.Game;
 import com.golden.gamedev.object.*;
-
 
 /**
  * It's time to play!
@@ -27,9 +28,9 @@ public class RuneroGame extends Game {
     public static RoomInstance room;
     public static GmlLibrary library;
     public EventManager eventManager;
-    
+
     public File GameFolder = new File("/home/serge/Develop/ENIGMA/enigma-dev/RuneroGame");
-    
+
     public int[] roomOrder;
     public ArrayList<GameRoom> rooms;
     public ArrayList<GameBackground> backgrounds;
@@ -40,9 +41,23 @@ public class RuneroGame extends Game {
     public ArrayList<GameScript> scripts;
     public ArrayList<GameFontRes> fonts;
     public ArrayList<GameTimeline> timelines;
-    
+
     public GameInformation gameInfo;
-    
+    public Hashtable<String, Variable> globalVars;
+
+    // Game Maker Global Game Variables....
+    public double room_speed;
+
+    public double score; // The current score.
+    public double lives; // Number of lives.
+    public double health; // The current health (0-100).
+    public boolean show_score;// Whether to show the score in the window caption.
+    public boolean show_lives; // Whether to show the number of lives in the window caption.
+    public boolean show_health; // Whether to show the health in the window caption.
+    public String caption_score; // The caption used for the score.
+    public String caption_lives; // The caption used for the number of lives.
+    public String caption_health; // The caption used for the health.
+
     RuneroGameField playfield; // the game playfield
 
     SpriteGroup PLAYER_GROUP;
@@ -62,20 +77,42 @@ public class RuneroGame extends Game {
         super();
         RuneroGame.game = this;
         library = new GmlLibrary();
-        eventManager =  new EventManager();
+        eventManager = new EventManager();
+        globalVars = new Hashtable<String, Variable>();
+        gameStart();
     }
-    
-    public void loadGame() {
 
+    public void loadGame() {
+       
         // make sure there is rooms
         if (rooms.size() < 1) {
             System.err.println("No rooms! Exiting...");
             System.exit(1);
         }
         // Go to the first room
-        room = new RoomInstance(this, rooms.get(3));
+        // this code is for ME, TESTING
+        if (rooms.size() > 3)
+            room = new RoomInstance(this, rooms.get(3));
+        else
+            room = new RoomInstance(this, rooms.get(0));
     }
-    
+
+    public void start() {
+        super.start();
+        //TODO: find a better place for this
+        // Load the images that are marked to preload
+        for (Preloadable p : Runner.rl.preloadables) {
+            p.load();
+        }
+        
+    }
+    // when game is started/restarted
+    public void gameStart() {
+        score = 0;
+        lives = -1;
+        health = 100;
+    }
+
     public GameBackground getBackground(int id) {
         for (GameBackground b : backgrounds) {
             if (b.getId() == id) {
@@ -93,7 +130,7 @@ public class RuneroGame extends Game {
         }
         return null;
     }
-    
+
     public GameSprite getSprite(int id) {
         for (GameSprite s : sprites) {
             if (s.getId() == id) {
@@ -102,14 +139,15 @@ public class RuneroGame extends Game {
         }
         return null;
     }
-    
+
     public void initResources() {
         // create the game playfield
         playfield = new RuneroGameField();
 
         // associate the playfield with a background
-     //   background = new ImageBackground(getImage("resources/background.jpg"), 640, 480);
-    //    playfield.setBackground(background);
+        // background = new
+        // ImageBackground(getImage("resources/background.jpg"), 640, 480);
+        // playfield.setBackground(background);
 
         // create our plane sprite
         plane = new AnimatedSprite(getImages("resources/plane2.png", 3, 1), 287.5, 390);
@@ -153,7 +191,6 @@ public class RuneroGame extends Game {
         // register collision to playfield
         playfield.addCollisionGroup(PROJECTILE_GROUP, ENEMY_GROUP, collision);
 
-
         font = fontManager.getFont(getImages("resources/font.png", 20, 3), " !            .,0123"
                 + "456789:   -? ABCDEFG" + "HIJKLMNOPQRSTUVWXYZ ");
     }
@@ -169,7 +206,7 @@ public class RuneroGame extends Game {
         // collision.checkCollision();
 
         // playfield update all things and check for collision
-  //      playfield.update(elapsedTime);
+        // playfield.update(elapsedTime);
         room.step();
 
         // enemy sprite movement timer
@@ -219,13 +256,13 @@ public class RuneroGame extends Game {
             collision.pixelPerfectCollision = !collision.pixelPerfectCollision;
         }
 
-     //   background.setToCenter(plane);
+        // background.setToCenter(plane);
     }
 
     public void render(Graphics2D g) {
         room.graphics = g;
         room.render(g);
-    //    playfield.render(g);
+        // playfield.render(g);
 
         // draw info text
         font.drawString(g, "ARROW KEY : MOVE", 10, 10);

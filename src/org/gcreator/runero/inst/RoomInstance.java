@@ -1,7 +1,10 @@
 package org.gcreator.runero.inst;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -35,6 +38,7 @@ public class RoomInstance {
         // Create Events
         if (game.eventManager.hasCreateEvents)
             EventExecutor.executeEvent(game.eventManager.create, this);
+
         System.out.println("New room " + room.getName() + "(" + room.width + "," + room.height + ")");
         System.out.println("Instances: " + instance_count);
     }
@@ -108,14 +112,14 @@ public class RoomInstance {
                 instance.performEvent(instance.obj.getMainEvent(MainEvent.EV_DESTROY).events.get(0));
             }
         }
-            
+
         // remove from the instance list
         getObjectGroup(instance.obj.getId()).instances.remove(instance);
-        
+
         instance.obj = newobj;
         // add it to somewhere else
         getObjectGroup(newobj.getId()).add(instance);
-        
+
         if (performEvents) {
             if (instance.obj.hasEvent(MainEvent.EV_CREATE)) {
                 instance.performEvent(instance.obj.getMainEvent(MainEvent.EV_CREATE).events.get(0));
@@ -193,12 +197,10 @@ public class RoomInstance {
             g.fillRect(0, 0, room.width, room.height);
         }
         g.setColor(Color.WHITE);
-        for (GameRoom.Background b : room.backgrounds) {
-            if (b.visible) {
-                GameBackground back = RuneroGame.game.getBackground(b.backgroundId);
-                if (back != null) {
-                    g.drawImage(back.getBackground().getImage(), b.x, b.y, null);
-                }
+        for (GameRoom.Background gb : room.backgrounds) {
+            if (gb.visible && !gb.foreground) {
+                // Thanks LateralGM XD
+                paintBackground(g, gb);
             }
         }
 
@@ -211,5 +213,45 @@ public class RoomInstance {
                     i.draw();
                 }
             }
+
+        // Draw Foregrounds
+        for (GameRoom.Background gb : room.backgrounds) {
+            if (gb.visible && gb.foreground) {
+                // Thanks LateralGM XD
+                paintBackground(g, gb);
+            }
+        }
+    }
+
+    private void paintBackground(Graphics g, GameRoom.Background b) {
+        Rectangle c = g.getClipBounds();
+        if (c == null)
+            c = new Rectangle(0, 0, room.width, room.height);
+        GameBackground bg = RuneroGame.game.getBackground(b.backgroundId);
+        if (bg == null)
+            return;
+        BufferedImage bi = bg.getBackground().getImage();
+        if (bi == null)
+            return;
+        int w = b.stretch ? room.width : bi.getWidth();
+        int h = b.stretch ? room.height : bi.getHeight();
+        int x = b.x;
+        int y = b.y;
+        if (b.tileHoriz || b.tileVert) {
+            int ncol = 1;
+            int nrow = 1;
+            if (b.tileHoriz) {
+                x = 1 + c.x + ((x + w - 1 - c.x) % w) - w;
+                ncol = 1 + (c.x + c.width - x - 1) / w;
+            }
+            if (b.tileVert) {
+                y = 1 + c.y + ((y + h - 1 - c.y) % h) - h;
+                nrow = 1 + (c.y + c.height - y - 1) / h;
+            }
+            for (int row = 0; row < nrow; row++)
+                for (int col = 0; col < ncol; col++)
+                    g.drawImage(bi, (x + w * col), (y + h * row), w, h, null);
+        } else
+            g.drawImage(bi, x, y, w, h, null);
     }
 }

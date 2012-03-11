@@ -1,12 +1,19 @@
 package org.gcreator.runero.gml.lib;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
 
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.event.Action;
 import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReturnValue;
+import org.gcreator.runero.gml.Variable;
 import org.gcreator.runero.inst.Instance;
+import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameSprite;
 
@@ -68,6 +75,13 @@ public class ActionLibrary {
     public static final int MESSAGE = 321;
     public static final int SHOW_INFO = 322;
     public static final int SHOW_VIDEO = 323;
+    // Game Maker 8 Splash functions
+    public static final int SPLASH_TEXT = 324;
+    public static final int SPLASH_IMAGE = 325;
+    public static final int SPLASH_WEB = 326;
+    public static final int SPLASH_VIDEO = 327;
+    public static final int SPLASH_SETTINGS = 328;
+
     public static final int RESTART_GAME = 331;
     public static final int END_GAME = 332;
     public static final int SAVE_GAME = 333;
@@ -94,7 +108,7 @@ public class ActionLibrary {
     public static final int CODE = 603; // not actually used
     public static final int EXECUTE_SCRIPT = 601;
     public static final int COMMENT = 605;
-    public static final int VARIABLE = 611; // not needed
+    public static final int VARIABLE = 611;
     public static final int IF_VARIABLE = 612;
     public static final int DRAW_VARIABLE = 613;
     // score
@@ -157,8 +171,7 @@ public class ActionLibrary {
     }
 
     /**
-     * ActionLibrary doesn't deal with silly function names, etc. It just looks
-     * up the action ID to see what to do.
+     * ActionLibrary doesn't deal with silly function names, etc. It just looks up the action ID to see what to do.
      * 
      * @param instance
      * @param act
@@ -175,7 +188,7 @@ public class ActionLibrary {
             }
             return ReturnValue.SUCCESS;
         }
-        
+
         switch (act.lib.id) {
         // move
         case ACTION_MOVE:
@@ -307,8 +320,8 @@ public class ActionLibrary {
 
             return ReturnValue.FAILURE;
         case MESSAGE:
-
-            return ReturnValue.FAILURE;
+            show_message(act, instance, other);
+            return ReturnValue.SUCCESS;
         case SHOW_INFO:
             show_info(act, instance, other);
             return ReturnValue.SUCCESS;
@@ -346,41 +359,44 @@ public class ActionLibrary {
         case EXECUTE_SCRIPT:
 
             return ReturnValue.FAILURE;
+        case VARIABLE:
+            variable(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_VARIABLE:
-
-            return ReturnValue.FAILURE;
+            draw_variable(act, instance, other);
+            return ReturnValue.SUCCESS;
             // score
         case SET_SCORE:
-
-            return ReturnValue.FAILURE;
+            set_score(act, instance, other);
+            return ReturnValue.SUCCESS;
 
         case DRAW_SCORE:
-
-            return ReturnValue.FAILURE;
+            draw_score(act, instance, other);
+            return ReturnValue.SUCCESS;
         case HIGHSCORE_SHOW:
-
-            return ReturnValue.FAILURE;
+            highscore_show(act, instance, other);
+            return ReturnValue.SUCCESS;
         case HIGHSCORE_CLEAR:
-
-            return ReturnValue.FAILURE;
+            highscore_clear(act, instance, other);
+            return ReturnValue.SUCCESS;
         case SET_LIFE:
-
-            return ReturnValue.FAILURE;
+            set_life(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_LIFE:
-
-            return ReturnValue.FAILURE;
+            draw_life(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_LIFE_IMAGES:
-
-            return ReturnValue.FAILURE;
+            draw_life_images(act, instance, other);
+            return ReturnValue.SUCCESS;
         case SET_HEALTH:
-
-            return ReturnValue.FAILURE;
+            set_health(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_HEALTH:
-
-            return ReturnValue.FAILURE;
+            draw_health(act, instance, other);
+            return ReturnValue.SUCCESS;
         case SET_CAPTION:
-
-            return ReturnValue.FAILURE;
+            set_caption(act, instance, other);
+            return ReturnValue.SUCCESS;
             // extra i.e. never going to be implemented
         case PART_SYST_CREATE:
 
@@ -440,57 +456,57 @@ public class ActionLibrary {
 
             return ReturnValue.FAILURE;
         case OPEN_WEBPAGE:
-
-            return ReturnValue.FAILURE;
+            open_webpage(act, instance, other);
+            return ReturnValue.SUCCESS;
             // draw
         case DRAW_SPRITE:
-
-            return ReturnValue.FAILURE;
+            draw_sprite(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_BACKGROUND:
-
-            return ReturnValue.FAILURE;
+            draw_background(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_TEXT:
-
-            return ReturnValue.FAILURE;
+            draw_text(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_TEXT_SCALED:
-
-            return ReturnValue.FAILURE;
+            draw_text_scaled(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_RECTANGLE:
-
-            return ReturnValue.FAILURE;
+            draw_rectangle(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_GRADIENT_HOR:
-
-            return ReturnValue.FAILURE;
+            draw_gradient_hor(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_GRADIENT_VERT:
-
-            return ReturnValue.FAILURE;
+            draw_gradient_vert(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_ELLIPSE:
-
-            return ReturnValue.FAILURE;
+            draw_ellipse(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_ELLIPSE_GRADIENT:
-
-            return ReturnValue.FAILURE;
+            draw_ellipse_gradient(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_LINE:
-
-            return ReturnValue.FAILURE;
+            draw_line(act, instance, other);
+            return ReturnValue.SUCCESS;
         case DRAW_ARROW:
-
-            return ReturnValue.FAILURE;
+            draw_arrow(act, instance, other);
+            return ReturnValue.SUCCESS;
         case SET_COLOR:
-
-            return ReturnValue.FAILURE;
+            set_color(act, instance, other);
+            return ReturnValue.SUCCESS;
         case SET_FONT:
-
-            return ReturnValue.FAILURE;
+            set_font(act, instance, other);
+            return ReturnValue.SUCCESS;
         case FULLSCREEN:
-
-            return ReturnValue.FAILURE;
+            fullscreen(act, instance, other);
+            return ReturnValue.SUCCESS;
         case TAKE_SNAPSHOT:
-
-            return ReturnValue.FAILURE;
+            take_snapshot(act, instance, other);
+            return ReturnValue.SUCCESS;
         case EFFECT:
-
-            return ReturnValue.FAILURE;
+            effect(act, instance, other);
+            return ReturnValue.SUCCESS;
         }
         return ReturnValue.FAILURE;
     }
@@ -502,7 +518,7 @@ public class ActionLibrary {
 
             return false;
         case IF_COLLISION:
-            
+
             return false;
         case IF_OBJECT:
 
@@ -892,6 +908,7 @@ public class ActionLibrary {
     ANOTHER_ROOM
     IF_PREVIOUS_ROOM
     IF_NEXT_ROOM*/
+
     // main2
     /*SET_ALARM*/
     private static void sleep(Action a, Instance instance, Instance other) {
@@ -911,8 +928,301 @@ public class ActionLibrary {
     SLEEP
     SET_TIMELINE
     POSITION_TIMELINE
-    MESSAGE*/
+    */
+    private static void show_message(Action a, Instance instance, Instance other) {
+        // TODO: real function, not this hack
+        // also todo, # newlines, \# escape
+        String msg = a.arguments.get(0).val;
+        JOptionPane.showMessageDialog(RuneroGame.game.bsGraphics.getComponent(), msg);
+    }
+
     private static void show_info(Action a, Instance instance, Instance other) {
         RuneroGame.game.gameInfo.showInfoWindow();
+    }
+
+    /*
+    SHOW_VIDEO
+    RESTART_GAME
+    END_GAME
+    SAVE_GAME
+    LOAD_GAME
+    REPLACE_SPRITE
+    REPLACE_SOUND
+    REPLACE_BACKGROUND*/
+
+    private static void variable(Action a, Instance instance, Instance other) {
+        // variable name, value, relative
+        String name = a.arguments.get(0).val;
+        String val = a.arguments.get(1).val;
+        GmlParser.setVariable(name, val, a.relative, instance, other);
+    }
+
+    private static void draw_variable(Action a, Instance instance, Instance other) {
+        Variable var = GmlParser.getVariable(a.arguments.get(0).val, instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        if (a.relative) {
+            x += instance.x;
+            y += instance.y;
+        }
+        String s = var.isReal ? "" + var.realVal : var.val;
+        draw_text(s, (float) x, (float) y);
+    }
+
+    // score
+    private static void set_score(Action a, Instance instance, Instance other) {
+        double newScore = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        if (a.relative) {
+            RuneroGame.game.score += newScore;
+        } else {
+            RuneroGame.game.score = newScore;
+        }
+    }
+
+    private static void draw_score(Action a, Instance instance, Instance other) {
+        // x, y, caption
+        double x = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        if (a.relative) {
+            x += instance.x;
+            y += instance.y;
+        }
+        String caption = a.arguments.get(2).val;
+        draw_text(caption + RuneroGame.game.score, (float) x, (float) y);
+    }
+
+    private static void highscore_show(Action a, Instance instance, Instance other) {
+
+    }
+
+    private static void highscore_clear(Action a, Instance instance, Instance other) {
+    }
+
+    private static void set_life(Action a, Instance instance, Instance other) {
+        double newLife = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        if (a.relative) {
+            RuneroGame.game.lives += newLife;
+        } else {
+            RuneroGame.game.lives = newLife;
+        }
+    }
+
+    private static void draw_life(Action a, Instance instance, Instance other) {
+        double x = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        if (a.relative) {
+            x += instance.x;
+            y += instance.y;
+        }
+        String caption = a.arguments.get(2).val;
+        draw_text(caption + RuneroGame.game.lives, (float) x, (float) y);
+    }
+
+    private static void draw_life_images(Action a, Instance instance, Instance other) {
+        int lives = (int) RuneroGame.game.lives;
+        if (lives <= 0) {
+            System.out.println("no lives in action draw life images");
+            return;
+        }
+
+        double x = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        int sprite = Integer.parseInt(a.arguments.get(2).val);
+        GameSprite s = RuneroGame.game.getSprite(sprite);
+        if (s == null) {
+            System.out.println("Can't draw life images; unkown sprite index " + sprite);
+            return;
+        }
+        if (a.relative) {
+            x += instance.x;
+            y += instance.y;
+        }
+        if (s.subImages.size() == 0) {
+            return;
+        }
+        BufferedImage lifeImg = s.getSubImage(0);
+        for (int i = 0; i < lives; i++) {
+            int off = lifeImg.getWidth() * i;
+            RuneroGame.room.graphics.drawImage(lifeImg, null, (int) x + off, (int) y);
+        }
+        // a nice thing would be to draw part of an image if lives is, say 1.5
+        // even though Game Maker does not have this feature.
+    }
+
+    private static void set_health(Action a, Instance instance, Instance other) {
+        // 0 - 100 ... supposedly
+        RuneroGame.game.health = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+    }
+
+    private static void draw_health(Action a, Instance instance, Instance other) {
+        // x1, y1, x2, y2
+        // back color
+        // (none|black|gray|silver|white|maroon|green|olive|navy|purple|teal|red|lime|yellow|blue|fuchsia|aqua)
+        // bar color (green to red|white to
+        // black|black|gray|silver|white|maroon|green|olive|navy|purple|teal|red|lime|yellow|blue|fuchsia|aqua)
+        // Fuuuuckkk this
+    }
+
+    private static void set_caption(Action a, Instance instance, Instance other) {
+        boolean showScore = Integer.parseInt(a.arguments.get(0).val) == 1;
+        String captionScore = a.arguments.get(1).val;
+        boolean showLives = Integer.parseInt(a.arguments.get(2).val) == 1;
+        String captionLives = a.arguments.get(2).val;
+        boolean showHealth = Integer.parseInt(a.arguments.get(3).val) == 1;
+        String captionHealth = a.arguments.get(4).val;
+        RuneroGame.game.show_score = showScore;
+        RuneroGame.game.show_lives = showLives;
+        RuneroGame.game.show_health = showHealth;
+        RuneroGame.game.caption_score = captionScore;
+        RuneroGame.game.caption_lives = captionLives;
+        RuneroGame.game.caption_health = captionHealth;
+    }
+
+    // extra i.e. never going to be implemented
+    /*
+    PART_SYST_CREATE
+    PART_SYST_DESTROY
+    PART_SYST_CLEAR
+    PART_TYPE_CREATE_OLD
+    PART_TYPE_CREATE
+    PART_TYPE_COLOR
+    PART_TYPE_LIFE
+    PART_TYPE_SPEED
+    PART_TYPE_GRAVITY
+    PART_TYPE_SECONDARY
+    PART_EMIT_CREATE
+    PART_EMIT_DESTROY
+    PART_EMIT_BURST
+    PART_EMIT_STREAM
+    CD_PLAY
+    CD_STOP
+    CD_PAUSE
+    CD_RESUME
+    CD_IF_EXISTS
+    CD_IF_PLAYING
+    SET_MOUSE
+    */
+    private static void open_webpage(Action a, Instance instance, Instance other) {
+        // Note: URL is supposed to be an expression OR a string, an expression when
+        // it starts with a single or double quote. This is the same for show_message
+        // however, I have tried it in Game Maker and it does not seem to work.
+        String url = a.arguments.get(0).val;
+        try {
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        } catch (IOException e) {
+            System.out.println("error creating url  + url");
+        }
+    }
+
+    // draw
+    private static void draw_sprite(Action a, Instance instance, Instance other) {
+        int sprite = Integer.parseInt(a.arguments.get(0).val);
+        double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        GameSprite s = RuneroGame.game.getSprite(sprite);
+        if (s == null) {
+            System.out.println("Can't draw sprite; unkown sprite index " + sprite);
+            return;
+        }
+        if (s.subImages.size() == 0) {
+            System.out.println("Cannot draw sprite with no sub-images");
+            return;
+        }
+        int subImage = Integer.parseInt(a.arguments.get(3).val);
+        if (subImage == -1) {
+            subImage = (int) Math.round(instance.sprite_index);
+        }
+
+        if (a.relative) {
+            x += instance.x;
+            y += instance.y;
+        }
+        BufferedImage img = s.getSubImage(subImage % s.subImages.size());
+        RuneroGame.room.graphics.drawImage(img, null, (int) Math.round(x), (int) Math.round(y));
+    }
+
+    private static void draw_background(Action a, Instance instance, Instance other) {
+        int background = Integer.parseInt(a.arguments.get(0).val);
+        int x = (int) Math.round(GmlParser.getExpression(a.arguments.get(1).val, instance, other));
+        int y = (int) Math.round(GmlParser.getExpression(a.arguments.get(2).val, instance, other));
+        boolean tiled = Integer.parseInt(a.arguments.get(3).val) == 1;
+
+        GameBackground bg = RuneroGame.game.getBackground(background);
+        if (bg == null) {
+            System.out.println("Can't draw unknown background " + background);
+            return;
+        }
+        if (a.relative) {
+            x += instance.x;
+            y += instance.y;
+        }
+        Graphics2D g = RuneroGame.room.graphics;
+
+        BufferedImage bi = bg.getBackground().getImage();
+        if (bi == null)
+            return;
+        int w = bi.getWidth();
+        int h = bi.getHeight();
+        if (tiled) {
+            int ncol = 1;
+            int nrow = 1;
+            x = 1 + ((x + w - 1) % w) - w;
+            ncol = 1 + (RuneroGame.room.room.width - x - 1) / w;
+
+            y = 1 + ((y + h - 1) % h) - h;
+            nrow = 1 + (RuneroGame.room.room.height - y - 1) / h;
+
+            for (int row = 0; row < nrow; row++)
+                for (int col = 0; col < ncol; col++)
+                    g.drawImage(bi, (x + w * col), (y + h * row), w, h, null);
+        } else
+            g.drawImage(bi, x, y, w, h, null);
+    }
+
+    private static void draw_text(Action a, Instance instance, Instance other) {
+    }
+
+    private static void draw_text_scaled(Action a, Instance instance, Instance other) {
+    }
+
+    private static void draw_rectangle(Action a, Instance instance, Instance other) {
+    }
+
+    private static void draw_gradient_hor(Action a, Instance instance, Instance other) {
+    }
+
+    private static void draw_gradient_vert(Action a, Instance instance, Instance other) {
+    }
+
+    private static void draw_ellipse(Action a, Instance instance, Instance other) {
+    }
+
+    private static void draw_ellipse_gradient(Action a, Instance instance, Instance other) {
+    }
+
+    private static void draw_line(Action a, Instance instance, Instance other) {
+    }
+
+    private static void draw_arrow(Action a, Instance instance, Instance other) {
+    }
+
+    private static void set_color(Action a, Instance instance, Instance other) {
+    }
+
+    private static void set_font(Action a, Instance instance, Instance other) {
+    }
+
+    private static void fullscreen(Action a, Instance instance, Instance other) {
+    }
+
+    private static void take_snapshot(Action a, Instance instance, Instance other) {
+    }
+
+    private static void effect(Action a, Instance instance, Instance other) {
+    }
+
+    private static void draw_text(String text, float x, float y) {
+
+        RuneroGame.room.graphics.drawString(text, (float) x, (float) y);
     }
 }

@@ -322,7 +322,7 @@ public abstract class Game {
      * @see #notifyError(Throwable)
      * @see #notifyExit()
      */
-    public final void start() {
+    public void start() {
         if (this.running || this.finish) {
             return;
         }

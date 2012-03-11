@@ -11,15 +11,30 @@ import org.gcreator.runero.res.GameObject;
 
 public class GmlParser {
 
+    public static void setVariable(String name, String value, boolean relative, Instance instance, Instance other) {
+
+        // first check to see if it is a defined variable
+        // then check to see if its a constant * variable
+
+        // name could be like other.x
+        
+    }
+
+    public static Variable getVariable(String name, Instance instance, Instance other) {
+
+        // first check to see if it is a defined variable
+        // then check to see if its a constant * variable
+
+        // name could be like other.x
+        return null;
+    }
+
     /**
      * Evaluates an expression
      * 
-     * @param instance
-     *            the instance
-     * @param s
-     *            the expression
-     * @param other
-     *            the 'other' if this is a collision event
+     * @param instance the instance
+     * @param s the expression
+     * @param other the 'other' if this is a collision event
      * @return
      */
     // TODO: Implement this!
@@ -42,12 +57,13 @@ public class GmlParser {
                     if (g.instances.size() == 0)
                         System.out.println("There are no " + obj + " left in this room!");
                     else
-                        return getVariable(g.instances.get(0), match.group(2));
+                        return getDoubleVariable(g.instances.get(0), match.group(2));
                 } else {
                     System.out.println("Room has no objects with id " + id + " (" + obj + ")");
                 }
             } else {
-                System.out.println("Cannot find object " + obj +"  (" + s + ")" + " from instance " + instance.obj.getName());
+                System.out.println("Cannot find object " + obj + "  (" + s + ")" + " from instance "
+                        + instance.obj.getName());
             }
         } else
             return getDouble(s);
@@ -74,12 +90,13 @@ public class GmlParser {
                 return Double.parseDouble(s);
             }
         }
-        System.out.println("Invalid double " + s);
+    //    System.out.println("Invalid double " + s);
 
         return 0;
     }
 
-    public static double getVariable(Instance i, String varname) {
+    // What a hack lol
+    public static double getDoubleVariable(Instance i, String varname) {
         if (varname.equals("x"))
             return i.x;
         if (varname.equals("y"))

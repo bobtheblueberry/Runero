@@ -107,7 +107,7 @@ public class BaseLoader {
 			image = (useMask) ? ImageUtil.getImage(url, this.maskColor)
 			        : ImageUtil.getImage(url);
 			
-			this.imageBank.put(imagefile, image);
+			//this.imageBank.put(imagefile, image);
 		}
 		
 		return image;

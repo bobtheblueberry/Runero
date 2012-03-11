@@ -26,10 +26,11 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.VolatileImage;
+
+import javax.swing.JFrame;
 
 import com.golden.gamedev.engine.BaseGraphics;
 import com.golden.gamedev.util.ImageUtil;
@@ -84,62 +85,55 @@ public class WindowedMode implements BaseGraphics {
 	 * @param bufferstrategy If a buffer strategy shall be used.
 	 */
 	public WindowedMode(Dimension d, boolean bufferstrategy) {
-		this.size = d;
-		
-		// sets game frame
-		this.frame = new Frame("Golden T Game Engine", WindowedMode.CONFIG);
-		
-		try {
-			// set frame icon
-			this.frame.setIconImage(ImageUtil.getImage(WindowedMode.class
-			        .getResource("Icon.png")));
-		}
-		catch (Exception e) {
-		}
-		
-		this.frame.addWindowListener(WindowExitListener.getInstance());
-		this.frame.setResizable(false); // non resizable frame
-		this.frame.setIgnoreRepaint(true); // turn off all paint events
-		// since we doing active rendering
-		
-		// the active component where the game drawn
-		this.canvas = new Canvas(WindowedMode.CONFIG);
-		this.canvas.setIgnoreRepaint(true);
-		this.canvas.setSize(this.size.width + 10, this.size.height);
-		
-		// frame title bar and border (frame insets) makes
-		// game screen smaller than requested size
-		// we must enlarge the frame by it's insets size
-	//	this.frame.setVisible(true);
-	//	Insets inset = this.frame.getInsets();
-		//this.frame.setVisible(false);
-	//	this.frame.setSize(this.size.width + inset.left + inset.right,
-//		        this.size.height + inset.top + inset.bottom);
-	//	this.frame.setSize(this.size);
-		this.frame.add(this.canvas);
-		this.frame.pack();
-		this.frame.setLayout(null);
-		this.frame.setLocationRelativeTo(null); // centering game frame
-		if (this.frame.getX() < 0) {
-			this.frame.setLocation(0, this.frame.getY());
-		}
-		if (this.frame.getY() < 0) {
-			this.frame.setLocation(this.frame.getX(), 0);
-		}
-		this.frame.setVisible(true);
-		
-		// create backbuffer
-		if (bufferstrategy) {
-			bufferstrategy = this.createBufferStrategy();
-		}
-		
-		if (!bufferstrategy) {
-			this.createBackBuffer();
-		}
+        this.size = d;
+        
+        // sets game frame
+        // currently using JFrame cause java is a fag
+        this.frame = new JFrame("Golden T Game Engine", WindowedMode.CONFIG);
+        
+        try {
+            // set frame icon
+            this.frame.setIconImage(ImageUtil.getImage(WindowedMode.class
+                    .getResource("Icon.png")));
+        }
+        catch (Exception e) {
+        }
+        
+        this.frame.addWindowListener(WindowExitListener.getInstance());
+        this.frame.setResizable(false); // non resizable frame
+        this.frame.setIgnoreRepaint(true); // turn off all paint events
+        // since we doing active rendering
+        
+        // the active component where the game drawn
+        this.canvas = new Canvas(WindowedMode.CONFIG);
+        this.canvas.setIgnoreRepaint(true);
+        this.canvas.setSize(this.size.width, this.size.height);
+
+        this.frame.add(this.canvas);
+        this.frame.setSize(this.size);
+        this.frame.pack();
+        this.frame.setLayout(null);
+        this.frame.setLocationRelativeTo(null); // centering game frame
+        if (this.frame.getX() < 0) {
+            this.frame.setLocation(0, this.frame.getY());
+        }
+        if (this.frame.getY() < 0) {
+            this.frame.setLocation(this.frame.getX(), 0);
+        }
+        this.frame.setVisible(true);
+        
+        // create backbuffer
+        if (bufferstrategy) {
+            bufferstrategy = this.createBufferStrategy();
+        }
+        
+        if (!bufferstrategy) {
+            this.createBackBuffer();
+        }
 
         this.canvas.setBounds(0, 0, this.size.width, this.size.height);
-		this.canvas.requestFocus();
-	}
+        this.canvas.requestFocus();
+    }
 	
 	/** ************************************************************************* */
 	/** ************************ GRAPHICS FUNCTION ****************************** */

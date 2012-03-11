@@ -9,7 +9,7 @@ import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameObject;
 
 public class GmlInterpreter {
-
+    
     public static void performEvent(Event e, Instance instance) {
         for (int i = 0; i < e.actions.size(); i++) {
             Action act = e.actions.get(i);
@@ -19,6 +19,19 @@ public class GmlInterpreter {
         }
     }
 
+    private static int executeBlock(Action act, Action.BlockAction ba, Instance instance, Event e, int i) {
+        if (ba.isFake)
+            return i;
+
+        for (int x = ba.start; x <= ba.end; x++) {
+            x = performAction(act, e, instance, i);
+            if (x < 0)
+                return -1;// EXIT
+        }
+
+        return ba.actionEnd;
+    }
+    
     private static int performAction(Action act, Event e, Instance instance, int i) {
         switch (act.lib.actionKind) {
         case Action.ACT_NORMAL:
@@ -49,23 +62,24 @@ public class GmlInterpreter {
                 }
                 break;
             }
+            
             boolean result = performAction(act, instance, e);
             if (act.lib.question) {
                 if (result) {
                     return executeBlock(act, act.ifAction, instance, e, i);
-                } else {
+                } else if (act.elseAction != null) {
                     return executeBlock(act, act.elseAction, instance, e, i);
                 }
             }
             break;
         case Action.ACT_BEGIN:
-            // {
+            // { should not happen
             break;
         case Action.ACT_END:
-            // }
+            // } should not happen
             break;
         case Action.ACT_ELSE:
-            // else
+            // else the game programmer is an idiot
             break;
         case Action.ACT_EXIT:
             // stop performing event.
@@ -74,10 +88,7 @@ public class GmlInterpreter {
             // repeat (expression)
             break;
         case Action.ACT_VARIABLE:
-            if (act.lib.id != ActionLibrary.VARIABLE) {
-                System.out.println("lol!");
-            }
-            // set var
+            // Handled by ActionLibrary
             break;
         case Action.ACT_CODE:
             // Execute code
@@ -96,19 +107,6 @@ public class GmlInterpreter {
             break;
         }
         return i;
-    }
-
-    private static int executeBlock(Action act, Action.BlockAction ba, Instance instance, Event e, int i) {
-        if (ba.isFake)
-            return i;
-
-        for (int x = ba.start; x <= ba.end; x++) {
-            x = performAction(act, e, instance, i);
-            if (x < 0)
-                return -1;// EXIT
-        }
-
-        return ba.actionEnd;
     }
 
     /**
@@ -146,7 +144,7 @@ public class GmlInterpreter {
                 return true;
 
             } else {
-                System.err.println("Error! reference to other outside collision event " + instance.getObject()
+                System.err.println("Error! reference to other outside collision event " + instance.obj
                         + " Event " + event);
                 return true;
             }

@@ -53,10 +53,7 @@ public class ResourceLoader {
         loadGameInfo();
         System.out.println("Loaded Game info");
 
-        // Load the images that are marked to preload
-        for (Preloadable p : preloadables) {
-            p.load();
-        }
+        
     }
 
     private void loadSprites() throws IOException {
@@ -140,8 +137,8 @@ public class ResourceLoader {
                 }
                 indentEvent(ev);
                 e.addEvent(ev);
-                game.eventManager.addObject(o);
             }
+            game.eventManager.addObject(o);
             r.close();
             game.objects.add(o);
         }
@@ -404,7 +401,7 @@ public class ResourceLoader {
 
     private BlockAction actionIndent(Event e, int index) {
         BlockAction qa = new BlockAction();
-        if (index + 1 >= e.actions.size()) {
+        if (index + 1 < e.actions.size()) {
             qa.start = index + 1;
         } else {
             qa.isFake = true;
@@ -413,6 +410,7 @@ public class ResourceLoader {
         Action next = e.actions.get(index + 1);
         if (next.lib.actionKind != Action.ACT_BEGIN) {
             qa.end = index + 1;
+            qa.actionEnd = index + 1;
         } else {
             for (int i = index + 2; i < e.actions.size(); i++) {
                 Action a = e.actions.get(i);

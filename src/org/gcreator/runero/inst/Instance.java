@@ -94,16 +94,21 @@ public class Instance {
         this.parentId = obj.parentId;
         this.mask_index = obj.maskId;
         this.variables = new Hashtable<String, Variable>();
+        updateImageNumber();
     }
 
     public Instance(GameRoom.StaticInstance i) {
         this(i.x, i.y, i.id, RuneroGame.game.getObject(i.objectId));
     }
-
-    public GameObject getObject() {
-        return obj;
+    
+    public void updateImageNumber() {
+        GameSprite s = RuneroGame.game.getSprite((int)Math.round(sprite_index));
+        if ( s == null) {
+            image_number = 0;
+        } else {
+            image_number = s.subImages.size();
+        }
     }
-
     /**
      * Performs event
      * 

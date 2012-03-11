@@ -1,7 +1,12 @@
 package org.gcreator.runero.gml;
 
+/**
+ * Holds a String or a double
+ * 
+ * @author serge
+ *
+ */
 public class Variable extends ReturnValue {
-
     
     public String val;
     public boolean isString = true;
