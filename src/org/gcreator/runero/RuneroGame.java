@@ -57,6 +57,7 @@ public class RuneroGame extends Game {
     public String caption_score; // The caption used for the score.
     public String caption_lives; // The caption used for the number of lives.
     public String caption_health; // The caption used for the health.
+    public int fontAlign; // Font alignment, 0,1,2 (left,center,right), respectively
 
     RuneroGameField playfield; // the game playfield
 
@@ -83,7 +84,7 @@ public class RuneroGame extends Game {
     }
 
     public void loadGame() {
-       
+
         // make sure there is rooms
         if (rooms.size() < 1) {
             System.err.println("No rooms! Exiting...");
@@ -99,18 +100,20 @@ public class RuneroGame extends Game {
 
     public void start() {
         super.start();
-        //TODO: find a better place for this
+        // TODO: find a better place for this
         // Load the images that are marked to preload
         for (Preloadable p : Runner.rl.preloadables) {
             p.load();
         }
-        
+
     }
+
     // when game is started/restarted
     public void gameStart() {
         score = 0;
         lives = -1;
         health = 100;
+        fontAlign = 0;
     }
 
     public GameBackground getBackground(int id) {
@@ -135,6 +138,15 @@ public class RuneroGame extends Game {
         for (GameSprite s : sprites) {
             if (s.getId() == id) {
                 return s;
+            }
+        }
+        return null;
+    }
+
+    public GameFontRes getFont(int id) {
+        for (GameFontRes f : fonts) {
+            if (f.getId() == id) {
+                return f;
             }
         }
         return null;
@@ -203,7 +215,7 @@ public class RuneroGame extends Game {
         // ENEMY_GROUP.update(elapsedTime);
         // PROJECTILE_GROUP.update(elapsedTime);
 
-        // collision.checkCollision();
+         collision.checkCollision();
 
         // playfield update all things and check for collision
         // playfield.update(elapsedTime);

@@ -94,8 +94,13 @@ public class RoomInstance {
         addInstace(g, x, y, 0, 0);
     }
 
+    public Rectangle getRectangle() {
+        // TODO: Account for room views if they are used
+        return new Rectangle(0, 0, room.width, room.height);
+    }
+
     /**
-     * removes the instance from the room
+     * Removes the instance from the room
      * 
      * @return whether or not successful
      */
@@ -173,7 +178,9 @@ public class RoomInstance {
                 }
 
             // TODO: Intersect boundary
-            // TODO: collision
+        }
+        // TODO: collision
+        if (game.eventManager.hasOtherEvents) {
             // TODO: No more lives
             // TODO: No more health
         }
@@ -221,6 +228,7 @@ public class RoomInstance {
                 paintBackground(g, gb);
             }
         }
+        //TODO Animation End comes after draw...
     }
 
     private void paintBackground(Graphics g, GameRoom.Background b) {

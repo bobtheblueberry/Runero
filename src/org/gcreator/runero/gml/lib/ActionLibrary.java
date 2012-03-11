@@ -1,16 +1,20 @@
 package org.gcreator.runero.gml.lib;
 
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
+import java.awt.Robot;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import org.gcreator.runero.RuneroGame;
@@ -20,6 +24,7 @@ import org.gcreator.runero.gml.ReturnValue;
 import org.gcreator.runero.gml.Variable;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameBackground;
+import org.gcreator.runero.res.GameFontRes;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameSprite;
 
@@ -930,7 +935,6 @@ public class ActionLibrary {
     }
 
     /*
-    SLEEP
     SET_TIMELINE
     POSITION_TIMELINE
     */
@@ -1340,19 +1344,29 @@ public class ActionLibrary {
     }
 
     private static void draw_arrow(Action a, Instance instance, Instance other) {
-    double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-    double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-    double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-    double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
-    double tipSize = GmlParser.getExpression(a.arguments.get(4).val, instance, other);
-    if (a.relative) {
-        x1 += instance.x;
-        x2 += instance.x;
-        y1 += instance.y;
-        y2 += instance.y;
-    }
-    RuneroGame.room.graphics.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
-        ///ffffffuck this
+        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
+        double tipSize = GmlParser.getExpression(a.arguments.get(4).val, instance, other);
+        if (a.relative) {
+            x1 += instance.x;
+            x2 += instance.x;
+            y1 += instance.y;
+            y2 += instance.y;
+        }
+        Graphics2D g = RuneroGame.room.graphics;
+        double rad = 0.32;
+        double angle = Math.atan2((y2 - y1), (x2 - x1)) - Math.PI / 2;
+        int tx1 = (int) (x2 - Math.cos(angle + rad) * tipSize);
+        int tx2 = (int) (x2 - Math.cos(angle - rad) * tipSize);
+        int ty1 = (int) (y2 + Math.sin(angle + rad) * tipSize);
+        int ty2 = (int) (y2 + Math.sin(angle - rad) * tipSize);
+        int[] xpoints = new int[] { tx1, tx2, (int) x2 };
+        int[] ypoints = new int[] { ty1, ty2, (int) y2 };
+
+        g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+        g.fillPolygon(xpoints, ypoints, 3);
     }
 
     private static void set_color(Action a, Instance instance, Instance other) {
@@ -1361,22 +1375,37 @@ public class ActionLibrary {
     }
 
     private static void set_font(Action a, Instance instance, Instance other) {
-        // Font resource font
-        // align (left|center|right)
+        int fontId = Integer.parseInt(a.arguments.get(0).val);
+        RuneroGame.game.fontAlign = Integer.parseInt(a.arguments.get(1).val);
+        // TODO: Font align in draw text functions
+        GameFontRes font = RuneroGame.game.getFont(fontId);
+        if (font == null)
+            return;
+
+        RuneroGame.room.graphics.setFont(font.getFont());
     }
 
     private static void fullscreen(Action a, Instance instance, Instance other) {
         // ? no idea how lol
-        //menu (switch|window|fullscreen)
+        // menu (switch|window|fullscreen)
     }
 
     private static void take_snapshot(Action a, Instance instance, Instance other) {
         // both filename (expr/string)
         String fname = a.arguments.get(0).val;
+        try {
+            BufferedImage screenshot = new Robot().createScreenCapture(RuneroGame.room.getRectangle());
+            ImageIO.write(screenshot,"PNG", new File(fname));
+        } catch (AWTException e) {
+           System.err.println("Can't take screenshot! AWT Error " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Can't take screenshot! IO Error " + e.getMessage());
+        }
+        
     }
 
     private static void effect(Action a, Instance instance, Instance other) {
-        //explosion|ring|ellipse|firework|smoke|smoke up|star|spark|flare|cloud|rain|snow
+        // explosion|ring|ellipse|firework|smoke|smoke up|star|spark|flare|cloud|rain|snow
         // x, y, size (small|medium|large)
         // color
         // where (below objects|above objects)

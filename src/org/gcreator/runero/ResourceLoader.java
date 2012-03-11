@@ -20,6 +20,7 @@ import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.res.Code;
 import org.gcreator.runero.res.GameBackground;
+import org.gcreator.runero.res.GameFontRes;
 import org.gcreator.runero.res.GameInformation;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
@@ -50,12 +51,36 @@ public class ResourceLoader {
         System.out.println("Loaded object data");
         loadSprites();
         System.out.println("Loaded sprite data");
+        loadFonts();
+        System.out.println("Loaded font data");
+        
         loadGameInfo();
         System.out.println("Loaded Game info");
 
         
     }
 
+    private void loadFonts() throws IOException {
+        File fntDir = new File(game.GameFolder, "fonts/");
+        File[] files = fntDir.listFiles(new FileFilter(".dat"));
+        game.fonts = new ArrayList<GameFontRes>(files.length);
+        for (File f : files) {
+            BufferedReader r = new BufferedReader(new FileReader(f));
+            GameFontRes fnt = new GameFontRes(r.readLine());
+            fnt.setId(Integer.parseInt(r.readLine()));
+            fnt.fontName = r.readLine();
+            fnt.size = Integer.parseInt(r.readLine());
+            fnt.bold = Boolean.parseBoolean(r.readLine());
+            fnt.italic = Boolean.parseBoolean(r.readLine());
+            fnt.antialias = Integer.parseInt(r.readLine());
+            fnt.charset = Integer.parseInt(r.readLine());
+            fnt.rangeMin = Integer.parseInt(r.readLine());
+            fnt.rangeMax = Integer.parseInt(r.readLine());
+            r.close();
+            game.fonts.add(fnt);
+        }
+    }
+    
     private void loadSprites() throws IOException {
         File sprDir = new File(game.GameFolder, "sprites/");
         File[] files = sprDir.listFiles(new FileFilter(".dat"));
