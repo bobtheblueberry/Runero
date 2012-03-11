@@ -39,8 +39,9 @@ public class GmlParser {
      */
     // TODO: Implement this!
     public static double getExpression(String s, Instance instance, Instance other) {
+      
         // object_specialmoon.x/y
-        Pattern regex = Pattern.compile("([A-Za-z0-9_]+)\\.([_a-zA-Z0-9])$");
+        /*Pattern regex = Pattern.compile("([A-Za-z0-9_]+)\\.([_a-zA-Z0-9])$"); // Doesnt work for 1.8 etc.
         Matcher match = regex.matcher(s);
         if (match.find()) {
             String obj = match.group(1);
@@ -65,9 +66,9 @@ public class GmlParser {
                 System.out.println("Cannot find object " + obj + "  (" + s + ")" + " from instance "
                         + instance.obj.getName());
             }
-        } else
+        } else*/
             return getDouble(s);
-        return 0;
+        //return 0;
     }
 
     public static double getDouble(String s) {

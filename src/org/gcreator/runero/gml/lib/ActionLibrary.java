@@ -1,6 +1,12 @@
 package org.gcreator.runero.gml.lib;
 
+import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.RadialGradientPaint;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -579,37 +585,36 @@ public class ActionLibrary {
         double speed = GmlParser.getExpression(arg1, instance, other);
         ArrayList<Integer> vals = new ArrayList<Integer>();
         for (int i = 0; i < 9; i++) {
-            if (!arg0.substring(i).equals("1"))
+            if (arg0.charAt(i) != '1')
                 continue;
             vals.add(i);
         }
         if (vals.size() == 0) {
-            instance.setSpeed(speed);
             return;
         }
-        int r = (int) (Math.random() * vals.size());
-        int x = vals.get(r);
-        if (x == 4) { // stop (middle button)
+        int x = (int) (Math.random() * vals.size());
+        int r = vals.get(x);
+        if (r == 4) { // stop (middle button)
             instance.setSpeed(0);
             return;
         }
         int d = 0;
         if (r == 0)
-            d = 315;
+            d = 225;
         else if (r == 1)
             d = 270;
         else if (r == 2)
-            d = 225;
+            d = 315;
         else if (r == 3)
-            d = 0;
-        else if (r == 5)
             d = 180;
+        else if (r == 5)
+            d = 0;
         else if (r == 6)
-            d = 45;
+            d = 135;
         else if (r == 7)
             d = 90;
         else if (r == 8)
-            d = 135;
+            d = 45;
         if (a.relative)
             speed += instance.getSpeed();
         instance.motion_set(d, speed);
@@ -1180,49 +1185,204 @@ public class ActionLibrary {
     }
 
     private static void draw_text(Action a, Instance instance, Instance other) {
+        String text = a.arguments.get(0).val;// TODO: Support 'Both' Argument types
+        double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+
+        if (a.relative) {
+            x += instance.x;
+            y += instance.y;
+        }
+        draw_text(text, (float) x, (float) y);
     }
 
     private static void draw_text_scaled(Action a, Instance instance, Instance other) {
+        String text = a.arguments.get(0).val;// TODO: Support 'Both' Argument types
+        double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        double xscale = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
+        double yscale = GmlParser.getExpression(a.arguments.get(4).val, instance, other);
+        double angle = GmlParser.getExpression(a.arguments.get(5).val, instance, other);
+
+        if (a.relative) {
+            x += instance.x;
+            y += instance.y;
+        }
+
+        Graphics2D g = RuneroGame.room.graphics;
+        AffineTransform old = g.getTransform();
+        AffineTransform t = new AffineTransform();
+        t.translate(x, y);
+        t.scale(xscale, yscale);
+        t.rotate(angle * Math.PI / 180);
+        g.transform(t);
+        draw_text(text, 0, 0);
+        g.setTransform(old);
     }
 
     private static void draw_rectangle(Action a, Instance instance, Instance other) {
+        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
+        boolean filled = Integer.parseInt(a.arguments.get(4).val) == 0;
+        if (a.relative) {
+            x1 += instance.x;
+            x2 += instance.x;
+            y1 += instance.y;
+            y2 += instance.y;
+        }
+        Graphics2D g = RuneroGame.room.graphics;
+        if (filled)
+            g.fillRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+        else
+            g.drawRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
     }
 
     private static void draw_gradient_hor(Action a, Instance instance, Instance other) {
+        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
+        Color c1 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(4).val));
+        Color c2 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(5).val));
+        if (a.relative) {
+            x1 += instance.x;
+            x2 += instance.x;
+            y1 += instance.y;
+            y2 += instance.y;
+        }
+        Graphics2D g = RuneroGame.room.graphics;
+        GradientPaint gradient = new GradientPaint((float) x1, (float) y1, c1, (float) x2, (float) y1, c2, false);
+        Paint old = g.getPaint();
+        g.setPaint(gradient);
+        g.fillRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+        g.setPaint(old);
     }
 
     private static void draw_gradient_vert(Action a, Instance instance, Instance other) {
+        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
+        Color c1 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(4).val));
+        Color c2 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(5).val));
+        if (a.relative) {
+            x1 += instance.x;
+            x2 += instance.x;
+            y1 += instance.y;
+            y2 += instance.y;
+        }
+        Graphics2D g = RuneroGame.room.graphics;
+        GradientPaint gradient = new GradientPaint((float) x1, (float) y1, c1, (float) x1, (float) y2, c2, false);
+        Paint old = g.getPaint();
+        g.setPaint(gradient);
+        g.fillRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+        g.setPaint(old);
     }
 
     private static void draw_ellipse(Action a, Instance instance, Instance other) {
+        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
+        boolean filled = Integer.parseInt(a.arguments.get(4).val) == 0;
+        if (a.relative) {
+            x1 += instance.x;
+            x2 += instance.x;
+            y1 += instance.y;
+            y2 += instance.y;
+        }
+        Graphics2D g = RuneroGame.room.graphics;
+        if (filled)
+            g.fillOval((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+        else
+            g.drawOval((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
     }
 
     private static void draw_ellipse_gradient(Action a, Instance instance, Instance other) {
+        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
+        Color c1 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(4).val));
+        Color c2 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(5).val));
+        if (a.relative) {
+            x1 += instance.x;
+            x2 += instance.x;
+            y1 += instance.y;
+            y2 += instance.y;
+        }
+        Graphics2D g = RuneroGame.room.graphics;
+        Point2D center = new Point2D.Float((float) (x1 + (x2 - x1) / 2), (float) (y1 + (y2 - y1) / 2));
+        float radius = (float) ((x2 - x1) / 2 + (y2 - y1) / 2) / 2; // Average radius, dumb but oh well
+        float[] dist = { 0.0f, 1.0f };
+        Color[] colors = { c1, c2 };
+        RadialGradientPaint gradient = new RadialGradientPaint(center, radius, dist, colors);
+        Paint old = g.getPaint();
+        g.setPaint(gradient);
+        g.fillOval((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+        g.setPaint(old);
     }
 
     private static void draw_line(Action a, Instance instance, Instance other) {
+        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
+        if (a.relative) {
+            x1 += instance.x;
+            x2 += instance.x;
+            y1 += instance.y;
+            y2 += instance.y;
+        }
+        RuneroGame.room.graphics.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
     }
 
     private static void draw_arrow(Action a, Instance instance, Instance other) {
+    double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+    double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+    double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+    double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
+    double tipSize = GmlParser.getExpression(a.arguments.get(4).val, instance, other);
+    if (a.relative) {
+        x1 += instance.x;
+        x2 += instance.x;
+        y1 += instance.y;
+        y2 += instance.y;
+    }
+    RuneroGame.room.graphics.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+        ///ffffffuck this
     }
 
     private static void set_color(Action a, Instance instance, Instance other) {
+        Color c = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(0).val));
+        RuneroGame.room.graphics.setColor(c);
     }
 
     private static void set_font(Action a, Instance instance, Instance other) {
+        // Font resource font
+        // align (left|center|right)
     }
 
     private static void fullscreen(Action a, Instance instance, Instance other) {
+        // ? no idea how lol
+        //menu (switch|window|fullscreen)
     }
 
     private static void take_snapshot(Action a, Instance instance, Instance other) {
+        // both filename (expr/string)
+        String fname = a.arguments.get(0).val;
     }
 
     private static void effect(Action a, Instance instance, Instance other) {
+        //explosion|ring|ellipse|firework|smoke|smoke up|star|spark|flare|cloud|rain|snow
+        // x, y, size (small|medium|large)
+        // color
+        // where (below objects|above objects)
     }
 
     private static void draw_text(String text, float x, float y) {
-
         RuneroGame.room.graphics.drawString(text, (float) x, (float) y);
     }
 }
