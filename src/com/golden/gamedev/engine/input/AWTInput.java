@@ -35,16 +35,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
-import com.golden.gamedev.engine.BaseInput;
-
 /**
  * Input engine using AWT Component as the input listener.
  * <p>
  * 
- * See {@link com.golden.gamedev.engine.BaseInput} for how to use input engine
- * separated from Golden T Game Engine (GTGE) Frame Work.
  */
-public class AWTInput implements BaseInput {
+public class AWTInput {
 	
 	/** **************************** AWT COMPONENT ****************************** */
 	
@@ -80,6 +76,10 @@ public class AWTInput implements BaseInput {
 	int releasedKey;
 	
 	private KeyTyped keyTyped;
+	
+	public static final int NO_BUTTON = Integer.MIN_VALUE;
+	public static final int NO_KEY = Integer.MIN_VALUE;
+	public static final int ANY_KEY = 1;
 	
 	/** ************************************************************************* */
 	/** ***************************** CONSTRUCTOR ******************************* */
@@ -173,7 +173,7 @@ public class AWTInput implements BaseInput {
 		this.pressedKey = this.releasedKey = 0;
 	}
 	
-	public void refresh() {
+	public void clear() {
 		// clear key typed event
 		this.keyTyped.refresh();
 		
@@ -190,7 +190,8 @@ public class AWTInput implements BaseInput {
 		for (int i = 0; i < this.keyDown.length; i++) {
 			this.keyDown[i] = false;
 		}
-		this.pressedKey = this.releasedKey = 0;
+		this.pressedKey = 0;
+		this.releasedKey = 0;
 	}
 	
 	public void cleanup() {
@@ -279,7 +280,7 @@ public class AWTInput implements BaseInput {
 	
 	public int getMousePressed() {
 		return (this.pressedMouse > 0) ? this.mousePressed[0]
-		        : BaseInput.NO_BUTTON;
+		        : AWTInput.NO_BUTTON;
 	}
 	
 	public boolean isMousePressed(int button) {
@@ -294,7 +295,7 @@ public class AWTInput implements BaseInput {
 	
 	public int getMouseReleased() {
 		return (this.releasedMouse > 0) ? this.mouseReleased[0]
-		        : BaseInput.NO_BUTTON;
+		        : AWTInput.NO_BUTTON;
 	}
 	
 	public boolean isMouseReleased(int button) {
@@ -324,7 +325,7 @@ public class AWTInput implements BaseInput {
 	/** ************************************************************************* */
 	
 	public int getKeyPressed() {
-		return (this.pressedKey > 0) ? this.keyPressed[0] : BaseInput.NO_KEY;
+		return (this.pressedKey > 0) ? this.keyPressed[0] : AWTInput.NO_KEY;
 	}
 	
 	public boolean isKeyPressed(int keyCode) {
@@ -338,7 +339,7 @@ public class AWTInput implements BaseInput {
 	}
 	
 	public int getKeyReleased() {
-		return (this.releasedKey > 0) ? this.keyReleased[0] : BaseInput.NO_KEY;
+		return (this.releasedKey > 0) ? this.keyReleased[0] : AWTInput.NO_KEY;
 	}
 	
 	public boolean isKeyReleased(int keyCode) {
@@ -442,6 +443,7 @@ public class AWTInput implements BaseInput {
 		
 		public void keyTyped(KeyEvent e) {
 			// make sure the key isn't processed for anything else
+		    // Key typed is pretty darn useless
 			e.consume();
 		}
 		
@@ -493,7 +495,7 @@ public class AWTInput implements BaseInput {
 		}
 		
 		public void focusLost(FocusEvent e) {
-			AWTInput.this.refresh();
+			AWTInput.this.clear();
 		}
 		
 	}

@@ -41,6 +41,7 @@ public class Action {
         public int start;
         public int end;
         public int actionEnd;
+        public boolean isBlock; // used to tell if it has Begin <  > End blocks
         public boolean isFake; // shouldn't be, but it can happen
                                // this happens when the question is the
                                // last action in the event, or there is

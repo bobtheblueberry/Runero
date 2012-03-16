@@ -1,5 +1,6 @@
 package org.gcreator.runero.res;
 
+import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -32,10 +33,17 @@ public class GameSprite extends GameResource implements Preloadable {
     public int width, height;
     public ArrayList<SubImage> subImages;
     private boolean loaded = false;
+    private Rectangle bounds;
 
     public GameSprite(String name) {
         super(name);
         subImages = new ArrayList<GameSprite.SubImage>();
+    }
+    
+    public Rectangle getBounds() {
+        if (bounds == null)
+            bounds = new Rectangle(Math.abs(right - left), Math.abs(bottom - top));
+        return bounds;
     }
     
     public BufferedImage getSubImage(int index) {

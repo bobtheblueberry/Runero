@@ -29,7 +29,7 @@ import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameSprite;
 
 /**
- * Implements all lib actions
+ * Implements all Game Maker library actions
  * 
  * @author serge
  * 
@@ -337,32 +337,32 @@ public class ActionLibrary {
             show_info(act, instance, other);
             return ReturnValue.SUCCESS;
         case SHOW_VIDEO:
-
-            return ReturnValue.FAILURE;
+            show_video(act, instance, other);
+            return ReturnValue.SUCCESS;
         case RESTART_GAME:
-
-            return ReturnValue.FAILURE;
+            restart_game(act, instance, other);
+            return ReturnValue.SUCCESS;
         case END_GAME:
-
-            return ReturnValue.FAILURE;
+            end_game(act, instance, other);
+            return ReturnValue.SUCCESS;
         case SAVE_GAME:
-
-            return ReturnValue.FAILURE;
+            save_game(act, instance, other);
+            return ReturnValue.SUCCESS;
         case LOAD_GAME:
-
-            return ReturnValue.FAILURE;
+            load_game(act, instance, other);
+            return ReturnValue.SUCCESS;
         case REPLACE_SPRITE:
-
-            return ReturnValue.FAILURE;
+            replace_sprite(act, instance, other);
+            return ReturnValue.SUCCESS;
         case REPLACE_SOUND:
-
-            return ReturnValue.FAILURE;
+            replace_sound(act, instance, other);
+            return ReturnValue.SUCCESS;
         case REPLACE_BACKGROUND:
-
-            return ReturnValue.FAILURE;
+            replace_background(act, instance, other);
+            return ReturnValue.SUCCESS;
             // control
         case INHERITED:
-
+            // This is actually handled by the action executor class.
             return ReturnValue.FAILURE;
         case CODE:
 
@@ -380,7 +380,6 @@ public class ActionLibrary {
         case SET_SCORE:
             set_score(act, instance, other);
             return ReturnValue.SUCCESS;
-
         case DRAW_SCORE:
             draw_score(act, instance, other);
             return ReturnValue.SUCCESS;
@@ -927,11 +926,12 @@ public class ActionLibrary {
         if (redraw == 1) {
             RuneroGame.game.bsGraphics.getComponent().repaint();
         }
-        try {
-            Thread.sleep((long) seconds);
-        } catch (InterruptedException e) {
-            System.out.println("Somebody bitched while game slept.");
-        }
+       // try {
+            //System.out.println("sleep " + seconds);
+         //   Thread.sleep((long) seconds);
+     //   } catch (InterruptedException e) {
+      //      System.out.println("Somebody bitched while game slept.");
+       // }
     }
 
     /*
@@ -941,7 +941,7 @@ public class ActionLibrary {
     private static void show_message(Action a, Instance instance, Instance other) {
         // TODO: real function, not this hack
         // also todo, # newlines, \# escape
-        String msg = a.arguments.get(0).val;
+        String msg = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
         JOptionPane.showMessageDialog(RuneroGame.game.bsGraphics.getComponent(), msg);
     }
 
@@ -949,15 +949,71 @@ public class ActionLibrary {
         RuneroGame.game.gameInfo.showInfoWindow();
     }
 
-    /*
-    SHOW_VIDEO
-    RESTART_GAME
-    END_GAME
-    SAVE_GAME
-    LOAD_GAME
-    REPLACE_SPRITE
-    REPLACE_SOUND
-    REPLACE_BACKGROUND*/
+    private static void show_video(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void restart_game(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void end_game(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void save_game(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void load_game(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void replace_sprite(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void replace_sound(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void replace_background(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    // GM8 Splash functions that SUCK
+    private static void splash_text(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void splash_image(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void splash_web(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void splash_video(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
+
+    private static void splash_settings(Action a, Instance instance, Instance other) {
+        // TODO: This
+        // TODO: Support 'Both' Argument types
+    }
 
     private static void variable(Action a, Instance instance, Instance other) {
         // variable name, value, relative
@@ -1076,9 +1132,9 @@ public class ActionLibrary {
         boolean showScore = Integer.parseInt(a.arguments.get(0).val) == 1;
         String captionScore = a.arguments.get(1).val;
         boolean showLives = Integer.parseInt(a.arguments.get(2).val) == 1;
-        String captionLives = a.arguments.get(2).val;
-        boolean showHealth = Integer.parseInt(a.arguments.get(3).val) == 1;
-        String captionHealth = a.arguments.get(4).val;
+        String captionLives = a.arguments.get(3).val;
+        boolean showHealth = Integer.parseInt(a.arguments.get(4).val) == 1;
+        String captionHealth = a.arguments.get(5).val;
         RuneroGame.game.show_score = showScore;
         RuneroGame.game.show_lives = showLives;
         RuneroGame.game.show_health = showHealth;
@@ -1115,7 +1171,8 @@ public class ActionLibrary {
         // Note: URL is supposed to be an expression OR a string, an expression when
         // it starts with a single or double quote. This is the same for show_message
         // however, I have tried it in Game Maker and it does not seem to work.
-        String url = a.arguments.get(0).val;
+        // BROKEN IN GM7, WORKS IN GM6.1
+        String url = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
         try {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
         } catch (IOException e) {
@@ -1189,7 +1246,7 @@ public class ActionLibrary {
     }
 
     private static void draw_text(Action a, Instance instance, Instance other) {
-        String text = a.arguments.get(0).val;// TODO: Support 'Both' Argument types
+        String text = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
         double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
         double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
 
@@ -1201,7 +1258,7 @@ public class ActionLibrary {
     }
 
     private static void draw_text_scaled(Action a, Instance instance, Instance other) {
-        String text = a.arguments.get(0).val;// TODO: Support 'Both' Argument types
+        String text = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
         double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
         double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
         double xscale = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
@@ -1391,17 +1448,16 @@ public class ActionLibrary {
     }
 
     private static void take_snapshot(Action a, Instance instance, Instance other) {
-        // both filename (expr/string)
-        String fname = a.arguments.get(0).val;
+        String fname = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
         try {
             BufferedImage screenshot = new Robot().createScreenCapture(RuneroGame.room.getRectangle());
-            ImageIO.write(screenshot,"PNG", new File(fname));
+            ImageIO.write(screenshot, "PNG", new File(fname));
         } catch (AWTException e) {
-           System.err.println("Can't take screenshot! AWT Error " + e.getMessage());
+            System.err.println("Can't take screenshot! AWT Error " + e.getMessage());
         } catch (IOException e) {
             System.err.println("Can't take screenshot! IO Error " + e.getMessage());
         }
-        
+
     }
 
     private static void effect(Action a, Instance instance, Instance other) {
@@ -1412,6 +1468,8 @@ public class ActionLibrary {
     }
 
     private static void draw_text(String text, float x, float y) {
+        if (RuneroGame.room.graphics == null)
+             return; // shouldnt happen lol
         RuneroGame.room.graphics.drawString(text, (float) x, (float) y);
     }
 }

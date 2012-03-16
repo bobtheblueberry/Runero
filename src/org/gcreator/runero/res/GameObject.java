@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.gcreator.runero.event.MainEvent;
 
-public class GameObject extends GameResource {
+public class GameObject extends GameResource implements Comparable<GameObject> {
 
     public static final int OBJECT_SELF = -1;
     public static final int OBJECT_OTHER = -2;
@@ -47,5 +47,10 @@ public class GameObject extends GameResource {
 
     public ArrayList<MainEvent> getMainEvents() {
         return mainEvents;
+    }
+
+    @Override
+    public int compareTo(GameObject o) {
+        return Integer.compare(depth, o.depth);
     }
 }

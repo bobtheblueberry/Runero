@@ -9,29 +9,36 @@ import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameObject;
 
 public class GmlInterpreter {
-    
+
     public static void performEvent(Event e, Instance instance) {
         for (int i = 0; i < e.actions.size(); i++) {
             Action act = e.actions.get(i);
-            i = performAction(act, e, instance, i);
+            try {
+                i = performAction(act, e, instance, i);
+            } catch (Exception exc) {
+                System.out.println("Error performing action " + act.lib.name + ":" + act.lib.id + " for object "
+                        + e.object.getName());
+                exc.printStackTrace();
+            }
             if (i < 0) // EXIT
                 return;
         }
     }
 
-    private static int executeBlock(Action act, Action.BlockAction ba, Instance instance, Event e, int i) {
+    private static int executeBlock(Action.BlockAction ba, Instance instance, Event e, int i) {
         if (ba.isFake)
             return i;
 
         for (int x = ba.start; x <= ba.end; x++) {
-            x = performAction(act, e, instance, i);
+            Action act = e.actions.get(x);
+            x = performAction(act, e, instance, x);
             if (x < 0)
                 return -1;// EXIT
         }
 
         return ba.actionEnd;
     }
-    
+
     private static int performAction(Action act, Event e, Instance instance, int i) {
         switch (act.lib.actionKind) {
         case Action.ACT_NORMAL:
@@ -58,17 +65,16 @@ public class GmlInterpreter {
                             performEvent(event, instance);
                         }
                     }
-
                 }
                 break;
             }
-            
+
             boolean result = performAction(act, instance, e);
             if (act.lib.question) {
                 if (result) {
-                    return executeBlock(act, act.ifAction, instance, e, i);
+                    return executeBlock(act.ifAction, instance, e, i);
                 } else if (act.elseAction != null) {
-                    return executeBlock(act, act.elseAction, instance, e, i);
+                    return executeBlock(act.elseAction, instance, e, i);
                 }
             }
             break;
@@ -85,8 +91,12 @@ public class GmlInterpreter {
             // stop performing event.
             return -1;
         case Action.ACT_REPEAT:
-            // repeat (expression)
-            break;
+            // TODO: Check to see what types GM uses
+            int times = Integer.parseInt(act.arguments.get(0).val);
+            int last = i;
+            for (int t = 0; t < times; t++)
+                last = executeBlock(act.repeatAction, instance, e, i);
+            return last;
         case Action.ACT_VARIABLE:
             // Handled by ActionLibrary
             break;
@@ -144,8 +154,8 @@ public class GmlInterpreter {
                 return true;
 
             } else {
-                System.err.println("Error! reference to other outside collision event " + instance.obj
-                        + " Event " + event);
+                System.err.println("Error! reference to other outside collision event " + instance.obj + " Event "
+                        + event);
                 return true;
             }
         } else {

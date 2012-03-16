@@ -4,13 +4,17 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.gcreator.runero.RuneroCollision;
 import org.gcreator.runero.RuneroGame;
+import org.gcreator.runero.event.CollisionEvent;
 import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.EventExecutor;
+import org.gcreator.runero.event.EventQueue;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameObject;
@@ -31,13 +35,21 @@ public class RoomInstance {
     public RoomInstance(RuneroGame game, GameRoom room) {
         this.game = game;
         this.room = room;
+    }
+
+    public void init(boolean gameStart) {
         loadInstances();
-        if (room.creation_code != null) {
-            // GMLScript.executeCode(room.creation_code);
-        }
+        // TODO: Object creation code
         // Create Events
         if (game.eventManager.hasCreateEvents)
             EventExecutor.executeEvent(game.eventManager.create, this);
+
+        if (gameStart && game.eventManager.otherGameStart != null)
+            EventExecutor.executeEvent(game.eventManager.otherGameStart, this);
+
+        if (room.creation_code != null) {
+            // GMLScript.executeCode(room.creation_code);
+        }
 
         System.out.println("New room " + room.getName() + "(" + room.width + "," + room.height + ")");
         System.out.println("Instances: " + instance_count);
@@ -61,7 +73,7 @@ public class RoomInstance {
      * @param id
      * @return
      */
-    private ObjectGroup getObjectGroup2(int id) {
+    public ObjectGroup getObjectGroup2(int id) {
         for (ObjectGroup g : instanceGroups)
             if (g.obj.getId() == id)
                 return g;
@@ -87,7 +99,13 @@ public class RoomInstance {
             instance_count++;
             instance_nextid = Math.max(instance_nextid + 1, i.id + 1);
         }
+        sortInstances();
+    }
+
+    private void sortInstances() {
         Collections.sort(instanceGroups);
+        for (ObjectGroup g : instanceGroups)
+            Collections.sort(g.instances);
     }
 
     public void addInstace(GameObject g, double x, double y) {
@@ -100,30 +118,35 @@ public class RoomInstance {
     }
 
     /**
-     * Removes the instance from the room
+     * Removes the instance from the room LATER ON
+     * and calls the instances destroy event,
+     * if is has one.
      * 
-     * @return whether or not successful
      */
-    public boolean destoryInstance(Instance instance) {
-        ObjectGroup g = getObjectGroup2(instance.obj.getId());
-        if (g == null)
-            return false;
-        return g.instances.remove(instance);
+    public void destoryInstance(Instance instance) {
+
+        instance.isDead = true;
+        // destroy event
+        if (instance.obj.hasEvent(MainEvent.EV_DESTROY)) {
+            instance.performEvent(instance.obj.getMainEvent(MainEvent.EV_DESTROY).events.get(0));
+        }
+        EventQueue.addDestroyEvent(instance);
     }
 
     public void changeInstance(Instance instance, GameObject newobj, boolean performEvents) {
-        if (performEvents) {
-            if (instance.obj.hasEvent(MainEvent.EV_DESTROY)) {
-                instance.performEvent(instance.obj.getMainEvent(MainEvent.EV_DESTROY).events.get(0));
+
+        EventQueue.addChangeEvent(instance, instance.obj.getId());
+        try {
+            if (performEvents) {
+                if (instance.obj.hasEvent(MainEvent.EV_DESTROY)) {
+                    instance.performEvent(instance.obj.getMainEvent(MainEvent.EV_DESTROY).events.get(0));
+                }
             }
+        } catch (Exception exc) {
+            System.err.println("Exception performing destroy event in instance change");
+            exc.printStackTrace();
         }
-
-        // remove from the instance list
-        getObjectGroup(instance.obj.getId()).instances.remove(instance);
-
         instance.obj = newobj;
-        // add it to somewhere else
-        getObjectGroup(newobj.getId()).add(instance);
 
         if (performEvents) {
             if (instance.obj.hasEvent(MainEvent.EV_CREATE)) {
@@ -134,22 +157,61 @@ public class RoomInstance {
 
     public void addInstace(GameObject g, double x, double y, double dir, double speed) {
         Instance i = new Instance(x, y, instance_nextid++, g);
+        EventQueue.addCreateEvent(i);
         if (speed != 0 || dir != 0) {
             i.motion_set(dir, speed);
         }
         // call create event
         if (g.hasEvent(MainEvent.EV_CREATE)) {
-            i.performEvent(g.getMainEvent(MainEvent.EV_COLLISION).events.get(0));
+            i.performEvent(g.getMainEvent(MainEvent.EV_CREATE).events.get(0));
         }
-        getObjectGroup(g.getId()).instances.add(i);
     }
 
     public void step() {
-        // begin step, normal step
+        EventQueue.processCreate(this);
+        EventQueue.processChange(this);
+        EventQueue.processDestroy(this);
+        // begin step
         if (game.eventManager.hasStepBeginEvents)
             EventExecutor.executeEvent(game.eventManager.stepBegin, this);
+
+        // TODO: alarm events
+
+        // keyboard
+        if (game.eventManager.hasKeyboardEvents)
+            for (Event e : game.eventManager.keyboardEvents) {
+                int type = Event.getGmKeyName(e.type);
+                if (game.input.isKeyDown(type)) {
+                    EventExecutor.executeEvent(e, this);
+                    System.out.println("Keyboard " + KeyEvent.getKeyText(type));
+                }
+            }
+
+        // key press
+        if (game.eventManager.hasKeyPressEvents)
+            for (Event e : game.eventManager.keyPressEvents) {
+                int type = Event.getGmKeyName(e.type);
+                if (game.input.isKeyPressed(type)) { //TODO: This behaves in the same way as keyDown...
+                    EventExecutor.executeEvent(e, this);
+                    System.out.println("Key press " + KeyEvent.getKeyText(type));
+                }
+            }
+        // key release
+        if (game.eventManager.hasKeyReleaseEvents)
+            for (Event e : game.eventManager.keyReleaseEvents) {
+                int type = Event.getGmKeyName(e.type);
+                if (game.input.isKeyReleased(type)) { //TODO: This behaves in the same way as keyDown...
+                    EventExecutor.executeEvent(e, this);
+                    System.out.println("Key press " + KeyEvent.getKeyText(type));
+                }
+            }
+        
+        // millions of mouse and joystick events
+
+        // normal step
         if (game.eventManager.hasStepNormalEvents)
             EventExecutor.executeEvent(game.eventManager.stepNormal, this);
+
         // Move objects
         for (ObjectGroup g : instanceGroups)
             for (Instance i : g.instances)
@@ -158,9 +220,9 @@ public class RoomInstance {
             // TODO: path end
             // outside room
             if (game.eventManager.otherOutsideRoom != null)
-                for (Event e : game.eventManager.otherOutsideRoom) {
+                for (Event e : game.eventManager.otherOutsideRoom)
                     for (ObjectGroup g : instanceGroups)
-                        if (g.obj.getId() == g.obj.getId()) {
+                        if (g.obj.getId() == e.object.getId())
                             for (Instance i : g.instances) {
                                 // TODO: PROPER bounding box checking
                                 int width = 0, height = 0;
@@ -174,19 +236,42 @@ public class RoomInstance {
                                     i.performEvent(e);
                                 }
                             }
-                        }
-                }
 
             // TODO: Intersect boundary
         }
-        // TODO: collision
+        if (game.eventManager.hasCollisionEvents)
+            for (CollisionEvent ce : game.eventManager.collision) {
+                // look for instances
+                ObjectGroup g = getObjectGroup2(ce.event.object.getId());
+                ObjectGroup g2 = getObjectGroup2(ce.otherId);
+                if (g == null || g2 == null)
+                    continue;
+                for (Instance i : g.instances)
+                    for (Instance i2 : g2.instances)
+                        if (i != i2 && RuneroCollision.checkCollision(i, i2, false)) {
+                            ce.collide(i, i2);
+                            System.out.println("collision with " + i + " and " + i2);
+                        }
+
+            }
+
         if (game.eventManager.hasOtherEvents) {
-            // TODO: No more lives
-            // TODO: No more health
+            // No more lives
+            if (game.eventManager.otherNoMoreLives != null && game.lives <= 0) {
+                EventExecutor.executeEvent(game.eventManager.otherNoMoreLives, this);
+            }
+            // No more health
+            if (game.eventManager.otherNoMoreLives != null && game.health <= 0) {
+                EventExecutor.executeEvent(game.eventManager.otherNoMoreHealth, this);
+            }
         }
         // end step
         if (game.eventManager.hasStepEndEvents)
             EventExecutor.executeEvent(game.eventManager.stepEnd, this);
+
+        game.input.clear();
+        // draw
+        // have to wait for someone else to call render...
     }
 
     public Instance getInstance(int id) {
@@ -228,7 +313,15 @@ public class RoomInstance {
                 paintBackground(g, gb);
             }
         }
-        //TODO Animation End comes after draw...
+
+        if (game.eventManager.otherAnimationEnd != null)
+            for (Event e : game.eventManager.otherAnimationEnd)
+                for (ObjectGroup gr : instanceGroups)
+                    if (gr.obj.getId() == e.object.getId())
+                        for (Instance i : gr.instances)
+                            if (i.image_number > 0 && i.image_index >= i.image_number - 1)
+                                i.performEvent(e);
+
     }
 
     private void paintBackground(Graphics g, GameRoom.Background b) {

@@ -44,7 +44,8 @@ package com.golden.gamedev.engine;
  *    }
  * </pre>
  */
-public interface BaseInput {
+//public interface BaseInput {
+interface Bull{
 	
 	/** ************************* INPUT CONSTANTS ******************************* */
 	

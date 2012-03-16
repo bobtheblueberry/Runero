@@ -39,7 +39,6 @@ import java.net.URL;
 import com.golden.gamedev.engine.BaseAudio;
 import com.golden.gamedev.engine.BaseGraphics;
 import com.golden.gamedev.engine.BaseIO;
-import com.golden.gamedev.engine.BaseInput;
 import com.golden.gamedev.engine.BaseLoader;
 import com.golden.gamedev.engine.BaseTimer;
 import com.golden.gamedev.engine.audio.MidiRenderer;
@@ -161,7 +160,7 @@ public abstract class Game {
     /** Image loader engine. */
     public BaseLoader bsLoader;
     /** Input engine. */
-    public BaseInput bsInput;
+    public AWTInput input;
     /** Timer engine. */
     public BaseTimer bsTimer;
     /** Audio engine for music. */
@@ -415,9 +414,9 @@ public abstract class Game {
         long elapsedTime = 0;
         out: while (true) {
             if (this.inFocus) {
+                this.input.update(elapsedTime); // update input
                 // update game
                 this.update(elapsedTime);
-                this.bsInput.update(elapsedTime); // update input
 
             } else {
                 // the game is not in focus!
@@ -426,10 +425,9 @@ public abstract class Game {
                 } catch (InterruptedException e) {
                 }
             }
-            try {//TODO: Proper game speed!
-                Thread.sleep(10);
-            }
-            catch (InterruptedException e) {
+            try {// TODO: Proper game speed!
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
             }
             do {
                 if (!this.running) {
@@ -485,7 +483,7 @@ public abstract class Game {
      * @see #setPauseOnLostFocus(boolean)
      */
     protected void renderLostFocus(Graphics2D g) {
-        String st1 = "GAME IS NOT IN FOCUSED", st2 = "CLICK HERE TO GET THE FOCUS BACK";
+        String st1 = "GAME IS NOT IN FOCUSED", st2 = "CLICK HERE TO GET THE FOCUS BACK", st3 = "Josh Ventura is Black!";
 
         g.setFont(new Font("Dialog", Font.BOLD, 15));
         FontMetrics fm = g.getFontMetrics();
@@ -493,7 +491,7 @@ public abstract class Game {
         int posy = (this.getHeight() / 2) - ((fm.getHeight() + 10) * (2 / 2));
 
         int x = (this.getWidth() / 2) - (fm.stringWidth(st2) / 2) - 20, y = posy - 25, width = fm.stringWidth(st2) + 40, height = fm
-                .getHeight() + fm.getHeight() + 30;
+                .getHeight() + fm.getHeight() + 60;
 
         g.setColor(Color.BLACK);
         g.fillRect(x, y, width - 1, height - 1);
@@ -514,6 +512,9 @@ public abstract class Game {
             g.drawString(st1, (this.getWidth() / 2) - (fm.stringWidth(st1) / 2), posy);
             posy += fm.getHeight() + 10;
             g.drawString(st2, (this.getWidth() / 2) - (fm.stringWidth(st2) / 2), posy);
+            posy += fm.getHeight() + 10;
+            g.drawString(st3, (this.getWidth() / 2) - (fm.stringWidth(st3) / 2), posy);
+
         }
     }
 
@@ -588,7 +589,7 @@ public abstract class Game {
      * @see #bsGraphics
      * @see #bsIO
      * @see #bsLoader
-     * @see #bsInput
+     * @see #input
      * @see #bsTimer
      * @see #bsMusic
      * @see #bsSound
@@ -607,8 +608,8 @@ public abstract class Game {
         if (this.bsLoader == null) {
             this.bsLoader = new BaseLoader(this.bsIO, Color.MAGENTA);
         }
-        if (this.bsInput == null) {
-            this.bsInput = new AWTInput(this.bsGraphics.getComponent());
+        if (this.input == null) {
+            this.input = new AWTInput(this.bsGraphics.getComponent());
         }
         if (this.bsMusic == null) {
             this.bsMusic = new BaseAudio(this.bsIO, new MidiRenderer());
@@ -723,10 +724,6 @@ public abstract class Game {
                         this.getWidth() - (this.getWidth() / 10 * 2), this.getHeight() - (this.getHeight() / 10 * 2));
                 g.setClip(shape);
 
-                // draw the game unto this image
-                if (this instanceof GameEngine) {
-                    ((GameEngine) this).getCurrentGame().render(g);
-                }
                 this.render(g);
 
                 g.dispose();
@@ -766,8 +763,8 @@ public abstract class Game {
             Canvas canvas = new Canvas() {
 
                 /**
-				 * 
-				 */
+                 * 
+                 */
                 private static final long serialVersionUID = 8493852179266447783L;
 
                 public void paint(Graphics g1) {
@@ -1017,23 +1014,23 @@ public abstract class Game {
     /**
      * *************************************************************************
      */
-    // -> com.golden.gamedev.engine.BaseInput
+    // -> com.golden.gamedev.engine.AWTInput
     /**
      * Effectively equivalent to the call
-     * {@linkplain com.golden.gamedev.engine.BaseInput#getMouseX()
+     * {@linkplain com.golden.gamedev.engine.AWTInput#getMouseX()
      * bsInput.getMouseX()}.
      */
     public int getMouseX() {
-        return this.bsInput.getMouseX();
+        return this.input.getMouseX();
     }
 
     /**
      * Effectively equivalent to the call
-     * {@linkplain com.golden.gamedev.engine.BaseInput#getMouseY()
+     * {@linkplain com.golden.gamedev.engine.AWTInput#getMouseY()
      * bsInput.getMouseY()}.
      */
     public int getMouseY() {
-        return this.bsInput.getMouseY();
+        return this.input.getMouseY();
     }
 
     /**
@@ -1126,56 +1123,56 @@ public abstract class Game {
 
     /**
      * Effectively equivalent to the call
-     * {@linkplain com.golden.gamedev.engine.BaseInput#isMousePressed(int)
+     * {@linkplain com.golden.gamedev.engine.AWTInput#isMousePressed(int)
      * bsInput.isMousePressed(java.awt.event.MouseEvent.BUTTON1)}.
      */
     public boolean click() {
-        return this.bsInput.isMousePressed(MouseEvent.BUTTON1);
+        return this.input.isMousePressed(MouseEvent.BUTTON1);
     }
 
     /**
      * Effectively equivalent to the call
-     * {@linkplain com.golden.gamedev.engine.BaseInput#isMousePressed(int)
+     * {@linkplain com.golden.gamedev.engine.AWTInput#isMousePressed(int)
      * bsInput.isMousePressed(java.awt.event.MouseEvent.BUTTON3)}.
      */
     public boolean rightClick() {
-        return this.bsInput.isMousePressed(MouseEvent.BUTTON3);
+        return this.input.isMousePressed(MouseEvent.BUTTON3);
     }
 
     /**
      * Effectively equivalent to the call
-     * {@linkplain com.golden.gamedev.engine.BaseInput#isKeyDown(int)
+     * {@linkplain com.golden.gamedev.engine.AWTInput#isKeyDown(int)
      * bsInput.isKeyDown(int)}.
      */
     public boolean keyDown(int keyCode) {
-        return this.bsInput.isKeyDown(keyCode);
+        return this.input.isKeyDown(keyCode);
     }
 
     /**
      * Effectively equivalent to the call
-     * {@linkplain com.golden.gamedev.engine.BaseInput#isKeyPressed(int)
+     * {@linkplain com.golden.gamedev.engine.AWTInput#isKeyPressed(int)
      * bsInput.isKeyPressed(int)}.
      */
     public boolean keyPressed(int keyCode) {
-        return this.bsInput.isKeyPressed(keyCode);
+        return this.input.isKeyPressed(keyCode);
     }
 
     /**
      * Effectively equivalent to the call
-     * {@linkplain com.golden.gamedev.engine.BaseInput#setMouseVisible(boolean)
+     * {@linkplain com.golden.gamedev.engine.AWTInput#setMouseVisible(boolean)
      * bsInput.setMouseVisible(false)}.
      */
     public void hideCursor() {
-        this.bsInput.setMouseVisible(false);
+        this.input.setMouseVisible(false);
     }
 
     /**
      * Effectively equivalent to the call
-     * {@linkplain com.golden.gamedev.engine.BaseInput#setMouseVisible(boolean)
+     * {@linkplain com.golden.gamedev.engine.AWTInput#setMouseVisible(boolean)
      * bsInput.setMouseVisible(true)}.
      */
     public void showCursor() {
-        this.bsInput.setMouseVisible(true);
+        this.input.setMouseVisible(true);
     }
 
     /**

@@ -17,7 +17,7 @@ public class GmlParser {
         // then check to see if its a constant * variable
 
         // name could be like other.x
-        
+
     }
 
     public static Variable getVariable(String name, Instance instance, Instance other) {
@@ -26,7 +26,22 @@ public class GmlParser {
         // then check to see if its a constant * variable
 
         // name could be like other.x
-        return null;
+        return new Variable("Josh Write me a Parser");
+    }
+
+    /**
+     * Some of the Game Maker actions have a 'both' type argument
+     * meaning either a string or an expression.
+     * Being an expression if it starts with a single ' or double " quote.
+     * For example 'X: ' + string(x)
+     * 
+     * @param expr
+     * @return 
+     */
+    public static String getExpressionString(String expr, Instance instance, Instance other) {
+        
+        //TODO: This, lol!
+        return expr;
     }
 
     /**
@@ -39,9 +54,16 @@ public class GmlParser {
      */
     // TODO: Implement this!
     public static double getExpression(String s, Instance instance, Instance other) {
-      
+
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid double " + s);
+            return 0;
+        }
+        /*
         // object_specialmoon.x/y
-        /*Pattern regex = Pattern.compile("([A-Za-z0-9_]+)\\.([_a-zA-Z0-9])$"); // Doesnt work for 1.8 etc.
+        Pattern regex = Pattern.compile("([A-Za-z0-9_]+)\\.([_a-zA-Z0-9])$"); // Doesnt work for 1.8 etc.
         Matcher match = regex.matcher(s);
         if (match.find()) {
             String obj = match.group(1);
@@ -63,12 +85,13 @@ public class GmlParser {
                     System.out.println("Room has no objects with id " + id + " (" + obj + ")");
                 }
             } else {
+                
                 System.out.println("Cannot find object " + obj + "  (" + s + ")" + " from instance "
-                        + instance.obj.getName());
+                        + instance.obj.getName() + " Expression " + s);
             }
-        } else*/
+        } else
             return getDouble(s);
-        //return 0;
+        return 0;*/
     }
 
     public static double getDouble(String s) {
@@ -91,7 +114,7 @@ public class GmlParser {
                 return Double.parseDouble(s);
             }
         }
-    //    System.out.println("Invalid double " + s);
+     //   System.out.println("Invalid double " + s);
 
         return 0;
     }

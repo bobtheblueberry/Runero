@@ -2,5 +2,12 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="/home/serge/Develop/lwjgl-2.8.3/jar/lwjgl.jar" sourcepath="/home/serge/Develop/lwjgl-2.8.3/src/src/java">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/serge/Develop/lwjgl-2.8.3/javadoc/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/home/serge/Develop/lwjgl-2.8.3/native/linux"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/serge/Develop/lwjgl-2.8.3/jar/lwjgl_util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

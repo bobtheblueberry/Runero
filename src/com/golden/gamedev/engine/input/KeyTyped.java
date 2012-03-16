@@ -17,7 +17,6 @@
 package com.golden.gamedev.engine.input;
 
 // GTGE
-import com.golden.gamedev.engine.BaseInput;
 import com.golden.gamedev.object.Timer;
 
 /**
@@ -31,7 +30,7 @@ import com.golden.gamedev.object.Timer;
  */
 public class KeyTyped {
 	
-	private BaseInput bsInput;
+	private AWTInput bsInput;
 	
 	private Timer repeatDelayTimer; // timer for starting repeat key
 	private Timer repeatRateTimer; // timer for repeating repeat key
@@ -46,11 +45,11 @@ public class KeyTyped {
 	/**
 	 * Constructs new <code>KeyTyped</code> using following input engine, and
 	 * specified initial repeat delay and repeat rate delay.
-	 * @param bsInput The {@link BaseInput} to use.
+	 * @param bsInput The {@link AWTInput} to use.
 	 * @param repeatDelay The repeat delay.
 	 * @param repeatRate The repeat rate.
 	 */
-	public KeyTyped(BaseInput bsInput, int repeatDelay, int repeatRate) {
+	public KeyTyped(AWTInput bsInput, int repeatDelay, int repeatRate) {
 		this.bsInput = bsInput;
 		
 		this.repeatDelayTimer = new Timer(repeatDelay);
@@ -58,15 +57,15 @@ public class KeyTyped {
 		
 		this.repeatDelayTimer.setActive(false);
 		
-		this.key = this.keyTyped = BaseInput.NO_KEY;
+		this.key = this.keyTyped = AWTInput.NO_KEY;
 	}
 	
 	/**
 	 * Constructs new <code>KeyTyped</code> with 450 ms repeat delay and 40 ms
 	 * repeat rate.
-	 * @param bsInput The {@link BaseInput} to use.
+	 * @param bsInput The {@link AWTInput} to use.
 	 */
-	public KeyTyped(BaseInput bsInput) {
+	public KeyTyped(AWTInput bsInput) {
 		this(bsInput, 450, 40);
 	}
 	
@@ -81,7 +80,7 @@ public class KeyTyped {
 	public void update(long elapsedTime) {
 		this.keyTyped = this.bsInput.getKeyPressed();
 		
-		if (this.keyTyped != BaseInput.NO_KEY) {
+		if (this.keyTyped != AWTInput.NO_KEY) {
 			// save key code for repeat key implementation
 			this.key = this.keyTyped;
 			this.repeatDelayTimer.setActive(true);
@@ -91,11 +90,11 @@ public class KeyTyped {
 			// check whether repeat key has been released or not
 			if (this.bsInput.getKeyReleased() == this.key) {
 				// repeat key has been released
-				this.key = BaseInput.NO_KEY;
+				this.key = AWTInput.NO_KEY;
 				this.repeatDelayTimer.setActive(false);
 				
 			}
-			else if (this.key != BaseInput.NO_KEY) {
+			else if (this.key != AWTInput.NO_KEY) {
 				// check for first time repeatness
 				if (this.repeatDelayTimer.isActive()) {
 					// first time delay
@@ -125,7 +124,7 @@ public class KeyTyped {
 		
 		this.repeatDelayTimer.setActive(false);
 		
-		this.key = this.keyTyped = BaseInput.NO_KEY;
+		this.key = this.keyTyped = AWTInput.NO_KEY;
 	}
 	
 	/** ************************************************************************* */
@@ -133,8 +132,8 @@ public class KeyTyped {
 	/** ************************************************************************* */
 	
 	/**
-	 * Returns key typed or {@link BaseInput#NO_KEY} if no key is being typed.
-	 * @return The typed key or {@link BaseInput#NO_KEY}.
+	 * Returns key typed or {@link AWTInput#NO_KEY} if no key is being typed.
+	 * @return The typed key or {@link AWTInput#NO_KEY}.
 	 * @see java.awt.event.KeyEvent#VK_1
 	 */
 	public int getKeyTyped() {

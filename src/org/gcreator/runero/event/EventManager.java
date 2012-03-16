@@ -35,8 +35,8 @@ public class EventManager {
                 case MainEvent.EV_COLLISION:
                     hasCollisionEvents = true;
                     if (collision == null)
-                        collision = new LinkedList<Event>();
-                    collision.add(e);
+                        collision = new LinkedList<CollisionEvent>();
+                    collision.add(new CollisionEvent(e, e.collisionId));
                     break;
                 case MainEvent.EV_STEP:
                     addStepEvent(e);
@@ -575,9 +575,11 @@ public class EventManager {
     public LinkedList<Event> stepBegin;
     public boolean hasStepEndEvents;
     public LinkedList<Event> stepEnd;
+    
     // collision - can't be dealt with as easily
     public boolean hasCollisionEvents;
-    public LinkedList<Event> collision;
+    public LinkedList<CollisionEvent> collision;
+    
     // keyboard
     public boolean hasKeyboardEvents;
     public LinkedList<Event> keyboardEvents;

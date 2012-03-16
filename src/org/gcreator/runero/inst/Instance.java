@@ -14,7 +14,7 @@ import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameSprite;
 
-public class Instance {
+public class Instance implements Comparable<Instance> {
 
     public int alarm[] = new int[12];
     public double depth;
@@ -29,7 +29,7 @@ public class Instance {
 
     public double image_alpha;
     public double image_angle;
-    public Color image_blend;
+    public Color image_blend = Color.white;
     public double image_index;
     public double image_single; // Deprecated
     public double image_speed = 1.0;
@@ -56,7 +56,11 @@ public class Instance {
     public double xprevious, yprevious;
     public int image_number = 0; // * cannot be set manually
 
-    public int parentId; // not accessed directly in GML, must use function
+    public int parentId; // not accessed directly in GML, must use GML function
+    /**
+     * When an instance is marked as dead then it does nothing and waits to be destroyed
+     */
+    public boolean isDead;
     /*
     object_index*
     id*
@@ -77,7 +81,7 @@ public class Instance {
     public GameObject obj;
     public int id;
     public Hashtable<String, Variable> variables;
-    
+
     public Instance(double x, double y, int id, GameObject obj) {
         this.id = id;
         this.obj = obj;
@@ -100,40 +104,61 @@ public class Instance {
     public Instance(GameRoom.StaticInstance i) {
         this(i.x, i.y, i.id, RuneroGame.game.getObject(i.objectId));
     }
-    
+
     public void updateImageNumber() {
-        GameSprite s = RuneroGame.game.getSprite((int)Math.round(sprite_index));
-        if ( s == null) {
+        GameSprite s = RuneroGame.game.getSprite((int) Math.round(sprite_index));
+        if (s == null) {
             image_number = 0;
         } else {
             image_number = s.subImages.size();
         }
     }
+
+    public GameSprite.SubImage getCurrentSubImg() {
+        GameSprite s = getSprite();
+        if (s == null)
+            return null;
+        return s.subImages.get(getImageIndex());
+    }
+
+    public int getImageIndex() {
+        if (sprite_index >= 0)
+            image_index %= image_number;
+        return (int) Math.round(image_index);
+    }
+
     /**
      * Performs event
      * 
-     * 
-     * @param index
-     *            main event index
+     * @param index  main event index
      */
     public void performEvent(Event event) {
+        if (isDead)
+            return;
         byte index = event.parent.mainEvent;
         if (index == MainEvent.EV_DRAW) {
             if (!visible)
                 return;
         }
-        if (obj.hasEvent(index)) {
-            MainEvent me = obj.getMainEvent(index);
-            for (Event e : me.events) {
-                GmlInterpreter.performEvent(e, this);
+        if (index == MainEvent.EV_COLLISION)
+            if (solid || event.collisionObject.solid) {
+                x = xprevious;
+                y = yprevious;
             }
-        }
+
+        GmlInterpreter.performEvent(event, this);
     }
 
     public GameSprite getSprite() {
         if (sprite_index < 0)
             return null;
-        return RuneroGame.game.getSprite(Math.round((int) sprite_index));
+        return RuneroGame.game.getSprite((int) Math.round(sprite_index));
+    }
+
+    public GameSprite getMask() {
+        if (mask_index < 0)
+            return null;
+        return RuneroGame.game.getSprite((int) Math.round(mask_index));
     }
 
     public void setSpeed(double newSpeed) {
@@ -174,17 +199,21 @@ public class Instance {
     }
 
     protected void move() {
+        if (isDead)
+            return;
         xprevious = x;
         yprevious = y;
         // Move with direction etc
         x += hspeed;
         y += vspeed;
         image_index += image_speed;
-        image_index %= image_number;
+        if (sprite_index >= 0)
+            image_index %= image_number;
     }
 
     protected void draw() {
-        // TODO: Draw the sprite
+        if (isDead)
+            return;
         Graphics2D g = RuneroGame.room.graphics;
         if (g == null) {
             System.err.println("Room draw error! null graphics");
@@ -236,5 +265,14 @@ public class Instance {
             return i.id == this.id;
         }
         return false;
+    }
+
+    @Override
+    public int compareTo(Instance o) {
+        return Double.compare(depth, o.depth);
+    }
+
+    public String toString() {
+        return obj.getName() + " at (" + x + "," + y + ")";
     }
 }

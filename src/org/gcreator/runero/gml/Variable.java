@@ -21,6 +21,11 @@ public class Variable extends ReturnValue {
         super(Type.VARIABLE);
     }
     
+    public Variable(String s) {
+        super(Type.VARIABLE);
+        this.val = s;
+    }
+    
     public static Variable Real(double val) {
         Variable v = new Variable();
         v.realVal = val;

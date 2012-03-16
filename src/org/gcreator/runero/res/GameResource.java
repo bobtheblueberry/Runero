@@ -1,6 +1,6 @@
 package org.gcreator.runero.res;
 
-public class GameResource implements Comparable<GameResource> {
+public class GameResource {
 
     String name;
     int id;
@@ -28,10 +28,5 @@ public class GameResource implements Comparable<GameResource> {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    @Override
-    public int compareTo(GameResource o) {
-        return Integer.compare(id, o.id);
     }
 }

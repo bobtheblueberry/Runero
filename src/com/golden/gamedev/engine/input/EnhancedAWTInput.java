@@ -36,7 +36,7 @@ public class EnhancedAWTInput extends AWTInput {
 	}
 	
 	public void refresh() {
-		super.refresh();
+		super.clear();
 		
 		this.keyDown.clear();
 	}

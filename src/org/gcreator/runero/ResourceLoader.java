@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 
 import org.gcreator.runero.event.Action;
@@ -48,16 +49,59 @@ public class ResourceLoader {
         loadBackgrounds();
         System.out.println("Loaded background data");
         loadObjects();
+        if (game.eventManager.hasCollisionEvents)
+            Collections.sort(game.eventManager.collision);
         System.out.println("Loaded object data");
         loadSprites();
         System.out.println("Loaded sprite data");
         loadFonts();
         System.out.println("Loaded font data");
-        
+
         loadGameInfo();
         System.out.println("Loaded Game info");
 
-        
+        // DEBUG TREE
+/*
+        for (GameObject o : game.objects) {
+            System.out.println("-" + o.getName());
+            for (MainEvent me : o.getMainEvents()) {
+                System.out.println(" - " + me.mainEvent);
+                for (Event e : me.events) {
+                    System.out.println("  -" + e.type);
+                    for (int i = 0; i < e.actions.size(); i++) {
+                        Action a = e.actions.get(i);
+                        String s = a.lib.id + "";
+                        if (a.lib.question)
+                            if (a.ifAction == null)
+                                s = "IF WTFFFFFFFF          ------------------------------------";
+                            else {
+                                String d = "";
+                                if (a.elseAction != null)
+                                    d = "  ELSE " + a.elseAction.start + " " + a.elseAction.end + ","
+                                            + a.elseAction.actionEnd;
+                                s = "If " + a.ifAction.start + ":" + a.ifAction.end + "," + a.ifAction.actionEnd + d;
+                            }
+                        else if (a.lib.actionKind == Action.ACT_REPEAT)
+                            s = "Repeat " + a.arguments.get(0).val;
+                        else if (a.lib.actionKind == Action.ACT_ELSE)
+                            s = "Else";
+                        else if (a.lib.actionKind == Action.ACT_BEGIN)
+                            s = "٨";
+                        else if (a.lib.actionKind == Action.ACT_END)
+                            s = "٧";
+                        else if (a.lib.actionKind == Action.ACT_EXIT)
+                            s = "exit";
+                        else if (a.lib.id == org.gcreator.runero.gml.lib.ActionLibrary.COMMENT)
+                            s = "* " + a.arguments.get(0).val;
+                        System.out.println(i + ((i < 10) ? " " : "") + "  - " + s);
+                    }
+                }
+            }
+
+        }
+
+        System.exit(0);
+*/
     }
 
     private void loadFonts() throws IOException {
@@ -80,7 +124,7 @@ public class ResourceLoader {
             game.fonts.add(fnt);
         }
     }
-    
+
     private void loadSprites() throws IOException {
         File sprDir = new File(game.GameFolder, "sprites/");
         File[] files = sprDir.listFiles(new FileFilter(".dat"));
@@ -393,8 +437,7 @@ public class ResourceLoader {
     /**
      * Indents actions by blocks, if's, else's, and repeat's
      * 
-     * @param e
-     *            the event to indent
+     * @param e the event to indent
      */
     private void indentEvent(Event e) {
         for (int i = 0; i < e.actions.size(); i++) {
@@ -403,7 +446,7 @@ public class ResourceLoader {
                 questionIndent(e, i, a);
                 i = a.ifAction.actionEnd;
             } else if (a.lib.actionKind == Action.ACT_REPEAT) {
-                actionIndent(e, i);
+                a.repeatAction = actionIndent(e, i);
                 i = a.repeatAction.actionEnd;
             }
         }
@@ -411,7 +454,7 @@ public class ResourceLoader {
 
     private void questionIndent(Event e, int index, Action a) {
         a.ifAction = actionIndent(e, index);
-        
+
         // look for else
         int i = a.ifAction.actionEnd + 1;
         if (i >= e.actions.size()) {
@@ -424,39 +467,60 @@ public class ResourceLoader {
         }
     }
 
+    /**
+     *  for indenting questions, else and repeat action
+     */
     private BlockAction actionIndent(Event e, int index) {
         BlockAction qa = new BlockAction();
-        if (index + 1 < e.actions.size()) {
-            qa.start = index + 1;
-        } else {
+        if (index + 2 > e.actions.size()) {
             qa.isFake = true;
             return qa;
         }
         Action next = e.actions.get(index + 1);
+
         if (next.lib.actionKind != Action.ACT_BEGIN) {
+            qa.start = index + 1;
             qa.end = index + 1;
             qa.actionEnd = index + 1;
-        } else {
-            for (int i = index + 2; i < e.actions.size(); i++) {
-                Action a = e.actions.get(i);
+            if (next.lib.question) {
+                questionIndent(e, index + 1, next);
+                if (next.elseAction != null)
+                    qa.end = qa.actionEnd = next.elseAction.actionEnd;
+                else
+                    qa.end = qa.actionEnd = next.ifAction.actionEnd;
 
-                if (a.lib.question) {
-                    questionIndent(e, i, a);
-                    i = a.ifAction.actionEnd;
-                } else if (a.lib.actionKind == Action.ACT_REPEAT) {
-                    a.repeatAction = actionIndent(e, i);
-                    i = a.ifAction.actionEnd;
-                }
-                if (a.lib.actionKind == Action.ACT_END) {
-                    if (i == index + 2)
-                        // empty block
-                        qa.isFake = true;
+                if (next.ifAction.isBlock)
+                    qa.end++;
+            } else if (next.lib.actionKind == Action.ACT_REPEAT) {
+                next.repeatAction = actionIndent(e, index + 1);
+                if (next.repeatAction.isBlock)
+                    qa.end = qa.actionEnd = next.repeatAction.actionEnd + 1;
+                else
+                    qa.end = qa.actionEnd = next.repeatAction.actionEnd;
+            }
+            return qa;
+        }
+        qa.start = index + 2;
+        qa.isBlock = true;
+        for (int i = qa.start; i < e.actions.size(); i++) {
+            Action a = e.actions.get(i);
 
-                    qa.end = i - 1;
-                    qa.actionEnd = i;
+            if (a.lib.question) {
+                questionIndent(e, i, a);
+                i = a.ifAction.actionEnd;
+            } else if (a.lib.actionKind == Action.ACT_REPEAT) {
+                a.repeatAction = actionIndent(e, i);
+                i = a.repeatAction.actionEnd;
+            }
+            if (a.lib.actionKind == Action.ACT_END) {
+                if (i == index + 2)
+                    // empty block
+                    qa.isFake = true;
 
-                    break;
-                }
+                qa.end = i - 1;
+                qa.actionEnd = i;
+
+                break;
             }
         }
         return qa;

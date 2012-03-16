@@ -19,7 +19,7 @@ package com.golden.gamedev.funbox;
 // JFC
 import java.awt.event.KeyEvent;
 
-import com.golden.gamedev.engine.BaseInput;
+import com.golden.gamedev.engine.input.AWTInput;
 
 /**
  * <code>KeyCapture</code> is an utility to capture key sequence combination,
@@ -30,7 +30,7 @@ import com.golden.gamedev.engine.BaseInput;
  * whenever the user type 'HELLO' in right sequence)
  * 
  * <pre>
- * BaseInput input;
+ * AWTInput input;
  * String key = &quot;HELLO&quot;;
  * KeyCapture keycap = new KeyCapture(input, key, 1000) {
  * 	
@@ -48,9 +48,9 @@ import com.golden.gamedev.engine.BaseInput;
 public abstract class KeyCapture {
 	
 	/**
-	 * <code>BaseInput</code> associated with this key capture.
+	 * <code>AWTInput</code> associated with this key capture.
 	 */
-	public BaseInput input;
+	public AWTInput input;
 	
 	/**
 	 * Turn on this DEBUG variable to debug player key input by print it to
@@ -83,12 +83,12 @@ public abstract class KeyCapture {
 	 * Creates new <code>KeyCapture</code> with specified input, key, delay,
 	 * and listener.
 	 * 
-	 * @param input <code>BaseInput</code> associated with this key capture
+	 * @param input <code>AWTInput</code> associated with this key capture
 	 * @param key key code array (from <code>java.awt.event.KeyEvent</code>
 	 *        class) to be captured
 	 * @param delay delay for each key input in milliseconds
 	 */
-	public KeyCapture(BaseInput input, int[] key, int delay) {
+	public KeyCapture(AWTInput input, int[] key, int delay) {
 		this.input = input;
 		this.delay = delay;
 		this.key = key;
@@ -106,11 +106,11 @@ public abstract class KeyCapture {
 	 * in string, delay, and listener. The string will be parsed internally
 	 * before used.
 	 * 
-	 * @param input <code>BaseInput</code> associated with this key capture
+	 * @param input <code>AWTInput</code> associated with this key capture
 	 * @param keyString string to be captured
 	 * @param delay delay for each key input in milliseconds
 	 */
-	public KeyCapture(BaseInput input, String keyString, int delay) {
+	public KeyCapture(AWTInput input, String keyString, int delay) {
 		this.input = input;
 		this.delay = delay;
 		this.key = this.parseString(keyString);
@@ -396,7 +396,7 @@ public abstract class KeyCapture {
 			}
 		}
 		
-		if (this.input.getKeyPressed() != BaseInput.NO_BUTTON) {
+		if (this.input.getKeyPressed() != AWTInput.NO_BUTTON) {
 			if (this.input.isKeyPressed(this.key[this.currentKey])) {
 				this.currentTick = 0; // refresh tick counter
 				

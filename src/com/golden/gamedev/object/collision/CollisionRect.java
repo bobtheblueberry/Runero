@@ -42,7 +42,7 @@ public class CollisionRect implements CollisionShape {
 	 */
 	public int height;
 	
-	private int x1, x2; // optimization, for intersects method
+	//private int x1, x2; // optimization, for intersects method
 	        
 	/** ************************************************************************* */
 	/** ***************************** CONSTRUCTOR ******************************* */
@@ -57,6 +57,14 @@ public class CollisionRect implements CollisionShape {
 		this.width = 0;
 		this.height = 0;
 	}
+	
+	public CollisionRect(double x, double y, int w, int h) {
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = h;
+    }
+    
 	
 	/**
 	 * Grows this collision rect by <code>h</code> width, and <code>v</code>

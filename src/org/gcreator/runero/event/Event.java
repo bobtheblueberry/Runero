@@ -1,14 +1,17 @@
 package org.gcreator.runero.event;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameTimeline;
 
+import com.golden.gamedev.engine.input.AWTInput;
+
 public class Event {
 
- // mouse event types
+    // mouse event types
     public static final byte EV_LEFT_BUTTON = 0;
     public static final byte EV_RIGHT_BUTTON = 1;
     public static final byte EV_MIDDLE_BUTTON = 2;
@@ -90,7 +93,7 @@ public class Event {
     public static final byte EV_STEP_BEGIN = 1;
     public static final byte EV_STEP_END = 2;
 
-    //alarm event types
+    // alarm event types
     public static final byte EV_ALARM0 = 0;
     public static final byte EV_ALARM1 = 1;
     public static final byte EV_ALARM2 = 2;
@@ -103,22 +106,43 @@ public class Event {
     public static final byte EV_ALARM9 = 9;
     public static final byte EV_ALARM10 = 10;
     public static final byte EV_ALARM11 = 11;
-    
+
     public MainEvent parent;
     public byte type;
     public int collisionId; // for collision events
-    public Instance collisionObject = null; // Object collided with in collision events 
+    public Instance collisionObject = null; // Object collided with in collision events
     public ArrayList<Action> actions;
     public GameObject object; // null for timeline events
     public GameTimeline timeline; // null for object events
-    
+
     public Event(MainEvent parent, byte type) {
         this.parent = parent;
         this.type = type;
         actions = new ArrayList<Action>();
     }
-    
+
     public void addAction(Action a) {
         actions.add(a);
+    }
+
+    public static int getGmKeyName(int keyCode) {
+        switch (keyCode) {
+        case 0:
+            return AWTInput.NO_KEY;
+        case 1:
+            return AWTInput.ANY_KEY;
+        case 13: // carriage return \r
+            keyCode = KeyEvent.VK_ENTER;
+            break;
+        case 46:
+            keyCode = KeyEvent.VK_DELETE;
+            break;
+        case 45:
+            keyCode = KeyEvent.VK_INSERT;
+            break;
+        default:
+            break;
+        }
+        return keyCode;
     }
 }
