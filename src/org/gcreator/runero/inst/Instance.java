@@ -211,7 +211,7 @@ public class Instance implements Comparable<Instance> {
             image_index %= image_number;
     }
 
-    protected void draw(GraphicsLibrary g) {
+    public void draw(GraphicsLibrary g) {
         if (isDead)
             return;
         if (sprite_index < 0) {

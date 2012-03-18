@@ -29,7 +29,7 @@ public class RoomInstance {
 
     public int width;
     public int height;
-    
+
     private int instance_count;
     private int instance_nextid = 100000;
 
@@ -184,17 +184,17 @@ public class RoomInstance {
         if (game.eventManager.hasKeyboardEvents)
             for (Event e : game.eventManager.keyboardEvents) {
                 int type = Event.getGmKeyName(e.type);
-         //       if (Keyboard.isKeyDown(type)) {
-           //         EventExecutor.executeEvent(e, this);
-             //       System.out.println("Keyboard " + KeyEvent.getKeyText(type));
-               // }
+                // if (Keyboard.isKeyDown(type)) {
+                // EventExecutor.executeEvent(e, this);
+                // System.out.println("Keyboard " + KeyEvent.getKeyText(type));
+                // }
             }
 
         // key press
         if (game.eventManager.hasKeyPressEvents)
             for (Event e : game.eventManager.keyPressEvents) {
                 int type = Event.getGmKeyName(e.type);
-                if (Keyboard.isKeyDown(type)) { //TODO: This behaves in the same way as keyDown...
+                if (Keyboard.isKeyDown(type)) { // TODO: This behaves in the same way as keyDown...
                     EventExecutor.executeEvent(e, this);
                     System.out.println("Key press " + KeyEvent.getKeyText(type));
                 }
@@ -203,13 +203,13 @@ public class RoomInstance {
         if (game.eventManager.hasKeyReleaseEvents)
             for (Event e : game.eventManager.keyReleaseEvents) {
                 int type = Event.getGmKeyName(e.type);
-                //TODO: THIs
-                if (false) { //TODO: This behaves in the same way as keyDown...
+                // TODO: THIs
+                if (false) { // TODO: This behaves in the same way as keyDown...
                     EventExecutor.executeEvent(e, this);
                     System.out.println("Key press " + KeyEvent.getKeyText(type));
                 }
             }
-        
+
         // millions of mouse and joystick events
 
         // normal step
@@ -220,7 +220,7 @@ public class RoomInstance {
         for (ObjectGroup g : instanceGroups)
             for (Instance i : g.instances)
                 i.move();
-        
+
         if (game.eventManager.hasOtherEvents) {
             // TODO: path end
             // outside room
@@ -228,19 +228,9 @@ public class RoomInstance {
                 for (Event e : game.eventManager.otherOutsideRoom)
                     for (ObjectGroup g : instanceGroups)
                         if (g.obj.getId() == e.object.getId())
-                            for (Instance i : g.instances) {
-                                // TODO: PROPER bounding box checking
-                                int width = 0, height = 0;
-                                GameSprite s = i.getSprite();
-                                if (s != null) {
-                                    width = s.width / 2;
-                                    height = s.height / 2;
-                                }
-                                if (i.x + width < 0 || i.x - width > width || i.y + height < 0
-                                        || i.y - height > height) {
+                            for (Instance i : g.instances)
+                                if (isOutside(i))
                                     i.performEvent(e);
-                                }
-                            }
 
             // TODO: Intersect boundary
         }
@@ -292,13 +282,8 @@ public class RoomInstance {
             g.setColor(room.background_color);
             g.fillRect(0, 0, width, height);
         }
-        for (GameRoom.Background gb : room.backgrounds) {
-            if (gb.visible && !gb.foreground) {
-                // Thanks LateralGM XD
-                paintBackground(g, gb);
-            }
-        }
-
+        // draw backgrounds
+        drawBackgrounds(g, false);
         // Draw instances
         for (ObjectGroup og : instanceGroups)
             for (Instance i : og.instances) {
@@ -310,13 +295,9 @@ public class RoomInstance {
             }
 
         // Draw Foregrounds
-        for (GameRoom.Background gb : room.backgrounds) {
-            if (gb.visible && gb.foreground) {
-                // Thanks LateralGM XD
-                paintBackground(g, gb);
-            }
-        }
+        drawBackgrounds(g, true);
 
+        // Animation end
         if (game.eventManager.otherAnimationEnd != null)
             for (Event e : game.eventManager.otherAnimationEnd)
                 for (ObjectGroup gr : instanceGroups)
@@ -327,6 +308,15 @@ public class RoomInstance {
 
     }
 
+    private void drawBackgrounds(GraphicsLibrary g, boolean foreground) {
+        for (GameRoom.Background gb : room.backgrounds) {
+            if (gb.visible && gb.foreground == foreground) {
+                // Thanks LateralGM XD
+                paintBackground(g, gb);
+            }
+        }
+    }
+
     private void paintBackground(GraphicsLibrary g, GameRoom.Background b) {
         GameBackground bg = RuneroGame.game.getBackground(b.backgroundId);
         if (bg == null)
@@ -335,5 +325,26 @@ public class RoomInstance {
         if (t == null)
             return;
         g.drawBackground(bg, b.x, b.y, b.tileHoriz, b.tileVert, b.stretch);
+    }
+
+    private boolean isOutside(Instance i) {
+        // If the instance has a sprite, make sure the entire
+        // sprite is outside the room, just like Game Maker does
+
+        GameSprite s = i.getSprite();
+        if (s == null) {
+            return (i.x < 0 || i.y < 0 || i.x > width || i.y > height);
+        }
+
+        double x1 = i.x - s.x;
+        double y1 = i.y - s.y;
+        double x2 = i.x + s.width - s.x;
+        double y2 = i.y + s.height - s.y;
+
+        if (x1 > width || y1 > height || x2 < 0 || y2 < 0) {
+            return true;
+        }
+
+        return false;
     }
 }

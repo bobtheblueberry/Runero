@@ -34,6 +34,7 @@ package org.gcreator.runero.gfx;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 
@@ -42,6 +43,12 @@ import org.newdawn.slick.util.BufferedImageUtil;
 
 public class TextureLoader {
 
+    public LinkedList<Texture> textures;
+    
+    public TextureLoader() {
+        textures = new LinkedList<Texture>();
+    }
+    
     /**
      * Load a texture
      *
@@ -54,6 +61,7 @@ public class TextureLoader {
         try {
             BufferedImage i = ImageIO.read(res);
             Texture t = BufferedImageUtil.getTexture(res.getName(), i);
+            textures.add(t);
             long time = System.currentTimeMillis() - start;
             System.out.println("Loaded " + res + " in " + time + " ms");
             return t;

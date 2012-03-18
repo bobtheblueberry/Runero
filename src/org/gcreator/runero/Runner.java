@@ -21,5 +21,7 @@ public class Runner {
         game.loadGame();
         RuneroGame.display = new RuneroDisplay();
         RuneroGame.display.start(game);
+        System.exit(0);
+        // Java Usually crashes here
     }
 }

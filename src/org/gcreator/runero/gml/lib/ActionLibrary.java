@@ -727,28 +727,30 @@ public class ActionLibrary {
         // horizontal|vertical|in both directions
         int dir = Integer.parseInt(a.arguments.get(0).val);
         GameSprite s = instance.getSprite();
-        int sw = 0,sh = 0;
+        int x = 0, y = 0;
         if (s != null) {
-            sw = s.width - s.x;
-            sh = s.height - s.y;
+            x = s.x;
+            y = s.y;
         }
         if (dir == 0 || dir == 2) {
             double newx = instance.x;
             int w = RuneroGame.room.width;
             // TODO: take the sprite into account
-            while (newx < 0)
-                newx = w + newx;
-            while (newx > w)
-                newx %= w;
+            if (newx < -x) {
+                newx = w + x;
+            } else if (newx > w) {
+                newx = - x;
+            }
             instance.x = newx;
         }
         if (dir == 1 || dir == 2) {
             double newy = instance.y;
             int h = RuneroGame.room.height;
-            while (newy < 0)
-                newy = h + newy;
-            while (newy > h)
-                newy %= h;
+            if (newy < -y) {
+                newy = h + y;
+            } else if (newy > h) {
+                newy = - y;
+            }
             instance.y = newy;
         }
     }

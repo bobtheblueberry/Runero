@@ -28,14 +28,14 @@ public class GraphicsLibrary {
         font = new TrueTypeFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12), true);
     }
 
-    public static GraphicsLibrary gfx = new GraphicsLibrary();
+    public final static GraphicsLibrary gfx = new GraphicsLibrary();
 
     public void setColor(Color c) {
         glColor4d(c.getRed() / 255.0, c.getGreen() / 255.0, c.getBlue() / 255.0, c.getAlpha() / 255.0);
     }
-    
-    public void setClearColor(Color c){
-        glClearColor (c.getRed() / 255.0f, c.getGreen() / 255.0f, c.getBlue() / 255.0f, c.getAlpha() / 255.0f);
+
+    public void setClearColor(Color c) {
+        glClearColor(c.getRed() / 255.0f, c.getGreen() / 255.0f, c.getBlue() / 255.0f, c.getAlpha() / 255.0f);
     }
 
     public void drawOval(double x, double y, double width, double height) {
@@ -116,19 +116,23 @@ public class GraphicsLibrary {
     }
 
     public void drawLine(double x1, double y1, double x2, double y2) {
+       
         glPushMatrix();
         glBegin(GL_LINE);
-        glVertex2d(x1, y1);
-        glVertex2d(x2, y2);
+        for (int i = 0; i < 10; i++) {
+            int v = i*10;
+        glVertex2d(x1+v, y1+v);
+        glVertex2d(x2+v, y2+v);
+        }
         glEnd();
         glPopMatrix();
     }
 
     public void fillRect(double x, double y, double width, double height) {
-        glRectd(x, y, x+width, y+height);
+        glRectd(x, y, x + width, y + height);
     }
 
-    private void drawRect(double x, double y, double width, double height) {
+    public void drawRect(double x, double y, double width, double height) {
         glPushMatrix();
         glTranslated(x, y, 0);
         glBegin(GL_LINE_LOOP);
@@ -211,6 +215,7 @@ public class GraphicsLibrary {
     }
 
     public void drawTexture(Texture t, double x, double y, double width, double height) {
+        glColor4d(1, 1, 1, 1);
         // store the current model matrix
         glPushMatrix();
 
@@ -228,19 +233,35 @@ public class GraphicsLibrary {
 
             glTexCoord2d(t.getWidth(), 0);
             glVertex2d(width, 0);
-            
+
             glTexCoord2d(t.getWidth(), t.getHeight());
             glVertex2d(width, height);
-            
+
             glTexCoord2d(0, t.getHeight());
             glVertex2d(0, height);
-
 
         }
         glEnd();
 
         // restore the model view matrix to prevent contamination
         glPopMatrix();
+    }
+
+    public void screen_redraw() {
+        // TODO This probably is broken
+        int width = RuneroGame.room.width;
+        int height = RuneroGame.room.height;
+        glViewport(0, 0, width, height); // Possible bug
+        glLoadIdentity();
+        glScalef(1, -1, 1);
+        glOrtho(-1, width, -1, height, 0, 1); // possible bug
+
+        if (RuneroGame.room.room.draw_background_color) {
+            setClearColor(RuneroGame.room.room.background_color);
+        }
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        RuneroGame.room.render(this);
     }
 
     /**

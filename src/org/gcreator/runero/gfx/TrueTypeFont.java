@@ -112,7 +112,7 @@ public class TrueTypeFont {
         }
         g.setFont(font);
         fontMetrics = g.getFontMetrics();
-        int charwidth = fontMetrics.charWidth(ch) + 8;
+        int charwidth = fontMetrics.charWidth(ch) + 9;
 
         if (charwidth <= 0) {
             charwidth = 7;
@@ -225,10 +225,23 @@ public class TrueTypeFont {
         float TextureSrcY = srcY / textureHeight;
         float SrcWidth = srcX2 - srcX;
         float SrcHeight = srcY2 - srcY;
+
         float RenderWidth = (SrcWidth / textureWidth);
         float RenderHeight = (SrcHeight / textureHeight);
 
+        //HACK - Y coords are flipped :/
+        
+        GL11.glTexCoord2f(TextureSrcX, TextureSrcY+ RenderHeight);
+        GL11.glVertex2f(drawX, drawY);
         GL11.glTexCoord2f(TextureSrcX, TextureSrcY);
+        GL11.glVertex2f(drawX, drawY + DrawHeight);
+        GL11.glTexCoord2f(TextureSrcX + RenderWidth, TextureSrcY );
+        GL11.glVertex2f(drawX + DrawWidth, drawY + DrawHeight);
+        GL11.glTexCoord2f(TextureSrcX + RenderWidth, TextureSrcY+ RenderHeight);
+        GL11.glVertex2f(drawX + DrawWidth, drawY);
+        
+        
+        /*GL11.glTexCoord2f(TextureSrcX, TextureSrcY);
         GL11.glVertex2f(drawX, drawY);
         GL11.glTexCoord2f(TextureSrcX, TextureSrcY + RenderHeight);
         GL11.glVertex2f(drawX, drawY + DrawHeight);
@@ -236,6 +249,7 @@ public class TrueTypeFont {
         GL11.glVertex2f(drawX + DrawWidth, drawY + DrawHeight);
         GL11.glTexCoord2f(TextureSrcX + RenderWidth, TextureSrcY);
         GL11.glVertex2f(drawX + DrawWidth, drawY);
+        */
     }
 
     public int getWidth(String whatchars) {
@@ -278,7 +292,6 @@ public class TrueTypeFont {
 
     public void drawString(float x, float y, String whatchars, int startIndex, int endIndex, float scaleX,
             float scaleY, float angle, int format) {
-
         IntObject intObject = null;
         int charCurrent;
 
@@ -323,7 +336,7 @@ public class TrueTypeFont {
 
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, fontTextureID);
         GL11.glBegin(GL11.GL_QUADS);
-        GL11.glRotated(angle, 0,0,0);//TODO: FIX THIS!
+        // GL11.glRotatef(angle, 1,1,1);//TODO: FIX THIS!
 
         while (i >= startIndex && i <= endIndex) {
 
