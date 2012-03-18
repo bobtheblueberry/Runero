@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import javax.swing.*;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.text.rtf.RTFEditorKit;
-
-import org.gcreator.runero.RuneroGame;
 
 public class GameInformation implements WindowListener {
 
@@ -40,7 +40,7 @@ public class GameInformation implements WindowListener {
         f.add(p);
         f.setSize(width, height);
         f.setResizable(allowResize);
-        f.setLocationRelativeTo(RuneroGame.game.bsGraphics.getComponent());
+        f.setLocationRelativeTo(null);
         f.setVisible(true);
         f.addWindowListener(this);
     }

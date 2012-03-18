@@ -4,8 +4,7 @@ import java.io.File;
 
 import org.gcreator.runero.Preloadable;
 import org.gcreator.runero.RuneroGame;
-
-import com.golden.gamedev.object.background.ImageBackground;
+import org.newdawn.slick.opengl.Texture;
 
 public class GameBackground extends GameResource implements Preloadable {
     
@@ -22,7 +21,7 @@ public class GameBackground extends GameResource implements Preloadable {
     
     public File imageFile;
     
-    private ImageBackground bg = null;
+    private Texture bg;
     
     public GameBackground(String name) {
         super(name);
@@ -31,10 +30,10 @@ public class GameBackground extends GameResource implements Preloadable {
     public void load() {
         if (bg != null)
             return;
-        bg = new ImageBackground(RuneroGame.game.getImage(imageFile.getPath()));
+        bg = RuneroGame.tex.getTexture(imageFile);
     }
 
-    public ImageBackground getBackground() {
+    public Texture getBackground() {
         if (bg == null) {
             load();
         }

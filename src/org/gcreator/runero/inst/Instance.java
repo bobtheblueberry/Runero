@@ -1,18 +1,18 @@
 package org.gcreator.runero.inst;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.util.Hashtable;
 
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
+import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gml.GmlInterpreter;
 import org.gcreator.runero.gml.Variable;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameSprite;
+import org.newdawn.slick.opengl.Texture;
 
 public class Instance implements Comparable<Instance> {
 
@@ -29,7 +29,7 @@ public class Instance implements Comparable<Instance> {
 
     public double image_alpha;
     public double image_angle;
-    public Color image_blend = Color.white;
+    public Color image_blend;
     public double image_index;
     public double image_single; // Deprecated
     public double image_speed = 1.0;
@@ -211,14 +211,9 @@ public class Instance implements Comparable<Instance> {
             image_index %= image_number;
     }
 
-    protected void draw() {
+    protected void draw(GraphicsLibrary g) {
         if (isDead)
             return;
-        Graphics2D g = RuneroGame.room.graphics;
-        if (g == null) {
-            System.err.println("Room draw error! null graphics");
-            return;
-        }
         if (sprite_index < 0) {
             return;
         }
@@ -233,14 +228,13 @@ public class Instance implements Comparable<Instance> {
             return;
         }
         s.load(); // load sub image files
-        BufferedImage img = s.getSubImage((int) Math.round(image_index));
+        Texture img = s.getSubImage((int) Math.round(image_index));
         // TODO: angle, scale, color blend
         if (img == null) {
             System.out.println("Null image for sprite " + s.getName() + " index " + image_index);
             return;
         }
-        g.drawImage(img, (int) x - s.x, (int) y - s.y, null);
-        g.setColor(Color.BLUE);
+        g.drawTexture(img,  x - s.x, y - s.y);
     }
 
     public double getSpeed() {

@@ -1,29 +1,29 @@
 package org.gcreator.runero;
 
-// JFC
-import java.awt.Graphics2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.gcreator.runero.event.EventManager;
+import org.gcreator.runero.gfx.GraphicsLibrary;
+import org.gcreator.runero.gfx.RuneroDisplay;
+import org.gcreator.runero.gfx.TextureLoader;
 import org.gcreator.runero.gml.GmlLibrary;
 import org.gcreator.runero.gml.Variable;
 import org.gcreator.runero.inst.RoomInstance;
 import org.gcreator.runero.res.*;
 
-import com.golden.gamedev.Game;
-
 /**
- * It's time to play!
+ * Game Engine base
  * 
- * Objective: show how to use playfield to automate all things!
  */
-public class RuneroGame extends Game {
+public class RuneroGame {
 
     public static RuneroGame game;
     public static RoomInstance room;
     public static GmlLibrary library;
+    public static RuneroDisplay display;
+    public static TextureLoader tex;
     public EventManager eventManager;
 
     public File GameFolder = new File("/home/serge/Develop/ENIGMA/enigma-dev/RuneroGame");
@@ -36,7 +36,7 @@ public class RuneroGame extends Game {
     public ArrayList<GameSound> sounds;
     public ArrayList<GamePath> paths;
     public ArrayList<GameScript> scripts;
-    public ArrayList<GameFontRes> fonts;
+    public ArrayList<GameFont> fonts;
     public ArrayList<GameTimeline> timelines;
 
     public GameInformation gameInfo;
@@ -54,7 +54,6 @@ public class RuneroGame extends Game {
     public String caption_score; // The caption used for the score.
     public String caption_lives; // The caption used for the number of lives.
     public String caption_health; // The caption used for the health.
-    public int fontAlign; // Font alignment, 0,1,2 (left,center,right), respectively
 
 
     public RuneroGame() {
@@ -63,6 +62,7 @@ public class RuneroGame extends Game {
         library = new GmlLibrary();
         eventManager = new EventManager();
         globalVars = new Hashtable<String, Variable>();
+        tex = new TextureLoader();
         gameStart();
     }
 
@@ -82,14 +82,12 @@ public class RuneroGame extends Game {
         room.init(true);
     }
 
-    public void start() {
-        super.start();
+    public void preload() {
         // TODO: find a better place for this
         // Load the images that are marked to preload
         for (Preloadable p : Runner.rl.preloadables) {
             p.load();
         }
-
     }
 
     // when game is started/restarted
@@ -97,7 +95,7 @@ public class RuneroGame extends Game {
         score = 0;
         lives = -1;
         health = 100;
-        fontAlign = 0;
+        GraphicsLibrary.gfx.fontAlign = 0;
     }
 
     public GameBackground getBackground(int id) {
@@ -127,8 +125,8 @@ public class RuneroGame extends Game {
         return null;
     }
 
-    public GameFontRes getFont(int id) {
-        for (GameFontRes f : fonts) {
+    public GameFont getFont(int id) {
+        for (GameFont f : fonts) {
             if (f.getId() == id) {
                 return f;
             }
@@ -136,17 +134,12 @@ public class RuneroGame extends Game {
         return null;
     }
 
-    public void initResources() {
-     //  System.out.println("nope, no init resources");
-    }
-
     
     public void update() {
         room.step();
     }
 
-    public void render(Graphics2D g) {
-        room.graphics = g;
-        room.render(g);
+    public void render() {
+        room.render(GraphicsLibrary.gfx);
     }
 }

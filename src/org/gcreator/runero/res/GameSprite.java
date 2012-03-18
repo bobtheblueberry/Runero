@@ -1,15 +1,12 @@
 package org.gcreator.runero.res;
 
 import java.awt.Rectangle;
-import java.awt.Transparency;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import org.gcreator.runero.Preloadable;
-
-import com.golden.gamedev.util.ImageUtil;
+import org.gcreator.runero.RuneroGame;
+import org.newdawn.slick.opengl.Texture;
 
 public class GameSprite extends GameResource implements Preloadable {
     public enum BBMode {
@@ -39,14 +36,14 @@ public class GameSprite extends GameResource implements Preloadable {
         super(name);
         subImages = new ArrayList<GameSprite.SubImage>();
     }
-    
+
     public Rectangle getBounds() {
         if (bounds == null)
             bounds = new Rectangle(Math.abs(right - left), Math.abs(bottom - top));
         return bounds;
     }
-    
-    public BufferedImage getSubImage(int index) {
+
+    public Texture getSubImage(int index) {
         int i = index % subImages.size();
         return subImages.get(i).load();
     }
@@ -58,34 +55,28 @@ public class GameSprite extends GameResource implements Preloadable {
 
     @Override
     public void load() {
-        if (loaded) 
+        if (loaded)
             return;
-        BufferedImage[] imgs = new BufferedImage[subImages.size()];
+        Texture[] imgs = new Texture[subImages.size()];
         for (int i = 0; i < subImages.size(); i++) {
             imgs[i] = subImages.get(i).load();
         }
         loaded = true;
     }
-    
+
     public class SubImage {
         File file;
-        BufferedImage image = null;
+        Texture image;
 
         public SubImage(File f) {
             this.file = f;
         }
-        
-        protected BufferedImage load() {
-            if (image != null) 
-                return image;  
-            try {
-                int transparency = (transparent) ? Transparency.BITMASK : Transparency.OPAQUE;
-                
-                return image = ImageUtil.getImage(file.toURI().toURL(), transparency);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            return null;
+
+        protected Texture load() {
+            if (image != null)
+                return image;
+
+            return image = RuneroGame.tex.getTexture(file);
         }
     }
 }

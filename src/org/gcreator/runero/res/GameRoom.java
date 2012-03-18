@@ -3,10 +3,28 @@ package org.gcreator.runero.res;
 import java.awt.Color;
 import java.util.ArrayList;
 
+
 public class GameRoom extends GameResource {
 
     public Color background_color;
-    public int width, height;
+    protected int width, height;
+    
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+    
+    public void setWidth(int w) {
+        this.width = w;
+    }
+    
+    public void setHeight(int h) {
+        this.height = h;
+    }
+
     public String caption;
     public int speed;
     public boolean persistent;

@@ -1,32 +1,24 @@
 package org.gcreator.runero.gml.lib;
 
-import java.awt.AWTException;
 import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.RadialGradientPaint;
-import java.awt.Robot;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.event.Action;
+import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReturnValue;
 import org.gcreator.runero.gml.Variable;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameBackground;
-import org.gcreator.runero.res.GameFontRes;
+import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameSprite;
+import org.newdawn.slick.opengl.Texture;
 
 /**
  * Implements all Game Maker library actions
@@ -177,6 +169,8 @@ public class ActionLibrary {
     public static final int TAKE_SNAPSHOT = 802;
     public static final int EFFECT = 532;
 
+    private static GraphicsLibrary g = GraphicsLibrary.gfx;
+
     public static ReturnValue executeAction(Action act, Instance instance) {
         return executeAction(act, instance, null);
     }
@@ -319,8 +313,8 @@ public class ActionLibrary {
             return ReturnValue.FAILURE;
             // main2
         case SET_ALARM:
-
-            return ReturnValue.FAILURE;
+            set_alarm(act, instance, other);
+            return ReturnValue.SUCCESS;
         case SLEEP:
             sleep(act, instance, other);
             return ReturnValue.SUCCESS;
@@ -709,8 +703,8 @@ public class ActionLibrary {
         double xsnap = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
         double ysnap = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
 
-        double rx = Math.random() * RuneroGame.room.room.width;
-        double ry = Math.random() * RuneroGame.room.room.height;
+        double rx = Math.random() * RuneroGame.room.width;
+        double ry = Math.random() * RuneroGame.room.height;
         if (xsnap > 0)
             rx = ((int) (rx / xsnap)) * xsnap;
         if (ysnap > 0)
@@ -729,11 +723,18 @@ public class ActionLibrary {
     }
 
     private static void wrap(Action a, Instance instance, Instance other) {
+        // TODO: This action sucks, esp. compared to GM's action
         // horizontal|vertical|in both directions
         int dir = Integer.parseInt(a.arguments.get(0).val);
+        GameSprite s = instance.getSprite();
+        int sw = 0,sh = 0;
+        if (s != null) {
+            sw = s.width - s.x;
+            sh = s.height - s.y;
+        }
         if (dir == 0 || dir == 2) {
             double newx = instance.x;
-            int w = RuneroGame.room.room.width;
+            int w = RuneroGame.room.width;
             // TODO: take the sprite into account
             while (newx < 0)
                 newx = w + newx;
@@ -743,7 +744,7 @@ public class ActionLibrary {
         }
         if (dir == 1 || dir == 2) {
             double newy = instance.y;
-            int h = RuneroGame.room.room.height;
+            int h = RuneroGame.room.height;
             while (newy < 0)
                 newy = h + newy;
             while (newy > h)
@@ -919,19 +920,24 @@ public class ActionLibrary {
     IF_NEXT_ROOM*/
 
     // main2
-    /*SET_ALARM*/
+    private static void set_alarm(Action a, Instance instance, Instance other) {
+        int steps = (int) Math.round(GmlParser.getExpression(a.arguments.get(0).val, instance, other));
+        int number = Integer.parseInt(a.arguments.get(1).val);
+        instance.alarm[number] = steps;
+    }
+
     private static void sleep(Action a, Instance instance, Instance other) {
         double seconds = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
         int redraw = Integer.parseInt(a.arguments.get(0).val);
         if (redraw == 1) {
-            RuneroGame.game.bsGraphics.getComponent().repaint();
+            // TODO: REDRAW
         }
-       // try {
-            //System.out.println("sleep " + seconds);
-         //   Thread.sleep((long) seconds);
-     //   } catch (InterruptedException e) {
-      //      System.out.println("Somebody bitched while game slept.");
-       // }
+        try {
+            System.out.println("sleep " + seconds);
+            Thread.sleep((long) seconds);
+        } catch (InterruptedException e) {
+            System.out.println("Somebody bitched while game slept.");
+        }
     }
 
     /*
@@ -942,7 +948,7 @@ public class ActionLibrary {
         // TODO: real function, not this hack
         // also todo, # newlines, \# escape
         String msg = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
-        JOptionPane.showMessageDialog(RuneroGame.game.bsGraphics.getComponent(), msg);
+        JOptionPane.showMessageDialog(null, msg);
     }
 
     private static void show_info(Action a, Instance instance, Instance other) {
@@ -1031,7 +1037,7 @@ public class ActionLibrary {
             y += instance.y;
         }
         String s = var.isReal ? "" + var.realVal : var.val;
-        draw_text(s, (float) x, (float) y);
+        g.drawString(s, (float) x, (float) y);
     }
 
     // score
@@ -1053,7 +1059,7 @@ public class ActionLibrary {
             y += instance.y;
         }
         String caption = a.arguments.get(2).val;
-        draw_text(caption + RuneroGame.game.score, (float) x, (float) y);
+        g.drawString(caption + RuneroGame.game.score, (float) x, (float) y);
     }
 
     private static void highscore_show(Action a, Instance instance, Instance other) {
@@ -1080,7 +1086,7 @@ public class ActionLibrary {
             y += instance.y;
         }
         String caption = a.arguments.get(2).val;
-        draw_text(caption + RuneroGame.game.lives, (float) x, (float) y);
+        g.drawString(caption + RuneroGame.game.lives, (float) x, (float) y);
     }
 
     private static void draw_life_images(Action a, Instance instance, Instance other) {
@@ -1105,10 +1111,10 @@ public class ActionLibrary {
         if (s.subImages.size() == 0) {
             return;
         }
-        BufferedImage lifeImg = s.getSubImage(0);
+        Texture lifeImg = s.getSubImage(0);
         for (int i = 0; i < lives; i++) {
-            int off = lifeImg.getWidth() * i;
-            RuneroGame.room.graphics.drawImage(lifeImg, null, (int) x + off, (int) y);
+            int off = lifeImg.getTextureWidth() * i;
+            g.drawTexture(lifeImg, x + off, y);
         }
         // a nice thing would be to draw part of an image if lives is, say 1.5
         // even though Game Maker does not have this feature.
@@ -1203,8 +1209,8 @@ public class ActionLibrary {
             x += instance.x;
             y += instance.y;
         }
-        BufferedImage img = s.getSubImage(subImage % s.subImages.size());
-        RuneroGame.room.graphics.drawImage(img, null, (int) Math.round(x), (int) Math.round(y));
+        Texture img = s.getSubImage(subImage % s.subImages.size());
+        g.drawTexture(img, x, y);
     }
 
     private static void draw_background(Action a, Instance instance, Instance other) {
@@ -1222,27 +1228,7 @@ public class ActionLibrary {
             x += instance.x;
             y += instance.y;
         }
-        Graphics2D g = RuneroGame.room.graphics;
-
-        BufferedImage bi = bg.getBackground().getImage();
-        if (bi == null)
-            return;
-        int w = bi.getWidth();
-        int h = bi.getHeight();
-        if (tiled) {
-            int ncol = 1;
-            int nrow = 1;
-            x = 1 + ((x + w - 1) % w) - w;
-            ncol = 1 + (RuneroGame.room.room.width - x - 1) / w;
-
-            y = 1 + ((y + h - 1) % h) - h;
-            nrow = 1 + (RuneroGame.room.room.height - y - 1) / h;
-
-            for (int row = 0; row < nrow; row++)
-                for (int col = 0; col < ncol; col++)
-                    g.drawImage(bi, (x + w * col), (y + h * row), w, h, null);
-        } else
-            g.drawImage(bi, x, y, w, h, null);
+        g.drawBackground(bg, x, y, tiled, tiled, false);
     }
 
     private static void draw_text(Action a, Instance instance, Instance other) {
@@ -1254,7 +1240,7 @@ public class ActionLibrary {
             x += instance.x;
             y += instance.y;
         }
-        draw_text(text, (float) x, (float) y);
+        g.drawString(text, (float) x, (float) y);
     }
 
     private static void draw_text_scaled(Action a, Instance instance, Instance other) {
@@ -1269,16 +1255,7 @@ public class ActionLibrary {
             x += instance.x;
             y += instance.y;
         }
-
-        Graphics2D g = RuneroGame.room.graphics;
-        AffineTransform old = g.getTransform();
-        AffineTransform t = new AffineTransform();
-        t.translate(x, y);
-        t.scale(xscale, yscale);
-        t.rotate(angle * Math.PI / 180);
-        g.transform(t);
-        draw_text(text, 0, 0);
-        g.setTransform(old);
+        g.drawString(x, y, text, xscale, yscale, angle);
     }
 
     private static void draw_rectangle(Action a, Instance instance, Instance other) {
@@ -1293,11 +1270,10 @@ public class ActionLibrary {
             y1 += instance.y;
             y2 += instance.y;
         }
-        Graphics2D g = RuneroGame.room.graphics;
         if (filled)
-            g.fillRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+            g.fillRect(x1, y1, (x2 - x1), (y2 - y1));
         else
-            g.drawRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+            g.drawRect(x1, y1, (x2 - x1), (y2 - y1));
     }
 
     private static void draw_gradient_hor(Action a, Instance instance, Instance other) {
@@ -1313,12 +1289,8 @@ public class ActionLibrary {
             y1 += instance.y;
             y2 += instance.y;
         }
-        Graphics2D g = RuneroGame.room.graphics;
-        GradientPaint gradient = new GradientPaint((float) x1, (float) y1, c1, (float) x2, (float) y1, c2, false);
-        Paint old = g.getPaint();
-        g.setPaint(gradient);
-        g.fillRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
-        g.setPaint(old);
+
+        g.drawRectGradientHor(x1, y1, (x2 - x1), (y2 - y1), c1, c2);
     }
 
     private static void draw_gradient_vert(Action a, Instance instance, Instance other) {
@@ -1334,12 +1306,7 @@ public class ActionLibrary {
             y1 += instance.y;
             y2 += instance.y;
         }
-        Graphics2D g = RuneroGame.room.graphics;
-        GradientPaint gradient = new GradientPaint((float) x1, (float) y1, c1, (float) x1, (float) y2, c2, false);
-        Paint old = g.getPaint();
-        g.setPaint(gradient);
-        g.fillRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
-        g.setPaint(old);
+        g.drawRectGradientVert(x1, y1, (x2 - x1), (y2 - y1), c1, c2);
     }
 
     private static void draw_ellipse(Action a, Instance instance, Instance other) {
@@ -1354,11 +1321,10 @@ public class ActionLibrary {
             y1 += instance.y;
             y2 += instance.y;
         }
-        Graphics2D g = RuneroGame.room.graphics;
         if (filled)
-            g.fillOval((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+            g.fillOval(x1, y1, (x2 - x1), (y2 - y1));
         else
-            g.drawOval((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
+            g.drawOval(x1, y1, (x2 - x1), (y2 - y1));
     }
 
     private static void draw_ellipse_gradient(Action a, Instance instance, Instance other) {
@@ -1374,16 +1340,7 @@ public class ActionLibrary {
             y1 += instance.y;
             y2 += instance.y;
         }
-        Graphics2D g = RuneroGame.room.graphics;
-        Point2D center = new Point2D.Float((float) (x1 + (x2 - x1) / 2), (float) (y1 + (y2 - y1) / 2));
-        float radius = (float) ((x2 - x1) / 2 + (y2 - y1) / 2) / 2; // Average radius, dumb but oh well
-        float[] dist = { 0.0f, 1.0f };
-        Color[] colors = { c1, c2 };
-        RadialGradientPaint gradient = new RadialGradientPaint(center, radius, dist, colors);
-        Paint old = g.getPaint();
-        g.setPaint(gradient);
-        g.fillOval((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
-        g.setPaint(old);
+        g.drawOvalGradient(x1, y1, (x2 - x1), (y2 - y1), c1, c2);
     }
 
     private static void draw_line(Action a, Instance instance, Instance other) {
@@ -1397,7 +1354,7 @@ public class ActionLibrary {
             y1 += instance.y;
             y2 += instance.y;
         }
-        RuneroGame.room.graphics.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+        g.drawLine(x1, y1, x2, y2);
     }
 
     private static void draw_arrow(Action a, Instance instance, Instance other) {
@@ -1412,34 +1369,22 @@ public class ActionLibrary {
             y1 += instance.y;
             y2 += instance.y;
         }
-        Graphics2D g = RuneroGame.room.graphics;
-        double rad = 0.32;
-        double angle = Math.atan2((y2 - y1), (x2 - x1)) - Math.PI / 2;
-        int tx1 = (int) (x2 - Math.cos(angle + rad) * tipSize);
-        int tx2 = (int) (x2 - Math.cos(angle - rad) * tipSize);
-        int ty1 = (int) (y2 + Math.sin(angle + rad) * tipSize);
-        int ty2 = (int) (y2 + Math.sin(angle - rad) * tipSize);
-        int[] xpoints = new int[] { tx1, tx2, (int) x2 };
-        int[] ypoints = new int[] { ty1, ty2, (int) y2 };
-
-        g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
-        g.fillPolygon(xpoints, ypoints, 3);
+        g.drawArrow(x1, y1, x2, y2, tipSize);
     }
 
     private static void set_color(Action a, Instance instance, Instance other) {
         Color c = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(0).val));
-        RuneroGame.room.graphics.setColor(c);
+        g.setColor(c);
     }
 
     private static void set_font(Action a, Instance instance, Instance other) {
         int fontId = Integer.parseInt(a.arguments.get(0).val);
-        RuneroGame.game.fontAlign = Integer.parseInt(a.arguments.get(1).val);
+        g.fontAlign = Integer.parseInt(a.arguments.get(1).val);
         // TODO: Font align in draw text functions
-        GameFontRes font = RuneroGame.game.getFont(fontId);
+        GameFont font = RuneroGame.game.getFont(fontId);
         if (font == null)
             return;
-
-        RuneroGame.room.graphics.setFont(font.getFont());
+        g.setFont(font);
     }
 
     private static void fullscreen(Action a, Instance instance, Instance other) {
@@ -1449,15 +1394,7 @@ public class ActionLibrary {
 
     private static void take_snapshot(Action a, Instance instance, Instance other) {
         String fname = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
-        try {
-            BufferedImage screenshot = new Robot().createScreenCapture(RuneroGame.room.getRectangle());
-            ImageIO.write(screenshot, "PNG", new File(fname));
-        } catch (AWTException e) {
-            System.err.println("Can't take screenshot! AWT Error " + e.getMessage());
-        } catch (IOException e) {
-            System.err.println("Can't take screenshot! IO Error " + e.getMessage());
-        }
-
+        g.saveScreenshot(new File(fname));
     }
 
     private static void effect(Action a, Instance instance, Instance other) {
@@ -1465,11 +1402,5 @@ public class ActionLibrary {
         // x, y, size (small|medium|large)
         // color
         // where (below objects|above objects)
-    }
-
-    private static void draw_text(String text, float x, float y) {
-        if (RuneroGame.room.graphics == null)
-             return; // shouldnt happen lol
-        RuneroGame.room.graphics.drawString(text, (float) x, (float) y);
     }
 }

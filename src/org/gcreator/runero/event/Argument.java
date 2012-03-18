@@ -12,7 +12,7 @@ package org.gcreator.runero.event;
 
 import org.gcreator.runero.res.Code;
 import org.gcreator.runero.res.GameBackground;
-import org.gcreator.runero.res.GameFontRes;
+import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GamePath;
 import org.gcreator.runero.res.GameResource;
@@ -70,7 +70,7 @@ public class Argument {
         case ARG_ROOM:
             return GameRoom.class;
         case ARG_FONT:
-            return GameFontRes.class;
+            return GameFont.class;
         case ARG_TIMELINE:
             return GameTimeline.class;
         default:

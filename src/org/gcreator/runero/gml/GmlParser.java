@@ -4,10 +4,7 @@ import java.awt.Color;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.inst.Instance;
-import org.gcreator.runero.inst.ObjectGroup;
-import org.gcreator.runero.res.GameObject;
 
 public class GmlParser {
 

@@ -1,6 +1,5 @@
 package org.gcreator.runero;
 
-import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,7 +20,7 @@ import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.res.Code;
 import org.gcreator.runero.res.GameBackground;
-import org.gcreator.runero.res.GameFontRes;
+import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameInformation;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
@@ -107,10 +106,10 @@ public class ResourceLoader {
     private void loadFonts() throws IOException {
         File fntDir = new File(game.GameFolder, "fonts/");
         File[] files = fntDir.listFiles(new FileFilter(".dat"));
-        game.fonts = new ArrayList<GameFontRes>(files.length);
+        game.fonts = new ArrayList<GameFont>(files.length);
         for (File f : files) {
             BufferedReader r = new BufferedReader(new FileReader(f));
-            GameFontRes fnt = new GameFontRes(r.readLine());
+            GameFont fnt = new GameFont(r.readLine());
             fnt.setId(Integer.parseInt(r.readLine()));
             fnt.fontName = r.readLine();
             fnt.size = Integer.parseInt(r.readLine());
@@ -242,11 +241,11 @@ public class ResourceLoader {
             GameRoom room = new GameRoom(r.readLine());
             room.setId(Integer.parseInt(r.readLine()));
             room.caption = r.readLine();
-            room.width = Integer.parseInt(r.readLine());
-            room.height = Integer.parseInt(r.readLine());
+            room.setWidth(Integer.parseInt(r.readLine()));
+            room.setHeight(Integer.parseInt(r.readLine()));
             room.speed = Integer.parseInt(r.readLine());
             room.persistent = Boolean.parseBoolean(r.readLine());
-            room.background_color = new Color(Integer.parseInt(r.readLine()));
+            room.background_color = new java.awt.Color(Integer.parseInt(r.readLine()));
             room.draw_background_color = Boolean.parseBoolean(r.readLine());
             hasCCode = Boolean.parseBoolean(r.readLine());
             int bgs = Integer.parseInt(r.readLine());
@@ -381,7 +380,7 @@ public class ResourceLoader {
         File settingsFile = new File(game.GameFolder, "Game Information.dat");
         GameInformation g = new GameInformation();
         BufferedReader r = new BufferedReader(new FileReader(settingsFile));
-        g.backgroundColor = new Color(Integer.parseInt(r.readLine()));
+        g.backgroundColor = new java.awt.Color(Integer.parseInt(r.readLine()));
         g.caption = r.readLine();
         g.left = Integer.parseInt(r.readLine());
         g.top = Integer.parseInt(r.readLine());
