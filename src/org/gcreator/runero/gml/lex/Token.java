@@ -4,7 +4,6 @@ public enum Token {
 
     BEGIN // { begin
     , END // } end
-    , WORD // word, or function name or something
     , IF // if
     , THEN // then
     , ELSE // else
@@ -25,6 +24,10 @@ public enum Token {
     , GLOBALVAR // globalvar
     , STRING // " This is a string " ' and this is too!'
     , NUMBER // a number
+    , WORD // word
+    , FUNCTION // func(x,y,z)
+    , ARRAY // grid[x,y]
+    , VARIABLE // x y obj0.x room_width obj5.target.y
     
     , DOT // .
     , SEMICOLON // ;
@@ -34,15 +37,16 @@ public enum Token {
     , BRACKET_CLOSE // ]
     , COMMA // ,
 
-    , ASSIGN_EQUALS // :=
-    , EQUALS // =
-    , PLUS_EQUALS // +=
-    , MINUS_EQUALS // -=
-    , MULTIPLY_EQUALS // *=
-    , DIVIDE_EQUALS // /=
+    , EQUAL // =
+    , ASSIGN_EQUAL // :=
+    , PLUS_EQUAL // +=
+    , MINUS_EQUAL // -=
+    , MULTIPLY_EQUAL // *=
+    , DIVIDE_EQUAL // /=
     , OR_EQUALS // |=
-    , AND_EQUALS // &=
-    , XOR_EQUALS // ^=
+    , AND_EQUAL // &=
+    , XOR_EQUAL // ^=
+    , MOD_EQUAL // %=
 
     , AND // && and
     , OR // or ||

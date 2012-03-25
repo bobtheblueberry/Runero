@@ -6,7 +6,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.Stack;
 
+import org.gcreator.runero.gml.exec.Statement;
 import org.gcreator.runero.gml.lex.GmlLexer.CharData;
 import static org.gcreator.runero.gml.lex.Token.*;
 
@@ -64,15 +67,16 @@ public class GmlTokenizer {
         tokens.put(",", COMMA);
         tokens.put("-", MINUS);
         tokens.put("+", PLUS);
-        tokens.put(":=", ASSIGN_EQUALS);
-        tokens.put("=", EQUALS);
-        tokens.put("+=", PLUS_EQUALS);
-        tokens.put("-=", MINUS_EQUALS);
-        tokens.put("*=", MULTIPLY_EQUALS);
-        tokens.put("/=", DIVIDE_EQUALS);
+        tokens.put(":=", ASSIGN_EQUAL);
+        tokens.put("=", EQUAL);
+        tokens.put("+=", PLUS_EQUAL);
+        tokens.put("-=", MINUS_EQUAL);
+        tokens.put("*=", MULTIPLY_EQUAL);
+        tokens.put("/=", DIVIDE_EQUAL);
         tokens.put("|=", OR_EQUALS);
-        tokens.put("&=", AND_EQUALS);
-        tokens.put("^=", XOR_EQUALS);
+        tokens.put("&=", AND_EQUAL);
+        tokens.put("^=", XOR_EQUAL);
+        tokens.put("%=", MOD_EQUAL);
         tokens.put("&&", AND);
         tokens.put("and", AND);
         tokens.put("||", OR);
@@ -128,12 +132,13 @@ public class GmlTokenizer {
     // ASSIGNMENT = [EXPR] { func(ARGS...), instance.x + 2 - x, "BOB" + 2, 12.0, $0FFAA}
 
     boolean ignoreComments = true;
-    ArrayList<TokenWord> tokenList;
+    LinkedList<TokenWord> tokenList;
+    CharData[] data;
 
     public GmlTokenizer() throws IOException {
 
         File test = new File("test.gml");
-        CharData[] data = GmlLexer.process(new BufferedInputStream(new FileInputStream(test)));
+        data = GmlLexer.process(new BufferedInputStream(new FileInputStream(test)));
 
         if (data == null || data.length == 0) {
             System.out.println("No data");
@@ -169,8 +174,66 @@ public class GmlTokenizer {
         System.out.println(ANSI.BLACK);
 
         System.out.println("================= PHASE TWO =================");
-        tokenList = new ArrayList<TokenWord>();
+        tokenList = new LinkedList<TokenWord>();
+        phase2();
+        debugLine = -1;
+        debugPos = -2;
+        System.out.println("================= PHASE 2.5 =================");
+        tokenList = phase25(tokenList);
+        System.out.println("================= PHASE 2.6 =================");
+        tokenList = phase26(tokenList);
+        printTree();
+
+        System.out.println("================ PHASE THREE ================");
+        TokenWord[] twords = new TokenWord[tokenList.size()];
+        twords = tokenList.toArray(twords);
+        ArrayList<Statement> statements = GmlCompiler.interpretGml(twords);
+    }
+
+    private void printTree() {
+        for (TokenWord tw : tokenList)
+            printToken(tw);
+    }
+
+    int block;
+
+    private void printToken(TokenWord tw) {
+        String s = "";
+        for (int i = 0; i < block; i++)
+            s += " ";
+        if (tw instanceof TokenGroup) {
+            TokenGroup tg = (TokenGroup) tw;
+            block++;
+            s += " ";
+            System.out.println(s + ((tw.token == PAR_OPEN) ? "(" : "["));
+            for (TokenWord t : tg.tokens)
+                printToken(t);
+            System.out.println(s + ((tw.token == PAR_OPEN) ? ")" : "]"));
+            block--;
+        } else if (tw instanceof TokenWordPair) {
+            TokenWordPair tp = (TokenWordPair) tw;
+            System.out.println(s + tw);
+            printToken(tp.child);
+        } else {
+            System.out.println(s + tw);
+        }
+    }
+
+    int debugPos;
+    int debugLine;
+
+    // part of phase2
+    Stack<TokenGroup> groups;
+    TokenGroup tg;
+
+    /**
+     * Creates a string of tokens from the lexer data
+     * and puts data from parenthesis and brackets into groups
+     */
+    private void phase2() {
         // Create a string of tokens from the data
+        // and group ( ) and [ ] in a hierarchy
+        groups = new Stack<TokenGroup>();
         for (CharData c : data) {
             debugLine = c.sline;
             String s = c.getData();
@@ -184,7 +247,7 @@ public class GmlTokenizer {
                     if (t == null)
                         error("Unexpected " + s + " !");
                     else
-                        tokenList.add(new TokenWord(t));
+                        phase2Add(new TokenWord(t));
                 } else {
                     // There could be multiple operators in a single chunk
                     // so we have to look for them
@@ -195,7 +258,7 @@ public class GmlTokenizer {
                         if (t != null) {
                             start = i;
                             i = c.datalen + 1; // will i-- later
-                            tokenList.add(new TokenWord(t));
+                            phase2Add(new TokenWord(t));
                         }
                         if (start >= c.datalen)
                             break;
@@ -205,14 +268,13 @@ public class GmlTokenizer {
                 // begin, end, delphi shizz
                 Token t = tokens.get(s);
                 if (t != null) {
-                    System.out.println(ANSI.CYAN + t + ANSI.BLACK);
-                    tokenList.add(new TokenWord(t));
+                    phase2Add(new TokenWord(t));
                 } else {
                     // just a regular old word... or function, maybe
-                    tokenList.add(new TokenWord(c, WORD));
+                    phase2Add(new TokenWord(c, WORD));
                 }
             } else if (c.isString) {
-                tokenList.add(new TokenWord(c, Token.STRING));
+                phase2Add(new TokenWord(c, Token.STRING));
             } else if (c.isNumber) {
                 // try to parse the number and if it's invalid then error
                 double number;
@@ -228,103 +290,128 @@ public class GmlTokenizer {
                     error("Invalid number " + s);
                     continue;
                 }
-                tokenList.add(new TokenWord(number));
-            }
-            // ignore comments and whitespace =D
-        }
-        for (TokenWord w : tokenList)
-            System.out.println(w);
-        System.out.println("================ PHASE THREE ================");
-        for (int i = 0; i < tokenList.size(); i++) {
-            boolean end = i + 1 >= tokenList.size();
-            TokenWord w = tokenList.get(i);
-
-            if (w.token == SEMICOLON)
-                continue;
-
-            if (w.token == WORD) {
-                if (end) {
-                    // wtf is this shit??
-                    error("unexpected end of data");
-                    break;
-                }
-                TokenWord next = tokenList.get(i);
-                if (next.token == PAR_OPEN) {
-                    // function!
-                    // i = some shit
-                    continue;
-                } else if (next.token == BRACKET_OPEN) {
-                    // Array.. SHIT!!!
-                } else if (next.token == ASSIGN_EQUALS || next.token == EQUALS) { // := =
-
-                } else if (next.token == PLUS_EQUALS) { // +=
-
-                } else if (next.token == MINUS_EQUALS) { // -=
-
-                } else if (next.token == DIVIDE_EQUALS) { // /=
-
-                } else if (next.token == AND_EQUALS) { // &=
-
-                } else if (next.token == OR_EQUALS) { // |=
-
-                } else if (next.token == XOR_EQUALS) { // ^=
-
-                } else {
-                    error("Unexpected " + next.token);
-                    break;
-                }
-                continue;
-            } else if (w.token == BEGIN) {
-                // useless...
-            } else if (w.token == END) {
-                // also useless..
-            } else {
-                error("unexpected " + w);
-                break;
+                phase2Add(new TokenWord(number));
             }
         }
+        // ignore comments and whitespace =D
+
     }
 
-    int debugPos;
-    int debugLine;
+    private void phase2Add(TokenWord tw) {
+        if (tw.token == PAR_OPEN || tw.token == BRACKET_OPEN) {
+            TokenGroup t = new TokenGroup(tw.token);
+            groups.push(t);
+            if (tg != null)
+                tg.tokens.add(t);
+            else
+                tokenList.add(t);
+            tg = t;
+            tw = t;
+            return;
+        } else if (tw.token == PAR_CLOSE) {
+            if (tg == null || tg.token != PAR_OPEN) {
+                error("Unexpected ')'");
+                return;
+            }
+            groups.pop();
+            if (groups.size() == 0)
+                tg = null;
+            else
+                tg = groups.peek();
+            return;
+        } else if (tw.token == BRACKET_CLOSE) {
+            if (tg == null || tg.token != BRACKET_OPEN) {
+                error("Unexpected ']'");
+                return;
+            }
+            groups.pop();
+            if (groups.size() == 0)
+                tg = null;
+            else
+                tg = groups.peek();
+            return; // don't bother adding the ]
+        }
+        if (tg != null)
+            tg.tokens.add(tw);
+        else
+            tokenList.add(tw);
+    }
+
+    /**
+     * turns arrays and functions into ARRAY and FUNCTION
+     * 
+     * @param tokensOrig
+     * @return
+     */
+    private LinkedList<TokenWord> phase25(LinkedList<TokenWord> tokensOrig) {
+        LinkedList<TokenWord> tokens = new LinkedList<TokenWord>();
+        for (int i = 0; i < tokensOrig.size(); i++) {
+            TokenWord tw = tokensOrig.get(i);
+            if (i + 1 < tokensOrig.size() && tw.token == WORD) {
+                TokenWord next = tokensOrig.get(i + 1);
+                if (next.token == PAR_OPEN || next.token == BRACKET_OPEN) {
+                    tw.token = (next.token == PAR_OPEN) ? FUNCTION : ARRAY;
+                    TokenWordPair tp = new TokenWordPair(tw);
+                    TokenGroup g = (TokenGroup) next;
+                    tp.child = g;
+                    i++; // skip next
+                    // phase25 next
+                    g.tokens = phase25(g.tokens);
+                    tw = tp;
+                }
+            }
+            tokens.add(tw);
+
+            if (tw instanceof TokenGroup) {
+                TokenGroup g = (TokenGroup) tw;
+                g.tokens = phase25(g.tokens);
+            }
+        }
+        return tokens;
+    }
+
+    /**
+     * Turns the rest of the words into variables like x or obj1.y
+     * 
+     * @param tokensOrig
+     * @return
+     */
+    private LinkedList<TokenWord> phase26(LinkedList<TokenWord> tokensOrig) {
+        LinkedList<TokenWord> tokens = new LinkedList<TokenWord>();
+        for (int i = 0; i < tokensOrig.size(); i++) {
+            TokenWord tw = tokensOrig.get(i);
+            if (tw.token == WORD) { // WORD DOT WORD DOT WORD
+                tw.token = VARIABLE;
+                TokenVariable var = new TokenVariable(tw);
+                tw = var;
+                while (i + 1 < tokensOrig.size()) {
+                    TokenWord next = tokensOrig.get(i + 1);
+                    if (next.token != DOT)
+                        break;
+                    i++;
+                    next = tokensOrig.get(i + 1);
+                    if (next.token != WORD) {
+                        error("Unexpected . ? ??");
+                        break;
+                    }
+                    var.add(next.data.getData());
+                    i++;
+                }
+            }
+
+            tokens.add(tw);
+
+            if (tw instanceof TokenGroup) {
+                TokenGroup g = (TokenGroup) tw;
+                g.tokens = phase26(g.tokens);
+            }
+        }
+        return tokens;
+    }
 
     private void error(String msg) {
         System.out.println(ANSI.RED + "Error in parser line " + debugLine + " position " + (debugPos + 1) + ": " + msg
                 + ANSI.BLACK);
-    }
-
-    class TokenWord {
-        boolean hasData;
-        boolean hasNumber;
-        Token token;
-        CharData data;
-        double number;
-
-        public TokenWord(double n) {
-            this.hasNumber = true;
-            this.number = n;
-            this.token = NUMBER;
-        }
-
-        public TokenWord(Token t) {
-            this.token = t;
-        }
-
-        public TokenWord(CharData data, Token t) {
-
-            this.token = t;
-            this.hasData = true;
-            this.data = data;
-        }
-
-        public String toString() {
-            String s = "" + token;
-            if (hasNumber)
-                s += " " + number;
-            if (hasData)
-                s += " " + data.getData();
-            return s;
-        }
     }
 
     final class ANSI {
