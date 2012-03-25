@@ -75,9 +75,10 @@ public class RuneroGame {
         }
         // Go to the first room
         // this code is for ME, TESTING
-//        if (rooms.size() > 3)
-  //          room = new RoomInstance(this, rooms.get(3));
-    //    else
+        int roomi = 3;
+        if (rooms.size() > roomi)
+            room = new RoomInstance(this, rooms.get(roomi));
+        else
             room = new RoomInstance(this, rooms.get(0));
         room.init(true);
     }

@@ -114,11 +114,14 @@ public class GraphicsLibrary {
         glEnd();
         glPopMatrix();
     }
-
+    
+    public void untexture() {
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    
     public void drawLine(double x1, double y1, double x2, double y2) {
-       
         glPushMatrix();
-        glBegin(GL_LINE);
+        glBegin(GL_LINE_LOOP);
         for (int i = 0; i < 10; i++) {
             int v = i*10;
         glVertex2d(x1+v, y1+v);
@@ -245,6 +248,7 @@ public class GraphicsLibrary {
 
         // restore the model view matrix to prevent contamination
         glPopMatrix();
+        untexture();
     }
 
     public void screen_redraw() {
