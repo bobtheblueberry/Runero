@@ -7,6 +7,10 @@
 /**/
 /******/ /****/ 
 
+cheese.is.a.real.noob = 1
+cheese.          is.  real . noob        =2
+cheese.is.a[1].noob.b1234y[1,2]=2
+
 x[1 + 2 / 5 % 6 ^ 3, 6 /2+round(2.5) + 2 + x[7,4]] = 1
 y[200 /y - 2*2000] = 2 
 
@@ -22,8 +26,6 @@ y[200 /y - 2*2000] = 2
   io_clear();
 }
 
-cheese.is.a.real.noob
-cheese.is.real.noob
 ////////////////////////////////////////////////////////////////
 // script name: highscore_fill
 //     creator: Mark Overmars
@@ -180,3 +182,8 @@ cheese.is.real.noob
   str = 'hello' + " world";
   b = (x < 5) && !(x==2 || x==4);
 }
+// Josh is black
+ if 0=="str"sound_play(0) 
+//do{a=(0).x+0end until"a"="b"
+// 123
+//for({i=0; j=1;}; i<j; {i*=2; k+=3end) begin}

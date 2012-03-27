@@ -3,13 +3,21 @@ package org.gcreator.runero.gml.lex;
 import static org.gcreator.runero.gml.lex.Token.*;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import org.gcreator.runero.gml.exec.Argument;
 import org.gcreator.runero.gml.exec.Assignment;
+import org.gcreator.runero.gml.exec.Constant;
 import org.gcreator.runero.gml.exec.Expression;
 import org.gcreator.runero.gml.exec.Function;
+import org.gcreator.runero.gml.exec.If;
 import org.gcreator.runero.gml.exec.Operator;
+import org.gcreator.runero.gml.exec.Repeat;
 import org.gcreator.runero.gml.exec.Statement;
+import org.gcreator.runero.gml.exec.Variable;
+import org.gcreator.runero.gml.exec.VariableDecl;
+import org.gcreator.runero.gml.exec.VariableRef;
+import org.gcreator.runero.gml.exec.While;
 import org.gcreator.runero.gml.lex.GmlTokenizer.ANSI;
 
 /**
@@ -24,211 +32,397 @@ public class GmlCompiler {
     public static ArrayList<Statement> interpretGml(TokenWord[] tokens) {
         GmlCompiler c = new GmlCompiler(tokens);
         c.execute();
-        return c.execution;
+        return c.main;
     }
 
     private GmlCompiler(TokenWord[] tokens) {
         this.tokens = tokens;
-        execution = new ArrayList<Statement>();
+        main = new ArrayList<Statement>();
     }
 
-    ArrayList<Statement> execution;
+    ArrayList<Statement> main;
     TokenWord[] tokens;
 
     int i;
-    boolean end;
+
     /**
      * Where the magic happens!
      * 
      */
     private void execute() {
         for (i = 0; i < tokens.length; i++) {
-            end = i + 1 >= tokens.length;
             TokenWord w = tokens[i];
-            if (w.token == SEMICOLON)
-                continue;
-            else
-                System.out.println(w);
-
-            String s = null;
-            if (w.hasData)
-                s = w.data.getData();
-
-            if (w.token == WORD) {
-                if (end) {
-                    // wtf is this shit??
-                    error("unexpected end of data");
-                    break;
-                }
-                TokenWord next = tokens[i + 1];
-                if (next.token == PAR_OPEN) {
-                    addFunction(s, (TokenGroup) next);
-                } else if (next.token == BRACKET_OPEN) { // [
-                    // Array.. SHIT!!!
-                    // TODO: support arrays...
-                    // /// should happen in phase2
-                } else if (next.token == ASSIGN_EQUAL || next.token == EQUAL) { // := =
-                    addAssignment(Assignment.OPERATION.SET);
-                } else if (next.token == PLUS_EQUAL) { // +=
-                    addAssignment(Assignment.OPERATION.ADD);
-                } else if (next.token == MINUS_EQUAL) { // -=
-                    addAssignment(Assignment.OPERATION.SUB);
-                } else if (next.token == MULTIPLY_EQUAL) { // *=
-                    addAssignment(Assignment.OPERATION.MULTIPLY);
-                } else if (next.token == DIVIDE_EQUAL) { // /=
-                    addAssignment(Assignment.OPERATION.DIVIDE);
-                } else if (next.token == MOD_EQUAL) { // %=
-                    addAssignment(Assignment.OPERATION.MOD);
-                } else if (next.token == AND_EQUAL) { // &=
-                    addAssignment(Assignment.OPERATION.AND);
-                } else if (next.token == OR_EQUALS) { // |=
-                    addAssignment(Assignment.OPERATION.OR);
-                } else if (next.token == XOR_EQUAL) { // ^=
-                    addAssignment(Assignment.OPERATION.XOR);
-                } else if (next.token == IF) { // if also handles THEN and ELSE
-                    addIf();
-                } else if (next.token == WHILE) {
-                    addWhile();
-                } else if (next.token == DO) { // do also handles UNTIL (expr)
-                    addDo();
-                } else if (next.token == FOR) {
-                    addFor();
-                } else if (next.token == WITH) {
-                    addWith();
-                } else if (next.token == REPEAT) {
-                    addRepeat();
-                } else if (next.token == EXIT) {
-                    addExit();
-                } else if (next.token == RETURN) {
-                    addReturn();
-                } else if (next.token == BREAK) {
-                    addBreak();
-                } else if (next.token == CONTINUE) {
-                    addContinue();
-                } else if (next.token == SWITCH) { // switch takes care of CASE and DEFAULT
-                    addSwitch();
-                } else if (next.token == VAR) {
-                    addVar(false);
-                } else if (next.token == GLOBALVAR) {
-                    addVar(true);
-                } else {
-                    error("Unexpected " + next);
-                    break;
-                }
-                continue;
-            } else if (w.token == BEGIN) {
-                // useless...
-            } else if (w.token == END) {
-                // also useless..
-            } else {
-                error("unexpected " + w);
-                break;
-            }
+            System.out.println(w + " " + i);
+            Statement s = getStatement(w);
+            if (s != null)
+                main.add(s);
+            System.out.println("LOOP " + i);
         }
     }
 
-    private Expression getExpression() {
+    private Statement getStatement(TokenWord w) {
+        if (w.token == SEMICOLON) { // useless
+            return null;
+        } else if (w.token == FUNCTION) {
+            return getFunction((TokenWordPair) w);
+        } else if (w.token == VARIABLE || w.token == ARRAY) {
+            TokenWord next = next();
+            if (next.token == ASSIGN_EQUAL || next.token == EQUAL) { // := =
+                return getAssignment(Assignment.OPERATION.SET);
+            } else if (next.token == PLUS_EQUAL) { // +=
+                return getAssignment(Assignment.OPERATION.ADD);
+            } else if (next.token == MINUS_EQUAL) { // -=
+                return getAssignment(Assignment.OPERATION.SUB);
+            } else if (next.token == MULTIPLY_EQUAL) { // *=
+                return getAssignment(Assignment.OPERATION.MULTIPLY);
+            } else if (next.token == DIVIDE_EQUAL) { // /=
+                return getAssignment(Assignment.OPERATION.DIVIDE);
+            } else if (next.token == MOD_EQUAL) { // %=
+                return getAssignment(Assignment.OPERATION.MOD);
+            } else if (next.token == AND_EQUAL) { // &=
+                return getAssignment(Assignment.OPERATION.AND);
+            } else if (next.token == OR_EQUALS) { // |=
+                return getAssignment(Assignment.OPERATION.OR);
+            } else if (next.token == XOR_EQUAL) { // ^=
+                return getAssignment(Assignment.OPERATION.XOR);
+            } else {
+                error("Unexpected " + next);
+                return null;
+            }
+        } else if (w.token == BEGIN) {
+            // useless...
+            return null;
+        } else if (w.token == END) {
+            // also useless..
+            return null;
+        } else if (w.token == IF) { // if also handles THEN and ELSE
+            return getIf();
+        } else if (w.token == WHILE) {
+            return getWhile();
+        } else if (w.token == DO) { // do also handles UNTIL (expr)
+            return getDo();
+        } else if (w.token == FOR) {
+            return getFor();
+        } else if (w.token == WITH) {
+            return getWith();
+        } else if (w.token == REPEAT) {
+            return getRepeat();
+        } else if (w.token == EXIT) {
+            return getExit();
+        } else if (w.token == RETURN) {
+            return getReturn();
+        } else if (w.token == BREAK) {
+            return getBreak();
+        } else if (w.token == CONTINUE) {
+            return getContinue();
+        } else if (w.token == SWITCH) { // switch takes care of CASE and DEFAULT
+            return getSwitch();
+        } else if (w.token == VAR) {
+            return getVar(false);
+        } else if (w.token == GLOBALVAR) {
+            return getVar(true);
+        } else {
+            error("unexpected " + w);
+            return null;
+        }
+    }
+
+    private Statement getVar(boolean global) {
+        VariableDecl d = new VariableDecl(global);
+        while (i < tokens.length) {
+            TokenWord w = next();
+            if (w.token == SEMICOLON)
+                break;
+            if (w.token == COMMA)
+                continue;
+            if (w.token != VARIABLE) {
+                error("Unexpected variable name " + w);
+                break;
+            }
+            TokenVariable v = (TokenVariable) w;
+            if (v.getVariables() != null) {
+                error("Unexpected variable name " + v);
+                break;
+            }
+            d.vars.add(v.data.getData());
+        }
+
+        return d;
+    }
+
+    private Statement getSwitch() {
+        // TODO Auto-generated method stub
         return null;
     }
 
-    private void addVar(boolean b) {
+    private Statement getContinue() {
         // TODO Auto-generated method stub
-
+        return null;
     }
 
-    private void addReturn() {
+    private Statement getBreak() {
         // TODO Auto-generated method stub
-
+        return null;
     }
 
-    private void addSwitch() {
+    private Statement getReturn() {
         // TODO Auto-generated method stub
-
+        return null;
     }
 
-    private void addContinue() {
+    private Statement getExit() {
         // TODO Auto-generated method stub
-
+        return null;
     }
 
-    private void addBreak() {
+    private Statement getRepeat() {
+        Repeat r = new Repeat();
+        r.condition = getArgument(false);
+        return r;
+    }
+
+    private Statement getWith() {
         // TODO Auto-generated method stub
-
+        return null;
     }
 
-    private void addExit() {
+    private Statement getFor() {
         // TODO Auto-generated method stub
-
+        return null;
     }
 
-    private void addFor() {
+    private Statement getDo() {
         // TODO Auto-generated method stub
-
+        return null;
     }
 
-    private void addWith() {
-        // TODO Auto-generated method stub
-
+    private Statement getWhile() {
+        While w = new While();
+        w.condition = getArgument(false);
+        w.exec = getBlock();
+        return w;
     }
 
-    private void addRepeat() {
-        // TODO Auto-generated method stub
-
+    private Statement getIf() {
+        If s = new If();
+        s.condition = getArgument(false);
+        s.exec = getBlock();
+        TokenWord next = next();
+        if (next.token == ELSE) {
+            s.hasElse = true;
+            s.elseExec = getBlock();
+        } else
+            i--;
+        System.out.println("ENDIF===");
+        return s;
     }
 
-    private void addDo() {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void addWhile() {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void addIf() {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void addAssignment(Assignment.OPERATION op) {
-        Assignment a = new Assignment(op);
-        execution.add(a);
-    }
-
-    private void addFunction(String name, TokenGroup g) {
-        Function f = new Function(name);
-        // look for args
-        if (g.tokens.size() > 0) {
-            Argument a = null;
-            for (TokenWord t : g.tokens) {
-                if (t.token == COMMA) {
-                    if (a == null) {
-                        error("Unexpected ','");
-                        break;
-                    } else {
-                        f.args.add(a);
-                        a = null;
-                        continue;
-                    }
-                }
-                if (a == null)
-                    a = new Argument();
-                Expression e = getExpression(t);
-                a.add(e);
+    private ArrayList<Statement> getBlock() {
+        ArrayList<Statement> list = new ArrayList<Statement>();
+        TokenWord next = next();
+        if (next.token == BEGIN) {
+            while (i < tokens.length) {
+                next = next();
+                if (next.token == END)
+                    break;
+                list.add(getStatement(next));
             }
+        } else {
+            list.add(getStatement(next));
+        }
+        return list;
+    }
+
+    private Assignment getAssignment(Assignment.OPERATION op) {
+        Assignment a = new Assignment(op);
+        a.value = getArgument(true);
+        return a;
+    }
+
+    /**
+     * gets an argument 
+     * 
+     * @return
+     */
+    private Argument getArgument(boolean allowSemicolon) {
+        System.out.println("Argument -->");
+        // UNARY? VAL (OP UNARY? VAL)*
+        // VAL = FUNCTION, VARIABLE, NUMBER, STRING, parenthesis
+        // OP = Operator
+
+        Argument a = new Argument();
+        TokenWord first = next();
+        if (isUnary(first.token)) {
+            // darn.
+            if (first.token == PLUS) {
+                // useless
+            }
+            first = next();
+        }
+        if (!isValue(first.token)) {
+            error("Unexpected " + first);
+            return null;
         }
 
-        execution.add(f);
+        a.add(getExpression(first));
+        boolean reqOp = true;
+        while (hasNext()) {
+            TokenWord next = next();
+            boolean unary = false;
+            boolean op = isOperator(next.token);
+            if (op && isUnary(next.token)) {
+                unary = true;
+                if (next.token == PLUS || next.token == MINUS) {
+                    // might not actually be unary
+                    TokenWord n2 = next();
+                    if (isOperator(n2.token)) { // x = y - ~y
+                        unary = true;
+                    } else {
+                        unary = false;
+                    }
+                    i--;// f is not used, we are just peeking
+                }
+            }
+
+            if (allowSemicolon && next.token == SEMICOLON) {
+                break;
+            }
+            if ((reqOp || unary) && op) {
+                if (unary) {
+                    Expression e = getUnaryExpression(next.token);
+                    if (e != null)
+                        a.add(e);
+                } else {
+                    a.add(getExpression(next));
+                }
+            } else if (!op && !reqOp && isValue(next.token)) {
+                a.add(getExpression(next));
+                // check to see if there is more things to add
+                next = next();
+                if (next.token != SEMICOLON) i--;
+                if (next.token == SEMICOLON || !isOperator(next.token))
+                    break; // end of statement
+            } else {
+                // end of statement
+                i--;
+                break;
+            }
+            if (unary)
+                reqOp = false;
+            else 
+                reqOp = !reqOp;
+        }
+        System.out.println("  <---");
+        return a;
+    }
+
+    private boolean isOperator(Token t) {
+        return t == EQUAL || t == AND || t == OR || t == XOR || t == NOT || t == PLUS || t == MINUS || t == NOT_EQUALS
+                || t == INT_DIVIDE || t == DIV || t == MULTIPLY || t == MODULO || t == GREATER || t == LESS
+                || t == GREATER_EQUAL || t == LESS_EQUAL || t == COMPARATOR_EQUALS || t == BITW_AND || t == BITW_OR
+                || t == BITW_XOR || t == BITW_INVERT || t == BITW_RIGHT || t == BITW_LEFT;
+    }
+
+    private boolean isValue(Token t) {
+        return t == FUNCTION || t == VARIABLE || t == NUMBER || t == STRING || t == PAR_OPEN;
+    }
+
+    private boolean isUnary(Token t) {
+        return t == NOT || t == PLUS || t == MINUS || t == BITW_INVERT;
+    }
+
+    private Expression getUnaryExpression(Token token) {
+        if (token == MINUS)
+            return new Expression(Operator.NEGATE);
+        else if (token == PLUS)
+            ; // useless
+        else if (token == NOT)
+            return new Expression(Operator.NOT);
+        else if (token == BITW_INVERT)
+            return new Expression(Operator.BITW_INVERT);
+        return null;
+    }
+
+    private boolean hasNext() {
+        return i + 1 < tokens.length;
+    }
+
+    private TokenWord next() {
+        i++;
+        if (i >= tokens.length)
+            error("Unexpected end of data");
+        else {
+            System.out.println("Next: [" + i + "]: " + tokens[i]);
+            return tokens[i];
+        }
+        return null;
+    }
+
+    private Function getFunction(TokenWordPair func) {
+        Function f = new Function(func.data.getData());
+        TokenGroup args = func.child;
+        if (args.tokens.size() > 0) {
+            Argument a = new Argument();
+            for (TokenWord w : args.tokens) {
+                if (w.token == COMMA) {
+                    // TODO: check syntax
+                    f.args.add(a);
+                    a = new Argument();
+                    continue;
+                }
+                a.expressions.add(getExpression(w));
+            }
+            f.args.add(a);
+        }
+        return f;
+    }
+
+    private Argument getExpression(TokenGroup g) {
+        Argument a = new Argument();
+        for (TokenWord t : g.tokens)
+            a.add(getExpression(t));
+        return a;
     }
 
     private Expression getExpression(TokenWord t) {
-        if (t.token == WORD)  { // variable function array etc.
-            if (end) {
-                 // end of data 
+        if (t.token == NUMBER) {
+            return new Expression(new Constant(t.number));
+        } else if (t.token == STRING) {
+            return new Expression(new Constant(t.data.getData()));
+        } else if (t.token == FUNCTION) {
+            TokenWordPair func = (TokenWordPair) t;
+            return new Expression(getFunction(func));
+        } else if (t.token == ARRAY) {
+            VariableRef var = new VariableRef();
+            Variable a = new Variable(t.data.getData());
+            a.isArray = true;
+            a.arrayIndex = getExpression(((TokenWordPair) t).child);
+            var.ref = new Variable[] { a };
+            return new Expression(var);
+        } else if (t.token == VARIABLE) {
+            TokenVariable v = (TokenVariable) t;
+            String st1 = v.data.getData();
+            TokenWord[] tws = v.getVariables();
+            VariableRef var = new VariableRef();
+            if (tws == null) {
+                var.ref = new Variable[] { new Variable(st1) };
+            } else {
+                var.ref = new Variable[tws.length + 1];
+                var.ref[0] = new Variable(st1);
+                for (int j = 1; j < var.ref.length; j++) {
+                    TokenWord tw = tws[j - 1];
+                    Variable a = new Variable(tw.data.getData());
+                    if (tw.token == ARRAY) {
+                        a.isArray = true;
+                        a.arrayIndex = getExpression(((TokenWordPair) tw).child);
+                    }
+                    var.ref[j] = a;
+                }
             }
-            
-            
+            return new Expression(var);
+
+        } else if (t.token == PAR_OPEN) {
+            return new Expression(getExpression((TokenGroup) t));
         } else if (t.token == AND)
             return new Expression(Operator.AND);
         else if (t.token == OR)
@@ -273,8 +467,11 @@ public class GmlCompiler {
             return new Expression(Operator.BITW_LEFT);
         else if (t.token == BITW_RIGHT)
             return new Expression(Operator.BITW_RIGHT);
+        else if (t.token == BITW_INVERT)
+            return new Expression(Operator.BITW_INVERT);
+        i--;
+        error("Unexpected in expression: " + t);
         return null;
-
     }
 
     private void error(String msg) {

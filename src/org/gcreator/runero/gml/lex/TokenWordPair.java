@@ -7,5 +7,4 @@ public class TokenWordPair extends TokenWord {
     protected TokenWordPair(TokenWord t) {
         super(t);
     }
-
 }

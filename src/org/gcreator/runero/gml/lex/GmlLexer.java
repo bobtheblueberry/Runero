@@ -128,6 +128,7 @@ public class GmlLexer {
             add(c);
             return;
         }
+        // end of word
         if (curData != null && isWord && !isLetterNumber(c)) {
             curData = null;
             isWord = false;
@@ -135,15 +136,26 @@ public class GmlLexer {
             return;
         }
 
-        if (!isStr && !isWord && !isNumber && (c == '$' || c == '.' || (c >= '0' && c <= '9'))) {
+        // number
+        boolean cond = (c == '$' || (c >= '0' && c <= '9'));
+        char next = 0;
+        if (c == '.' && !isStr && !isWord && !isNumber && !cond) {
+            next = next();
+            if (next >= '0' && next <= '9')
+                cond = true;
+        }
+            
+        if (!isStr && !isWord && !isNumber && cond) {
             block();
             curData.isNumber = true;
             if (c == '$')
                 curData.isHexNumber = true;
             isNumber = true;
             add(c);
+            if (next > 0) parse(next);
             return;
         }
+        // end of number
         if (curData != null && isNumber && !((c >= '0' && c <= '9') || (!curData.isHexNumber && c == '.'))
                 && !(curData.isHexNumber ? ((c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')) : false)) {
             curData = null;
@@ -153,6 +165,7 @@ public class GmlLexer {
         }
 
         add(c);
+        if (next > 0) parse(next);
     }
 
     private boolean isUseless(char c) {
@@ -200,7 +213,7 @@ public class GmlLexer {
     }
     
     private void add(char c, boolean force) {
-        if (!force && c == '\n' && curData == null) // avoid useless code blocks
+        if (!isStr && !force && c == '\n' && curData == null) // avoid useless code blocks
             return;
         if (!isComment && !isComment2 && !isStr && !isWord && !isNumber) {
             if (isUseless(c)) { // deal with useless/whitespace

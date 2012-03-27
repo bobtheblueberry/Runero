@@ -15,7 +15,7 @@ public class Expression {
     public Type type;
 
     public Constant constant; // string/number constants
-    public Variable variable; // variables
+    public VariableRef variable; // variables
     public Function function; // used for function types
     public Argument parenthesis; // used for parenthesis types
     public Operator op; // Used for operator types
@@ -30,7 +30,7 @@ public class Expression {
         constant = c;
     }
     
-    public Expression (Variable var) {
+    public Expression (VariableRef var) {
         this.type = Type.VARIABLE;
         variable = var;
     }

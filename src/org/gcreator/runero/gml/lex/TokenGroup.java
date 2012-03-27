@@ -18,9 +18,10 @@ class TokenGroup extends TokenWord {
     public String toString() {
         if (tokens.size() == 0)
             return "<Empty Group>";
-        String s = "";
+        String s = "( ";
         for (TokenWord w : tokens)
             s += w + " ";
+        s += ")";
         return s;
     }
 }

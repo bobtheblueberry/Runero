@@ -1,3 +1,108 @@
+Java order of operations:
+Executed from highest to lowest
+
+1
+
+(), []
+
+non-associative
+
+2
+
+new
+
+non-associative
+
+3
+
+.
+
+left-associative
+
+4
+
+++, - -
+
+non-associative
+
+5
+
+- (unary), + (unary), !, ~, ++, - -, (type)
+
+right-associative
+
+6
+
+*, /, %
+
+left-associative
+
+7
+
++, -
+
+left-associative
+
+8
+
+<<, >>, >>>
+
+left-associative
+
+9
+
+<, >, <=, >=, instanceof
+
+non-associative
+
+10
+
+==, !=
+
+left-associative
+
+11
+
+&
+
+left-associative
+
+12
+
+^
+
+left-associative
+
+13
+
+|
+
+left-associative
+
+14
+
+&&
+
+left-associative
+
+15
+
+||
+
+left-associative
+
+16
+
+?:
+
+right-associative
+
+17
+
+=, *=, /=, %=, -=, <<=, >>=, >>>=, &=, ^=, |=
+
+right-associative
+
 
 -The following operators exist (GM5):
 and

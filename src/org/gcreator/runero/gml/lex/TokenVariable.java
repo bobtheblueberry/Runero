@@ -4,20 +4,20 @@ import java.util.LinkedList;
 
 public class TokenVariable extends TokenWord {
 
-    private LinkedList<String> variables;// x.y.a.b.c.y
-
+    private LinkedList<TokenWord> variables;// TokenWordPair for arrays
+    
     protected TokenVariable(TokenWord t) {
         super(t);
     }
 
-    public void add(String name) {
+    public void add(TokenWord t) {
         if (variables == null)
-            variables = new LinkedList<String>();
-        variables.add(name);
+            variables = new LinkedList<TokenWord>();
+        variables.add(t);
     }
 
-    public String[] getVariables() {
-        return variables.toArray(new String[variables.size()]);
+    public TokenWord[] getVariables() {
+        return (variables == null) ? null : variables.toArray(new TokenWord[variables.size()]);
     }
 
     public String toString() {

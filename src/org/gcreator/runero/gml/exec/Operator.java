@@ -6,5 +6,6 @@ public enum Operator {
     EQUALS, NOT_EQUAL, PLUS, MINUS, MULTIPLY, DIVIDE, // == != + - * /
     INT_DIVIDE, MODULO, NEGATE, // div mod or % -
     BITW_AND, BITW_OR, BITW_XOR, // & | ^
-    BITW_LEFT,BITW_RIGHT // << >>
+    BITW_LEFT,BITW_RIGHT, // << >>
+    BITW_INVERT // ~
 }

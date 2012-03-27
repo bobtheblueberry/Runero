@@ -5,7 +5,9 @@ public class Assignment implements Statement {
     public enum OPERATION { // = += -= /= *= %= &= |= ^=
         SET, ADD, SUB, DIVIDE, MULTIPLY, MOD, AND, OR, XOR 
     }
+    
     public final OPERATION op;
+    public Argument value;
     
     public Assignment(OPERATION op) {
         this.op = op;

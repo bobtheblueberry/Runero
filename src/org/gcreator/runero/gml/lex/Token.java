@@ -24,10 +24,10 @@ public enum Token {
     , GLOBALVAR // globalvar
     , STRING // " This is a string " ' and this is too!'
     , NUMBER // a number
-    , WORD // word
+    , WORD // word, not used after the final stages of lexing
     , FUNCTION // func(x,y,z)
     , ARRAY // grid[x,y]
-    , VARIABLE // x y obj0.x room_width obj5.target.y
+    , VARIABLE // x y obj0.x room_width obj5.target.y obj2.array[5]
     
     , DOT // .
     , SEMICOLON // ;

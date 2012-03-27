@@ -252,7 +252,7 @@ public class GmlTokenizer {
                     // There could be multiple operators in a single chunk
                     // so we have to look for them
                     int start = 0;
-                    for (int i = c.datalen; i > 0; i--) {
+                    for (int i = c.datalen; i > start; i--) {
                         String s2 = s.substring(start, i);
                         Token t = tokens.get(s2);
                         if (t != null) {
@@ -274,7 +274,7 @@ public class GmlTokenizer {
                     phase2Add(new TokenWord(c, WORD));
                 }
             } else if (c.isString) {
-                phase2Add(new TokenWord(c, Token.STRING));
+                phase2Add(new TokenWord(c, STRING));
             } else if (c.isNumber) {
                 // try to parse the number and if it's invalid then error
                 double number;
@@ -298,6 +298,10 @@ public class GmlTokenizer {
     }
 
     private void phase2Add(TokenWord tw) {
+        if (tw.token == THEN) {
+            System.err.println("WARNING: Discarding useless 'then' !");
+            return;
+        }
         if (tw.token == PAR_OPEN || tw.token == BRACKET_OPEN) {
             TokenGroup t = new TokenGroup(tw.token);
             groups.push(t);
@@ -390,11 +394,13 @@ public class GmlTokenizer {
                         break;
                     i++;
                     next = tokensOrig.get(i + 1);
-                    if (next.token != WORD) {
-                        error("Unexpected . ? ??");
+                    if (next.token != WORD && next.token != ARRAY) {
+                        error("Unexpected . ?? " + next);
                         break;
                     }
-                    var.add(next.data.getData());
+                    if (next.token == WORD)
+                        next.token = VARIABLE;
+                    var.add(next);
                     i++;
                 }
             }
@@ -404,6 +410,9 @@ public class GmlTokenizer {
             if (tw instanceof TokenGroup) {
                 TokenGroup g = (TokenGroup) tw;
                 g.tokens = phase26(g.tokens);
+            } else if (tw instanceof TokenWordPair) {
+                TokenWordPair g = (TokenWordPair) tw;
+                g.child.tokens = phase26(g.child.tokens);
             }
         }
         return tokens;
