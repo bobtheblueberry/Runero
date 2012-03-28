@@ -53,7 +53,6 @@ public class GmlLexer {
     boolean isStr;
     boolean isComment;// // comments
     boolean isComment2; // /* */ comments
-    boolean isWord;
     boolean isNumber;
     char stringChar;
     int cb;
@@ -61,8 +60,7 @@ public class GmlLexer {
     private void parse(char c) throws IOException {
         if (c == 0)
             return;
-
-        if (!isWord && !isNumber && !isComment && !isComment2 && !isStr && c == '/') {
+        if (!isWord() && !isNumber && !isComment && !isComment2 && !isStr && c == '/') {
             char next = next();
             if (next == '/')
                 isComment = true;
@@ -96,7 +94,6 @@ public class GmlLexer {
                 add(next);
                 isComment2 = false;
                 curData = null;
-
             } else {
                 add(c);
                 parse(next);
@@ -108,51 +105,51 @@ public class GmlLexer {
             add(c);
             return;
         }
+        // beginning/end of string
         if ((!isStr && c == '\'') || (!isStr && c == '"') || (isStr && c == stringChar)) {
             isStr = !isStr;
             if (isStr) {
                 block();
                 curData.isString = true;
+                stringChar = c;
             } else
                 curData = null;
-            stringChar = c;
             return;
         }
 
         // Seperate into words and numbers
-        if (!isComment && !isComment2 && !isStr && !isWord && !isNumber
+        if (!isComment && !isComment2 && !isStr && !isWord() && !isNumber
                 && ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_')) {
             block();
             curData.isWord = true;
-            isWord = true;
             add(c);
             return;
         }
         // end of word
-        if (curData != null && isWord && !isLetterNumber(c)) {
+        if (curData != null && isWord() && !isLetterNumber(c)) {
             curData = null;
-            isWord = false;
             add(c);
             return;
         }
 
-        // number
+        // beginning of number
         boolean cond = (c == '$' || (c >= '0' && c <= '9'));
         char next = 0;
-        if (c == '.' && !isStr && !isWord && !isNumber && !cond) {
+        if (c == '.' && !isStr && !isWord() && !isNumber && !cond) {
             next = next();
             if (next >= '0' && next <= '9')
                 cond = true;
         }
-            
-        if (!isStr && !isWord && !isNumber && cond) {
+
+        if (!isStr && !isWord() && !isNumber && cond) {
             block();
             curData.isNumber = true;
             if (c == '$')
                 curData.isHexNumber = true;
             isNumber = true;
             add(c);
-            if (next > 0) parse(next);
+            if (next > 0)
+                parse(next);
             return;
         }
         // end of number
@@ -160,12 +157,13 @@ public class GmlLexer {
                 && !(curData.isHexNumber ? ((c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')) : false)) {
             curData = null;
             isNumber = false;
-            add(c, true);
+            parse(c);
             return;
         }
 
         add(c);
-        if (next > 0) parse(next);
+        if (next > 0)
+            parse(next);
     }
 
     private boolean isUseless(char c) {
@@ -174,6 +172,12 @@ public class GmlLexer {
 
     private boolean isLetterNumber(char c) {
         return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_';
+    }
+
+    private boolean isWord() {
+        if (curData == null)
+            return false;
+        return curData.isWord;
     }
 
     public class CharData {
@@ -207,15 +211,15 @@ public class GmlLexer {
         curData = new CharData();
         data.add(curData);
     }
-    
+
     private void add(char c) {
         add(c, false);
     }
-    
+
     private void add(char c, boolean force) {
-        if (!isStr && !force && c == '\n' && curData == null) // avoid useless code blocks
-            return;
-        if (!isComment && !isComment2 && !isStr && !isWord && !isNumber) {
+        // if (!isStr && !force && c == '\n' && curData == null) // avoid useless code blocks
+        // return;
+        if (!isComment && !isComment2 && !isStr && !isWord() && !isNumber) {
             if (isUseless(c)) { // deal with useless/whitespace
                 if (curData == null)
                     block();
@@ -229,6 +233,7 @@ public class GmlLexer {
             block();
         if (curData.datalen + 1 == curData.cdata.length)
             curData.cdata = Arrays.copyOf(curData.cdata, curData.cdata.length + 20);
+
         curData.cdata[curData.datalen++] = c;
     }
 }

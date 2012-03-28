@@ -3,22 +3,28 @@ package org.gcreator.runero.gml.lex;
 import static org.gcreator.runero.gml.lex.Token.*;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
 import org.gcreator.runero.gml.exec.Argument;
 import org.gcreator.runero.gml.exec.Assignment;
+import org.gcreator.runero.gml.exec.Break;
 import org.gcreator.runero.gml.exec.Constant;
+import org.gcreator.runero.gml.exec.Continue;
+import org.gcreator.runero.gml.exec.Do;
 import org.gcreator.runero.gml.exec.Expression;
+import org.gcreator.runero.gml.exec.For;
 import org.gcreator.runero.gml.exec.Function;
 import org.gcreator.runero.gml.exec.If;
 import org.gcreator.runero.gml.exec.Operator;
 import org.gcreator.runero.gml.exec.Repeat;
+import org.gcreator.runero.gml.exec.Return;
 import org.gcreator.runero.gml.exec.Statement;
 import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.gml.exec.VariableDecl;
 import org.gcreator.runero.gml.exec.VariableRef;
 import org.gcreator.runero.gml.exec.While;
+import org.gcreator.runero.gml.exec.With;
 import org.gcreator.runero.gml.lex.GmlTokenizer.ANSI;
+import org.gcreator.runero.gml.lex.TokenVariable.TokenVariableSub;
 
 /**
  * Turns GML tokens into something useful (maybe)
@@ -42,6 +48,8 @@ public class GmlCompiler {
 
     ArrayList<Statement> main;
     TokenWord[] tokens;
+    TokenGroup tricks;
+    int trickI;
 
     int i;
 
@@ -140,7 +148,7 @@ public class GmlCompiler {
                 break;
             }
             TokenVariable v = (TokenVariable) w;
-            if (v.getVariables() != null) {
+            if (v.variables.size() == 0) {
                 error("Unexpected variable name " + v);
                 break;
             }
@@ -156,44 +164,73 @@ public class GmlCompiler {
     }
 
     private Statement getContinue() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Continue();
     }
 
     private Statement getBreak() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Break();
     }
 
     private Statement getReturn() {
-        // TODO Auto-generated method stub
-        return null;
+        Return r = new Return();
+        if (hasNext()) {
+            TokenWord next = next();
+            // TODO: test this
+            if (next.token != SEMICOLON) {
+                r.value = getArgument(true);
+            }
+        }
+
+        return r;
     }
 
     private Statement getExit() {
-        // TODO Auto-generated method stub
-        return null;
+        // Exit is basically the same thing
+        return new Return();
     }
 
     private Statement getRepeat() {
         Repeat r = new Repeat();
         r.condition = getArgument(false);
+        r.exec = getBlock();
         return r;
     }
 
     private Statement getWith() {
-        // TODO Auto-generated method stub
-        return null;
+        With w = new With();
+        w.who = getArgument(false);
+        w.code = getBlock();
+        return w;
     }
 
     private Statement getFor() {
-        // TODO Auto-generated method stub
-        return null;
+        TokenWord next = next();
+        if (next.token != PAR_OPEN) {
+            error("Expected symbol '('");
+            return null;
+        }
+        TokenGroup g = (TokenGroup) next;
+        For f = new For();
+        tricks = g;
+        trickI = 0;
+        f.initial = getStatement(next());
+        f.condition = getArgument(true);
+        f.increcement = getStatement(next());
+        tricks = null;
+        f.code = getBlock();
+        return f;
     }
 
     private Statement getDo() {
-        // TODO Auto-generated method stub
-        return null;
+        Do d = new Do();
+        d.code = getBlock();
+        TokenWord next = next();
+        if (next.token != UNTIL) {
+            error("Expected 'until'");
+            return null;
+        }
+        d.condition = getArgument(true);
+        return d;
     }
 
     private Statement getWhile() {
@@ -207,13 +244,14 @@ public class GmlCompiler {
         If s = new If();
         s.condition = getArgument(false);
         s.exec = getBlock();
+        if (!hasNext())
+            return s;
         TokenWord next = next();
         if (next.token == ELSE) {
             s.hasElse = true;
             s.elseExec = getBlock();
         } else
-            i--;
-        System.out.println("ENDIF===");
+            regress();
         return s;
     }
 
@@ -256,6 +294,10 @@ public class GmlCompiler {
             // darn.
             if (first.token == PLUS) {
                 // useless
+            } else {
+                Expression e = getUnaryExpression(first.token);
+                if (e != null)
+                    a.add(e);
             }
             first = next();
         }
@@ -280,7 +322,7 @@ public class GmlCompiler {
                     } else {
                         unary = false;
                     }
-                    i--;// f is not used, we are just peeking
+                    regress();// f is not used, we are just peeking
                 }
             }
 
@@ -299,17 +341,19 @@ public class GmlCompiler {
                 a.add(getExpression(next));
                 // check to see if there is more things to add
                 next = next();
-                if (next.token != SEMICOLON) i--;
+                if (next.token != SEMICOLON)
+                    regress();
+
                 if (next.token == SEMICOLON || !isOperator(next.token))
                     break; // end of statement
             } else {
                 // end of statement
-                i--;
+                regress();
                 break;
             }
             if (unary)
                 reqOp = false;
-            else 
+            else
                 reqOp = !reqOp;
         }
         System.out.println("  <---");
@@ -344,10 +388,23 @@ public class GmlCompiler {
     }
 
     private boolean hasNext() {
+        if (tricks != null)
+            return trickI + 1 < tricks.tokens.size();
         return i + 1 < tokens.length;
     }
 
     private TokenWord next() {
+        if (tricks != null) {
+            if (trickI >= tricks.tokens.size())
+                error("Unexpected end of data");
+            else {
+                System.out.println("Sub-next: [" + trickI + "]: " + tricks.tokens.get(trickI));
+                System.out.println("Index " + trickI);
+                return tricks.tokens.get(trickI++);
+            }
+            return null;
+        }
+
         i++;
         if (i >= tokens.length)
             error("Unexpected end of data");
@@ -356,6 +413,14 @@ public class GmlCompiler {
             return tokens[i];
         }
         return null;
+    }
+
+    private void regress() {
+        if (tricks != null)
+            trickI--;
+        else
+            i--;
+        System.out.println("regress..");
     }
 
     private Function getFunction(TokenWordPair func) {
@@ -392,32 +457,22 @@ public class GmlCompiler {
         } else if (t.token == FUNCTION) {
             TokenWordPair func = (TokenWordPair) t;
             return new Expression(getFunction(func));
-        } else if (t.token == ARRAY) {
-            VariableRef var = new VariableRef();
-            Variable a = new Variable(t.data.getData());
-            a.isArray = true;
-            a.arrayIndex = getExpression(((TokenWordPair) t).child);
-            var.ref = new Variable[] { a };
-            return new Expression(var);
         } else if (t.token == VARIABLE) {
             TokenVariable v = (TokenVariable) t;
-            String st1 = v.data.getData();
-            TokenWord[] tws = v.getVariables();
             VariableRef var = new VariableRef();
-            if (tws == null) {
-                var.ref = new Variable[] { new Variable(st1) };
-            } else {
-                var.ref = new Variable[tws.length + 1];
-                var.ref[0] = new Variable(st1);
-                for (int j = 1; j < var.ref.length; j++) {
-                    TokenWord tw = tws[j - 1];
-                    Variable a = new Variable(tw.data.getData());
-                    if (tw.token == ARRAY) {
-                        a.isArray = true;
-                        a.arrayIndex = getExpression(((TokenWordPair) tw).child);
-                    }
-                    var.ref[j] = a;
+            for (TokenVariableSub s : v.variables) {
+                Variable vv = new Variable();
+                if (s.isExpression) {
+                    vv.isExpression = true;
+                    vv.expression = getExpression(s.expression);
+                } else if (s.isArray) {
+                    vv.name = s.name;
+                    vv.isArray = true;
+                    vv.arrayIndex = getExpression(s.arrayIndex);
+                } else {
+                    vv.name = vv.name;
                 }
+                var.ref.add(vv);
             }
             return new Expression(var);
 
@@ -469,7 +524,7 @@ public class GmlCompiler {
             return new Expression(Operator.BITW_RIGHT);
         else if (t.token == BITW_INVERT)
             return new Expression(Operator.BITW_INVERT);
-        i--;
+        regress();
         error("Unexpected in expression: " + t);
         return null;
     }

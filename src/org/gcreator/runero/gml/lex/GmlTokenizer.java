@@ -11,6 +11,8 @@ import java.util.Stack;
 
 import org.gcreator.runero.gml.exec.Statement;
 import org.gcreator.runero.gml.lex.GmlLexer.CharData;
+import org.gcreator.runero.gml.lex.TokenVariable.TokenVariableSub;
+
 import static org.gcreator.runero.gml.lex.Token.*;
 
 /**
@@ -131,11 +133,12 @@ public class GmlTokenizer {
     // -- .othervar.var.var [ASSIGNMENT] EXPR
     // ASSIGNMENT = [EXPR] { func(ARGS...), instance.x + 2 - x, "BOB" + 2, 12.0, $0FFAA}
 
-    boolean ignoreComments = true;
     LinkedList<TokenWord> tokenList;
     CharData[] data;
 
     public GmlTokenizer() throws IOException {
+
+        boolean ignoreComments = true;
 
         File test = new File("test.gml");
         data = GmlLexer.process(new BufferedInputStream(new FileInputStream(test)));
@@ -182,12 +185,13 @@ public class GmlTokenizer {
         tokenList = phase25(tokenList);
         System.out.println("================= PHASE 2.6 =================");
         tokenList = phase26(tokenList);
-        printTree();
+        // printTree();
 
         System.out.println("================ PHASE THREE ================");
         TokenWord[] twords = new TokenWord[tokenList.size()];
         twords = tokenList.toArray(twords);
         ArrayList<Statement> statements = GmlCompiler.interpretGml(twords);
+
     }
 
     private void printTree() {
@@ -375,7 +379,7 @@ public class GmlTokenizer {
     }
 
     /**
-     * Turns the rest of the words into variables like x or obj1.y
+     * Turns the rest of the words into variables like x or obj1.y or (1234).x
      * 
      * @param tokensOrig
      * @return
@@ -384,23 +388,31 @@ public class GmlTokenizer {
         LinkedList<TokenWord> tokens = new LinkedList<TokenWord>();
         for (int i = 0; i < tokensOrig.size(); i++) {
             TokenWord tw = tokensOrig.get(i);
-            if (tw.token == WORD) { // WORD DOT WORD DOT WORD
-                tw.token = VARIABLE;
+            boolean cond = true;
+            if (tw.token == PAR_OPEN) {
+                if (tw instanceof TokenWordPair) // function
+                    cond = false;
+                if (i + 1 > tokensOrig.size())
+                    cond = false;
+                else {
+                    TokenWord next = tokensOrig.get(i + 1);
+                    if (next.token != DOT) 
+                        cond = false;
+                }
+            }
+            if (cond && (tw.token == WORD || tw.token == ARRAY || tw.token == PAR_OPEN)) { // WORD DOT WORD DOT (1234)?
+
                 TokenVariable var = new TokenVariable(tw);
+                var.add(getVariable(tw));
                 tw = var;
+                tw.token = VARIABLE;
                 while (i + 1 < tokensOrig.size()) {
                     TokenWord next = tokensOrig.get(i + 1);
                     if (next.token != DOT)
                         break;
                     i++;
                     next = tokensOrig.get(i + 1);
-                    if (next.token != WORD && next.token != ARRAY) {
-                        error("Unexpected . ?? " + next);
-                        break;
-                    }
-                    if (next.token == WORD)
-                        next.token = VARIABLE;
-                    var.add(next);
+                    var.add(getVariable(next));
                     i++;
                 }
             }
@@ -416,6 +428,25 @@ public class GmlTokenizer {
             }
         }
         return tokens;
+    }
+
+    private TokenVariableSub getVariable(TokenWord tw) {
+        TokenVariableSub s = new TokenVariableSub();
+        if (tw.token == ARRAY) {
+            TokenWordPair p = (TokenWordPair) tw;
+            s.name = p.data.getData();
+            s.arrayIndex = p.child;
+            s.isArray = true;
+        } else if (tw.token == PAR_OPEN) {
+            s.expression = (TokenGroup) tw;
+            s.isExpression = true;
+        } else if (tw.token == WORD) {
+            s.name = tw.data.getData();
+        } else {
+            error("Unexpected . ?? " + tw);
+            return null;
+        }
+        return s;
     }
 
     private void error(String msg) {
