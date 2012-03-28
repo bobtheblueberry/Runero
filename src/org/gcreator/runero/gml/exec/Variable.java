@@ -4,8 +4,7 @@ public class Variable {
     public String name;
     public boolean isArray;
     public Argument arrayIndex;
-
-    public Variable(String name) {
-        this.name = name;
-    }
+    
+    public boolean isExpression;
+    public Argument expression;
 }
