@@ -1,12 +1,44 @@
-// Random snippets of useless GmL
-/* */
-/*
 
 
+ x = y b = 2 n = 5 g = 2 var h i j ; a += b for (i = 0 i < 55 i += 1) x = 1 do y =x div 2 until i < 2 y = 2 x =
+     show_message('bbbb')
+    
+do{a=(0).x+0end until"a"="b" // 123
+// 123
+
+{
+  for (i=0; i<=9; i+=1) list[i] = i+1;
+}
+
+do x = 2 until y > 3 
+y = 2
+//for (i=0i<10i+=1)show_message(string(i))
+with (all)
+{
+  if (distance_to_object(other) < 50) instance_destroy();
+}
+with (ball)
+{
+  x = other.x;
+  y = other.y;
+}
+with (ball)
+{
+  x = random(room_width);
+  y = random(room_height);
+}
+
+/* NOOO NOT THE SWITCH STATEMENT
+switch (keyboard_key)
+{
+  case vk_left:
+  case vk_numpad4:
+    x -= 4; break;
+  case vk_right:
+  case vk_numpad6:
+    x += 4; break;
+}
 */
-/**/
-/******/ /****/ 
-
 cheese.is.a.real.noob = 1
 cheese.          is.  real . noob        =2
 cheese.is.a[1].noob.b1234y[1,2]=2
@@ -184,6 +216,4 @@ y[200 /y - 2*2000] = 2
 }
 // Josh is black
  if 0=="str"sound_play(0) 
-//do{a=(0).x+0end until"a"="b"
-// 123
 //for({i=0; j=1;}; i<j; {i*=2; k+=3end) begin}

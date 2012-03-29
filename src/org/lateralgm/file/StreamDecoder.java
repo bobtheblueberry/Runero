@@ -100,6 +100,13 @@ public class StreamDecoder extends InputStream
 		int d = read();
 		return (a | (b << 8) | (c << 16) | (d << 24));
 		}
+	
+	public boolean readBool() throws IOException {
+	    int a = read();
+	    if (a == 1)
+	        return true;
+	    return false;
+	}
 
 	public double readD() throws IOException
 		{
@@ -110,6 +117,13 @@ public class StreamDecoder extends InputStream
 			r |= (b[i] & 0xFFL) << (8 * i);
 		return Double.longBitsToDouble(r);
 		}
+	
+	public String readStr() throws IOException
+    {
+    byte data[] = new byte[read4()];
+    read(data);
+    return new String(data);
+    }
 
 	public void close() throws IOException
 		{

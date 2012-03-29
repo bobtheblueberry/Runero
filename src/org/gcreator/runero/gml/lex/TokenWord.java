@@ -4,7 +4,7 @@ import static org.gcreator.runero.gml.lex.Token.NUMBER;
 
 import org.gcreator.runero.gml.lex.GmlLexer.CharData;
 
-class TokenWord {
+public class TokenWord {
     boolean hasData;
     boolean hasNumber;
     Token token;

@@ -7,7 +7,7 @@ import java.util.LinkedList;
  * @author serge
  *
  */
-class TokenGroup extends TokenWord {
+public class TokenGroup extends TokenWord {
     public TokenGroup(Token t) {
         super(t);
         tokens = new LinkedList<TokenWord>();

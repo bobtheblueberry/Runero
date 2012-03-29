@@ -28,6 +28,7 @@ import org.gcreator.runero.res.GameRoom.Tile;
 import org.gcreator.runero.res.GameSprite;
 import org.gcreator.runero.res.GameSprite.BBMode;
 import org.gcreator.runero.res.GameSprite.MaskShape;
+import org.lateralgm.file.StreamDecoder;
 import org.lateralgm.resources.library.RLibAction;
 import org.lateralgm.resources.library.RLibManager;
 
@@ -60,47 +61,47 @@ public class ResourceLoader {
         System.out.println("Loaded Game info");
 
         // DEBUG TREE
-/*
-        for (GameObject o : game.objects) {
-            System.out.println("-" + o.getName());
-            for (MainEvent me : o.getMainEvents()) {
-                System.out.println(" - " + me.mainEvent);
-                for (Event e : me.events) {
-                    System.out.println("  -" + e.type);
-                    for (int i = 0; i < e.actions.size(); i++) {
-                        Action a = e.actions.get(i);
-                        String s = a.lib.id + "";
-                        if (a.lib.question)
-                            if (a.ifAction == null)
-                                s = "IF WTFFFFFFFF          ------------------------------------";
-                            else {
-                                String d = "";
-                                if (a.elseAction != null)
-                                    d = "  ELSE " + a.elseAction.start + " " + a.elseAction.end + ","
-                                            + a.elseAction.actionEnd;
-                                s = "If " + a.ifAction.start + ":" + a.ifAction.end + "," + a.ifAction.actionEnd + d;
+        /*
+                for (GameObject o : game.objects) {
+                    System.out.println("-" + o.getName());
+                    for (MainEvent me : o.getMainEvents()) {
+                        System.out.println(" - " + me.mainEvent);
+                        for (Event e : me.events) {
+                            System.out.println("  -" + e.type);
+                            for (int i = 0; i < e.actions.size(); i++) {
+                                Action a = e.actions.get(i);
+                                String s = a.lib.id + "";
+                                if (a.lib.question)
+                                    if (a.ifAction == null)
+                                        s = "IF WTFFFFFFFF          ------------------------------------";
+                                    else {
+                                        String d = "";
+                                        if (a.elseAction != null)
+                                            d = "  ELSE " + a.elseAction.start + " " + a.elseAction.end + ","
+                                                    + a.elseAction.actionEnd;
+                                        s = "If " + a.ifAction.start + ":" + a.ifAction.end + "," + a.ifAction.actionEnd + d;
+                                    }
+                                else if (a.lib.actionKind == Action.ACT_REPEAT)
+                                    s = "Repeat " + a.arguments.get(0).val;
+                                else if (a.lib.actionKind == Action.ACT_ELSE)
+                                    s = "Else";
+                                else if (a.lib.actionKind == Action.ACT_BEGIN)
+                                    s = "٨";
+                                else if (a.lib.actionKind == Action.ACT_END)
+                                    s = "٧";
+                                else if (a.lib.actionKind == Action.ACT_EXIT)
+                                    s = "exit";
+                                else if (a.lib.id == org.gcreator.runero.gml.lib.ActionLibrary.COMMENT)
+                                    s = "* " + a.arguments.get(0).val;
+                                System.out.println(i + ((i < 10) ? " " : "") + "  - " + s);
                             }
-                        else if (a.lib.actionKind == Action.ACT_REPEAT)
-                            s = "Repeat " + a.arguments.get(0).val;
-                        else if (a.lib.actionKind == Action.ACT_ELSE)
-                            s = "Else";
-                        else if (a.lib.actionKind == Action.ACT_BEGIN)
-                            s = "٨";
-                        else if (a.lib.actionKind == Action.ACT_END)
-                            s = "٧";
-                        else if (a.lib.actionKind == Action.ACT_EXIT)
-                            s = "exit";
-                        else if (a.lib.id == org.gcreator.runero.gml.lib.ActionLibrary.COMMENT)
-                            s = "* " + a.arguments.get(0).val;
-                        System.out.println(i + ((i < 10) ? " " : "") + "  - " + s);
+                        }
                     }
+
                 }
-            }
 
-        }
-
-        System.exit(0);
-*/
+                System.exit(0);
+        */
     }
 
     private void loadFonts() throws IOException {
@@ -406,30 +407,31 @@ public class ResourceLoader {
 
     private Action loadAction(String file) throws IOException {
         File f = new File(actionFolder, "a_" + file + ".dat");
-        BufferedReader r = new BufferedReader(new FileReader(f));
-        int parentId = Integer.parseInt(r.readLine());
-        int id = Integer.parseInt(r.readLine());
+        StreamDecoder in = new StreamDecoder(f);
+
+        int parentId = in.read4();
+        int id = in.read4();
         RLibAction a = RLibManager.getLibAction(parentId, id);
         // Done of Lib stuff
         // Load Action
         Action act = new Action(a);
-        int args = Integer.parseInt(r.readLine());
+        int args = in.read4();
         for (int i = 0; i < args; i++) {
-            int kind = Integer.parseInt(r.readLine());
+            int kind = in.read();
             Argument arg = new Argument(kind);
-            if (r.readLine().equals("ref")) {
+            int type = in.read();
+            if (type == 0) {
                 arg.ref = true;
-            }
-            if (a.actionKind == Action.ACT_CODE) {
-                arg.code = Code.load(actionFolder, "c_" + r.readLine().substring(1) + ".gml");
-            } else
-                arg.val = r.readLine();
+            } else if (type == 1) {
+                arg.val = in.readStr();
+            } else if (type == 2)
+                arg.code = new Code(in.readStr());
             act.arguments.add(arg);
         }
-        act.appliesTo = Integer.parseInt(r.readLine());
-        act.relative = Boolean.parseBoolean(r.readLine());
-        act.not = Boolean.parseBoolean(r.readLine());
-        r.close();
+        act.appliesTo = in.read4();
+        act.relative = in.readBool();
+        act.not = in.readBool();
+        in.close();
         return act;
     }
 
