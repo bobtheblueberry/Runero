@@ -1,6 +1,7 @@
 package org.gcreator.runero.gfx;
 
 import org.gcreator.runero.RuneroGame;
+import org.gcreator.runero.res.GameFont;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -39,9 +40,6 @@ public class RuneroDisplay {
             glMatrixMode(GL_MODELVIEW);
             glLoadIdentity();
             glViewport(0, 0, width, height);
-            
-            
-       
         } catch (LWJGLException e) {
             e.printStackTrace();
             System.exit(0);

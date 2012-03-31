@@ -4,7 +4,7 @@ import static org.gcreator.runero.gml.lex.Token.*;
 
 import java.util.ArrayList;
 
-import org.gcreator.runero.gml.exec.Argument;
+import org.gcreator.runero.gml.exec.ExprArgument;
 import org.gcreator.runero.gml.exec.Assignment;
 import org.gcreator.runero.gml.exec.Break;
 import org.gcreator.runero.gml.exec.Constant;
@@ -41,7 +41,7 @@ public class GmlCompiler {
         return c.main;
     }
 
-    private GmlCompiler(TokenWord[] tokens) {
+    public GmlCompiler(TokenWord[] tokens) {
         this.tokens = tokens;
         main = new ArrayList<Statement>();
     }
@@ -57,14 +57,12 @@ public class GmlCompiler {
      * Where the magic happens!
      * 
      */
-    private void execute() {
+    public void execute() {
         for (i = 0; i < tokens.length; i++) {
             TokenWord w = tokens[i];
-            System.out.println(w + " " + i);
             Statement s = getStatement(w);
             if (s != null)
                 main.add(s);
-            System.out.println("LOOP " + i);
         }
     }
 
@@ -277,18 +275,22 @@ public class GmlCompiler {
         return a;
     }
 
+    public ExprArgument getArgument() {
+        i--;
+        return getArgument(false);
+    }
+    
     /**
      * gets an argument 
      * 
      * @return
      */
-    private Argument getArgument(boolean allowSemicolon) {
-        System.out.println("Argument -->");
+    private ExprArgument getArgument(boolean allowSemicolon) {
         // UNARY? VAL (OP UNARY? VAL)*
         // VAL = FUNCTION, VARIABLE, NUMBER, STRING, parenthesis
         // OP = Operator
 
-        Argument a = new Argument();
+        ExprArgument a = new ExprArgument();
         TokenWord first = next();
         if (isUnary(first.token)) {
             // darn.
@@ -337,7 +339,7 @@ public class GmlCompiler {
                 } else {
                     a.add(getExpression(next));
                 }
-            } else if (!op && !reqOp && isValue(next.token)) {
+            } else if (!op && !reqOp && isValue(next.token) && hasNext()) {
                 a.add(getExpression(next));
                 // check to see if there is more things to add
                 next = next();
@@ -356,7 +358,6 @@ public class GmlCompiler {
             else
                 reqOp = !reqOp;
         }
-        System.out.println("  <---");
         return a;
     }
 
@@ -398,8 +399,6 @@ public class GmlCompiler {
             if (trickI >= tricks.tokens.size())
                 error("Unexpected end of data");
             else {
-                System.out.println("Sub-next: [" + trickI + "]: " + tricks.tokens.get(trickI));
-                System.out.println("Index " + trickI);
                 return tricks.tokens.get(trickI++);
             }
             return null;
@@ -409,7 +408,6 @@ public class GmlCompiler {
         if (i >= tokens.length)
             error("Unexpected end of data");
         else {
-            System.out.println("Next: [" + i + "]: " + tokens[i]);
             return tokens[i];
         }
         return null;
@@ -420,19 +418,18 @@ public class GmlCompiler {
             trickI--;
         else
             i--;
-        System.out.println("regress..");
     }
 
     private Function getFunction(TokenWordPair func) {
         Function f = new Function(func.data.getData());
         TokenGroup args = func.child;
         if (args.tokens.size() > 0) {
-            Argument a = new Argument();
+            ExprArgument a = new ExprArgument();
             for (TokenWord w : args.tokens) {
                 if (w.token == COMMA) {
                     // TODO: check syntax
                     f.args.add(a);
-                    a = new Argument();
+                    a = new ExprArgument();
                     continue;
                 }
                 a.expressions.add(getExpression(w));
@@ -442,8 +439,8 @@ public class GmlCompiler {
         return f;
     }
 
-    private Argument getExpression(TokenGroup g) {
-        Argument a = new Argument();
+    private ExprArgument getExpression(TokenGroup g) {
+        ExprArgument a = new ExprArgument();
         for (TokenWord t : g.tokens)
             a.add(getExpression(t));
         return a;

@@ -23,9 +23,6 @@ import java.awt.image.BufferedImage;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameSprite;
 
-import com.golden.gamedev.object.CollisionManager;
-import com.golden.gamedev.object.collision.CollisionShape;
-
 /**
  * Borrowed/stolen from GTGE 
  *  

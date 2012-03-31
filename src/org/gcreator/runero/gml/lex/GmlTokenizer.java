@@ -136,7 +136,30 @@ public class GmlTokenizer {
     LinkedList<TokenWord> tokenList;
     CharData[] data;
 
-    public GmlTokenizer() throws IOException {
+    public static TokenWord[] process(CharData[] data) {
+        return new GmlTokenizer(data).twords;
+    }
+    
+    private GmlTokenizer(CharData[] data) {
+        this.data = data;
+        tokenList = new LinkedList<TokenWord>();
+        phase2();
+        debugLine = -1;
+        debugPos = -2;
+        tokenList = phase25(tokenList);
+        tokenList = phase26(tokenList);
+        twords = tokenList.toArray(new TokenWord[tokenList.size()]);
+    }
+    
+    TokenWord[] twords;
+    
+    /**
+     * Testing code
+     * 
+     * 
+     * @throws IOException
+     */
+    private GmlTokenizer() throws IOException {
 
         boolean ignoreComments = true;
 
@@ -190,8 +213,7 @@ public class GmlTokenizer {
         System.out.println("================ PHASE THREE ================");
         TokenWord[] twords = new TokenWord[tokenList.size()];
         twords = tokenList.toArray(twords);
-        ArrayList<Statement> statements = GmlCompiler.interpretGml(twords);
-
+        GmlCompiler.interpretGml(twords);
     }
 
     private void printTree() {

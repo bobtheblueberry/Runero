@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class While implements Statement {
 
-    public Argument condition;
+    public ExprArgument condition;
     public ArrayList<Statement> exec;
     
     @Override

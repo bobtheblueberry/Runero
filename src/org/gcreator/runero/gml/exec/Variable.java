@@ -3,8 +3,8 @@ package org.gcreator.runero.gml.exec;
 public class Variable {
     public String name;
     public boolean isArray;
-    public Argument arrayIndex;
+    public ExprArgument arrayIndex;
     
     public boolean isExpression;
-    public Argument expression;
+    public ExprArgument expression;
 }

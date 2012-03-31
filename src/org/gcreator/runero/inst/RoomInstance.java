@@ -311,7 +311,6 @@ public class RoomInstance {
     private void drawBackgrounds(GraphicsLibrary g, boolean foreground) {
         for (GameRoom.Background gb : room.backgrounds) {
             if (gb.visible && gb.foreground == foreground) {
-                // Thanks LateralGM XD
                 paintBackground(g, gb);
             }
         }

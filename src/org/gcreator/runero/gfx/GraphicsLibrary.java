@@ -114,18 +114,14 @@ public class GraphicsLibrary {
         glEnd();
         glPopMatrix();
     }
-    
-    public void untexture() {
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-    
+
     public void drawLine(double x1, double y1, double x2, double y2) {
         glPushMatrix();
         glBegin(GL_LINE_LOOP);
         for (int i = 0; i < 10; i++) {
-            int v = i*10;
-        glVertex2d(x1+v, y1+v);
-        glVertex2d(x2+v, y2+v);
+            int v = i * 10;
+            glVertex2d(x1 + v, y1 + v);
+            glVertex2d(x2 + v, y2 + v);
         }
         glEnd();
         glPopMatrix();
@@ -190,17 +186,17 @@ public class GraphicsLibrary {
      * @param tilev
      * @param stretch
      */
-    public void drawBackground(GameBackground bg, int x, int y, boolean tileh, boolean tilev, boolean stretch) {
+    public void drawBackground(GameBackground bg, double x, double y, boolean tileh, boolean tilev, boolean stretch) {
         Texture bi = bg.getBackground();
         if (bi == null)
             return;
-        int w = stretch ? RuneroGame.room.width : bi.getTextureWidth();
-        int h = stretch ? RuneroGame.room.height : bi.getTextureHeight();
+        int w = stretch ? RuneroGame.room.width : bi.getImageWidth();
+        int h = stretch ? RuneroGame.room.height : bi.getImageHeight();
         // TODO: View bounds
         Rectangle c = new Rectangle(0, 0, RuneroGame.room.width, RuneroGame.room.height);
         if (tileh || tilev) {
-            int ncol = 1;
-            int nrow = 1;
+            double ncol = 1;
+            double nrow = 1;
             if (tileh) {
                 x = 1 + c.getX() + ((x + w - 1 - c.getX()) % w) - w;
                 ncol = 1 + (c.getX() + c.getWidth() - x - 1) / w;
@@ -211,8 +207,9 @@ public class GraphicsLibrary {
             }
 
             for (int row = 0; row < nrow; row++)
-                for (int col = 0; col < ncol; col++)
+                for (int col = 0; col < ncol; col++) {
                     drawTexture(bi, (x + w * col), (y + h * row), w, h);
+                }
         } else
             drawTexture(bi, x, y, w, h);
     }
@@ -221,7 +218,6 @@ public class GraphicsLibrary {
         glColor4d(1, 1, 1, 1);
         // store the current model matrix
         glPushMatrix();
-
         // bind to the appropriate texture for this sprite
         t.bind();
 
@@ -248,7 +244,6 @@ public class GraphicsLibrary {
 
         // restore the model view matrix to prevent contamination
         glPopMatrix();
-        untexture();
     }
 
     public void screen_redraw() {
@@ -279,7 +274,8 @@ public class GraphicsLibrary {
     }
 
     public void setFont(GameFont f) {
-        font = new TrueTypeFont(f.getFont(), f.antialias > 0);
+       //TODO: fonts are broken
+       // font = f.load();
     }
 
     public void drawString(String text, float x, float y) {
@@ -287,15 +283,15 @@ public class GraphicsLibrary {
     }
 
     public void drawString(float x, float y, String text) {
-        font.drawString(x, y, text, 1, 1, fontAlign);
+       // font.drawString(x, y, text, 1, 1, fontAlign);
     }
 
     public void drawString(float x, float y, String text, float xscale, float yscale, float angle) {
-        font.drawString(x, y, text, 1, 1, xscale, yscale, angle, fontAlign);
+     //   font.drawString(x, y, text, 1, 1, xscale, yscale, angle, fontAlign);
     }
 
     public void drawString(double x, double y, String text, double xscale, double yscale, double angle) {
-        font.drawString((float) x, (float) y, text, 1, 1, (float) xscale, (float) yscale, (float) angle, fontAlign);
+        //font.drawString((float) x, (float) y, text, 1, 1, (float) xscale, (float) yscale, (float) angle, fontAlign);
     }
 
     public void saveScreenshot(File file) {

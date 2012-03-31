@@ -18,6 +18,8 @@ import org.gcreator.runero.event.Action.BlockAction;
 import org.gcreator.runero.event.Argument;
 import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
+import org.gcreator.runero.gml.CodeManager;
+import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.res.Code;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
@@ -31,6 +33,7 @@ import org.gcreator.runero.res.GameSprite.MaskShape;
 import org.lateralgm.file.StreamDecoder;
 import org.lateralgm.resources.library.RLibAction;
 import org.lateralgm.resources.library.RLibManager;
+import org.lateralgm.resources.library.RLibAction.LibArgument;
 
 public class ResourceLoader {
 
@@ -421,7 +424,8 @@ public class ResourceLoader {
             Argument arg = new Argument(kind);
             int type = in.read();
             if (type == 0) {
-                arg.ref = true;
+                arg.resVal = in.read4();
+                arg.val = "Resource; ID: " + arg.resVal;
             } else if (type == 1) {
                 arg.val = in.readStr();
             } else if (type == 2)
@@ -432,7 +436,45 @@ public class ResourceLoader {
         act.relative = in.readBool();
         act.not = in.readBool();
         in.close();
+        lexAction(act, a);
         return act;
+    }
+
+    private void lexAction(Action a, RLibAction r) {
+        for (int i = 0; i < r.libArguments.length; i++) {
+            LibArgument la = r.libArguments[i];
+            Argument arg = a.arguments.get(i);
+            if (arg.val == null) {
+                System.out.println("Null arg: " + i + " " + r.name);
+                continue;
+            }
+            boolean expr = false;
+            if (la.kind == Argument.ARG_BOOLEAN) {
+                arg.boolVal = arg.val.equals("1") ? true : false;
+            } else if (la.kind == Argument.ARG_COLOR) {
+                arg.colorVal = GmlParser.convertGmColor(Integer.parseInt(arg.val));
+            } else if (la.kind == Argument.ARG_MENU) {
+                arg.menuVal = Integer.parseInt(arg.val);
+            } else if (la.kind == Argument.ARG_BOTH) {
+                for (int j = 0; j < arg.val.length(); j++) {
+                    char c = arg.val.charAt(j);
+                    if (c == ' ')
+                        continue;
+                    else if (c == '\'' || c == '"') {
+                        arg.bothIsExpr = true;
+                        expr = true;
+                        break;
+                    } else
+                        break;
+                }
+            } else if (la.kind == Argument.ARG_EXPRESSION) {
+                expr = true;
+            }
+            
+            if (expr)
+                arg.exprVal = CodeManager.getArgument(arg.val);
+        }
+
     }
 
     /**

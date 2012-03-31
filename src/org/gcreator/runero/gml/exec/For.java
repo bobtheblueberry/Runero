@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class For implements Statement {
 
     public Statement initial;
-    public Argument condition;
+    public ExprArgument condition;
     public Statement increcement;
     public ArrayList<Statement> code;
     

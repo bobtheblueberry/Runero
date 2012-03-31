@@ -3,7 +3,7 @@ package org.gcreator.runero.gml.exec;
 import java.util.ArrayList;
 
 public class Repeat implements Statement {
-    public Argument condition;
+    public ExprArgument condition;
     public ArrayList<Statement> exec;
 
     @Override

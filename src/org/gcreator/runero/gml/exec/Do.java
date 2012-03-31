@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Do implements Statement {
 
     public ArrayList<Statement> code;
-    public Argument condition;
+    public ExprArgument condition;
 
     @Override
     public void execute(Context context) {

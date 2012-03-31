@@ -5,7 +5,7 @@ import java.util.Random;
 
 import org.gcreator.runero.gml.FunctionLibrary;
 import org.gcreator.runero.gml.ReturnValue;
-import org.gcreator.runero.gml.Variable;
+import org.gcreator.runero.gml.VariableVal;
 
 /*
 // section 2.2
@@ -58,12 +58,12 @@ public class MathLibrary extends FunctionLibrary {
     
     private MathLibrary() {}
 
-    public ReturnValue getFunction(String fn, Variable... args) {
+    public ReturnValue getFunction(String fn, VariableVal... args) {
         // Check to see if some dumbo gave us strings
         // they are only allowed for min, max, is_real, and is_string
         if (args.length > 1 && !fn.equals("min") && !fn.equals("max") && !fn.equals("is_real")
                 && !fn.equals("is_string") && !fn.equals("choose"))
-            for (Variable v : args) {
+            for (VariableVal v : args) {
                 if (!v.isReal) {
                     System.err.println("Math Library given String for function " + fn);
                     return null;
@@ -86,79 +86,79 @@ public class MathLibrary extends FunctionLibrary {
         switch (c) {
         case 'a':
             if (fn.equals("abs")) {
-                return Variable.Real(abs(arg0));
+                return VariableVal.Real(abs(arg0));
             }
             if (fn.equals("arcsin")) {
-                return Variable.Real(arcsin(arg0));
+                return VariableVal.Real(arcsin(arg0));
             }
             if (fn.equals("arccos")) {
-                return Variable.Real(arccos(arg0));
+                return VariableVal.Real(arccos(arg0));
             }
             if (fn.equals("arctan")) {
-                return Variable.Real(arctan(arg0));
+                return VariableVal.Real(arctan(arg0));
             }
             if (fn.equals("arctan2")) {
-                return Variable.Real(arctan2(arg0, arg1));
+                return VariableVal.Real(arctan2(arg0, arg1));
             }
 
             break;
         case 'c':
 
             if (fn.equals("ceil")) {
-                return Variable.Real(ceil(arg0));
+                return VariableVal.Real(ceil(arg0));
             }
             if (fn.equals("choose")) {
                 return choose(args);
             }
             if (fn.equals("cos")) {
-                return Variable.Real(cos(arg0));
+                return VariableVal.Real(cos(arg0));
             }
             break;
         case 'd':
 
             if (fn.equals("degtorad")) {
-                return Variable.Real(degtorad(arg0));
+                return VariableVal.Real(degtorad(arg0));
             }
             break;
         case 'e':
             if (fn.equals("exp")) {
-                return Variable.Real(exp(arg0));
+                return VariableVal.Real(exp(arg0));
             }
             break;
         case 'f':
             if (fn.equals("floor")) {
-                return Variable.Real(floor(arg0));
+                return VariableVal.Real(floor(arg0));
             }
             if (fn.equals("frac")) {
-                return Variable.Real(frac(arg0));
+                return VariableVal.Real(frac(arg0));
             }
             break;
         case 'i':
             if (fn.equals("is_real")) {
-                return Variable.Bool(is_real(args[0]));
+                return VariableVal.Bool(is_real(args[0]));
             }
             if (fn.equals("is_string")) {
-                return Variable.Bool(is_string(args[0]));
+                return VariableVal.Bool(is_string(args[0]));
             }
             break;
         case 'l':
             if (fn.equals("lendir_x")) {
-                return Variable.Real(lendir_x(arg0, arg1));
+                return VariableVal.Real(lendir_x(arg0, arg1));
             }
             if (fn.equals("lendir_y")) {
-                return Variable.Real(lendir_y(arg0, arg1));
+                return VariableVal.Real(lendir_y(arg0, arg1));
             }
             if (fn.equals("ln")) {
-                return Variable.Real(ln(arg0));
+                return VariableVal.Real(ln(arg0));
             }
             if (fn.equals("log10")) {
-                return Variable.Real(log10(arg0));
+                return VariableVal.Real(log10(arg0));
             }
             if (fn.equals("log2")) {
-                return Variable.Real(log2(arg0));
+                return VariableVal.Real(log2(arg0));
             }
             if (fn.equals("logn")) {
-                return Variable.Real(logn(arg0, arg1));
+                return VariableVal.Real(logn(arg0, arg1));
             }
             break;
         case 'm':
@@ -166,43 +166,43 @@ public class MathLibrary extends FunctionLibrary {
                 if (args[0].isString) {
                     return maxStr(args);
                 } else {
-                    return Variable.Real(max(getReals(args)));
+                    return VariableVal.Real(max(getReals(args)));
                 }
             }
             if (fn.equals("min")) {
                 if (args[0].isString) {
                     return minStr(args);
                 } else {
-                    return Variable.Real(min(getReals(args)));
+                    return VariableVal.Real(min(getReals(args)));
                 }
             }
             if (fn.equals("mean")) {
-                return Variable.Real(mean(arg0));
+                return VariableVal.Real(mean(arg0));
             }
             if (fn.equals("median")) {
-                return Variable.Real(median(arg0));
+                return VariableVal.Real(median(arg0));
             }
             break;
         case 'p':
             if (fn.equals("point_direction")) {
-                return Variable.Real(point_direction(arg0, arg1, arg2, arg3));
+                return VariableVal.Real(point_direction(arg0, arg1, arg2, arg3));
             }
             if (fn.equals("point_distance")) {
-                return Variable.Real(point_distance(arg0, arg1, arg2, arg3));
+                return VariableVal.Real(point_distance(arg0, arg1, arg2, arg3));
             }
             if (fn.equals("power")) {
-                return Variable.Real(power(arg0, arg1));
+                return VariableVal.Real(power(arg0, arg1));
             }
             break;
         case 'r':
             if (fn.equals("random")) {
-                return Variable.Real(random(arg0));
+                return VariableVal.Real(random(arg0));
             }
             if (fn.equals("radtodeg")) {
-                return Variable.Real(radtodeg(arg0));
+                return VariableVal.Real(radtodeg(arg0));
             }
             if (fn.equals("random_get_seed")) {
-                return Variable.Real(Double.longBitsToDouble(random_get_seed()));
+                return VariableVal.Real(Double.longBitsToDouble(random_get_seed()));
             }
             if (fn.equals("random_set_seed")) {
                 random_set_seed(Double.doubleToLongBits(arg0));
@@ -213,33 +213,33 @@ public class MathLibrary extends FunctionLibrary {
                 return ReturnValue.SUCCESS;
             }
             if (fn.equals("round")) {
-                return Variable.Real(round(arg0));
+                return VariableVal.Real(round(arg0));
             }
             break;
         case 's':
             if (fn.equals("sign")) {
-                return Variable.Real(sign(arg0));
+                return VariableVal.Real(sign(arg0));
             }
             if (fn.equals("sin")) {
-                return Variable.Real(sin(arg0));
+                return VariableVal.Real(sin(arg0));
             }
             if (fn.equals("sqr")) {
-                return Variable.Real(sqr(arg0));
+                return VariableVal.Real(sqr(arg0));
             }
             if (fn.equals("sqrt")) {
-                return Variable.Real(sqrt(arg0));
+                return VariableVal.Real(sqrt(arg0));
             }
             break;
         case 't':
             if (fn.equals("tan")) {
-                return Variable.Real(tan(arg0));
+                return VariableVal.Real(tan(arg0));
             }
             break;
         }
         return null;
     }
 
-    private static double[] getReals(Variable... vars) {
+    private static double[] getReals(VariableVal... vars) {
         double[] ds = new double[vars.length];
         for (int i = 0; i < vars.length; i++) {
             ds[i] = vars[i].realVal;
@@ -247,7 +247,7 @@ public class MathLibrary extends FunctionLibrary {
         return ds;
     }
 
-    private static boolean is_real(Variable var) {
+    private static boolean is_real(VariableVal var) {
         if (var == null || var.val == null)
             return false;
         try {
@@ -258,7 +258,7 @@ public class MathLibrary extends FunctionLibrary {
         return true;
     }
 
-    private static boolean is_string(Variable val) {
+    private static boolean is_string(VariableVal val) {
         return val.isString;
     }
 
@@ -280,7 +280,7 @@ public class MathLibrary extends FunctionLibrary {
         random.setSeed(seed);
     }
 
-    private static Variable choose(Variable... vals) {
+    private static VariableVal choose(VariableVal... vals) {
         int n = (int) (Math.random() * vals.length);
         return vals[n];
     }
@@ -386,9 +386,9 @@ public class MathLibrary extends FunctionLibrary {
         return d;
     }
 
-    private static Variable minStr(Variable... vars) {
-        Variable var = vars[0];
-        for (Variable v : vars) {
+    private static VariableVal minStr(VariableVal... vars) {
+        VariableVal var = vars[0];
+        for (VariableVal v : vars) {
             if (v.val.length() < var.val.length())
                 var = v;
         }
@@ -404,9 +404,9 @@ public class MathLibrary extends FunctionLibrary {
         return d;
     }
 
-    private static Variable maxStr(Variable... vars) {
-        Variable var = vars[0];
-        for (Variable v : vars) {
+    private static VariableVal maxStr(VariableVal... vars) {
+        VariableVal var = vars[0];
+        for (VariableVal v : vars) {
             if (v.val.length() > var.val.length())
                 var = v;
         }

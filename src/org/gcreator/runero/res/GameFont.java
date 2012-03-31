@@ -2,6 +2,8 @@ package org.gcreator.runero.res;
 
 import java.awt.Font;
 
+import org.gcreator.runero.gfx.TrueTypeFont;
+
 public class GameFont extends GameResource {
 
     public String fontName;
@@ -13,6 +15,7 @@ public class GameFont extends GameResource {
     public int antialias;
     public int charset;
 
+    private TrueTypeFont ttf;
     private Font font;
 
     public GameFont(String name) {
@@ -29,5 +32,11 @@ public class GameFont extends GameResource {
             style |= Font.BOLD;
         font = new Font(fontName, style, size);
         return font;
+    }
+    
+    public TrueTypeFont load() {
+        if (ttf == null)
+            ttf = new TrueTypeFont(getFont(), antialias > 0);
+        return ttf;
     }
 }

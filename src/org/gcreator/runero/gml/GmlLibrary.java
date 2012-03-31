@@ -12,7 +12,7 @@ public class GmlLibrary {
         libs.add(MathLibrary.lib);
     }
     
-    public ReturnValue executeFunction(String function, Variable... args) {
+    public ReturnValue executeFunction(String function, VariableVal... args) {
         ReturnValue rv = null;
         for (FunctionLibrary l : libs) {
             rv = l.getFunction(function, args);

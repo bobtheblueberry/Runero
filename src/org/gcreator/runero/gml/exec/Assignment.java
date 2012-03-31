@@ -7,7 +7,7 @@ public class Assignment implements Statement {
     }
     
     public final OPERATION op;
-    public Argument value;
+    public ExprArgument value;
     
     public Assignment(OPERATION op) {
         this.op = op;

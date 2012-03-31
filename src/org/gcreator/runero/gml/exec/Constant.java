@@ -15,6 +15,11 @@ public class Constant {
         dVal = d;
     }
     
+    public Constant(boolean b) {
+        type = NUMBER;
+        dVal = b ? 1 : 0;
+    }
+    
     public Constant(String s) {
         type = STRING;
         sVal = s;

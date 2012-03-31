@@ -7,8 +7,6 @@ import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameTimeline;
 
-import com.golden.gamedev.engine.input.AWTInput;
-
 public class Event {
 
     // mouse event types
@@ -128,9 +126,9 @@ public class Event {
     public static int getGmKeyName(int keyCode) {
         switch (keyCode) {
         case 0:
-            return AWTInput.NO_KEY;
+            //return AWTInput.NO_KEY;
         case 1:
-            return AWTInput.ANY_KEY;
+           // return AWTInput.ANY_KEY;
         case 13: // carriage return \r
             keyCode = KeyEvent.VK_ENTER;
             break;

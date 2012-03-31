@@ -12,7 +12,7 @@ import org.gcreator.runero.event.Action;
 import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReturnValue;
-import org.gcreator.runero.gml.Variable;
+import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
@@ -359,10 +359,10 @@ public class ActionLibrary {
             // This is actually handled by the action executor class.
             return ReturnValue.FAILURE;
         case CODE:
-
+            //TODO: This
             return ReturnValue.FAILURE;
         case EXECUTE_SCRIPT:
-
+            //TODO: this
             return ReturnValue.FAILURE;
         case VARIABLE:
             variable(act, instance, other);
@@ -457,7 +457,7 @@ public class ActionLibrary {
 
             return ReturnValue.FAILURE;
         case SET_MOUSE:
-
+            //TODO: set mouse
             return ReturnValue.FAILURE;
         case OPEN_WEBPAGE:
             open_webpage(act, instance, other);
@@ -578,9 +578,8 @@ public class ActionLibrary {
     private static void action_move(Action a, Instance instance, Instance other) {
         // Move Fixed..
         // Arrows.. yay
+        double speed = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
         String arg0 = a.arguments.get(0).val;
-        String arg1 = a.arguments.get(1).val;
-        double speed = GmlParser.getExpression(arg1, instance, other);
         ArrayList<Integer> vals = new ArrayList<Integer>();
         for (int i = 0; i < 9; i++) {
             if (arg0.charAt(i) != '1')
@@ -619,8 +618,8 @@ public class ActionLibrary {
     }
 
     private static void set_motion(Action a, Instance instance, Instance other) {
-        double direction = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double speed = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double direction = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double speed = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
         if (a.relative)
             instance.motion_add(direction, speed);
         else
@@ -629,9 +628,9 @@ public class ActionLibrary {
 
     private static void move_point(Action a, Instance instance, Instance other) {
         // x,y,speed
-        double x = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double speed = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double speed = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
         double dir;
         if (a.relative) {
             dir = MathLibrary.point_direction(instance.x, instance.y, instance.x + x, instance.y + y);
@@ -642,7 +641,7 @@ public class ActionLibrary {
     }
 
     private static void set_hspeed(Action a, Instance instance, Instance other) {
-        double hspeed = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double hspeed = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
         if (a.relative)
             instance.setHspeed(instance.getHspeed() + hspeed);
         else
@@ -650,7 +649,7 @@ public class ActionLibrary {
     }
 
     private static void set_vspeed(Action a, Instance instance, Instance other) {
-        double vspeed = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double vspeed = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
         if (a.relative)
             instance.setVspeed(instance.getHspeed() + vspeed);
         else
@@ -658,8 +657,8 @@ public class ActionLibrary {
     }
 
     private static void set_gravity(Action a, Instance instance, Instance other) {
-        double direction = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double gravity = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double direction = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double gravity = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
         instance.gravity_direction = direction;
         if (a.relative)
             instance.gravity += gravity;
@@ -676,13 +675,13 @@ public class ActionLibrary {
     }
 
     private static void set_friction(Action a, Instance instance, Instance other) {
-        double friction = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double friction = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
         instance.friction = friction;
     }
 
     private static void move_to(Action a, Instance instance, Instance other) {
-        double x = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
         if (a.relative) {
             instance.x += x;
             instance.y += y;
@@ -700,8 +699,8 @@ public class ActionLibrary {
     private static void move_random(Action a, Instance instance, Instance other) {
         // TODO: Solid object checking
 
-        double xsnap = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double ysnap = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double xsnap = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double ysnap = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
 
         double rx = Math.random() * RuneroGame.room.width;
         double ry = Math.random() * RuneroGame.room.height;
@@ -714,8 +713,8 @@ public class ActionLibrary {
     }
 
     private static void snap(Action a, Instance instance, Instance other) {
-        double h = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double v = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double h = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double v = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
         double newX = Math.round(instance.x / h);
         double newY = Math.round(instance.y / v);
         instance.x = newX * h;
@@ -723,9 +722,8 @@ public class ActionLibrary {
     }
 
     private static void wrap(Action a, Instance instance, Instance other) {
-        // TODO: This action sucks, esp. compared to GM's action
         // horizontal|vertical|in both directions
-        int dir = Integer.parseInt(a.arguments.get(0).val);
+        int dir = a.arguments.get(0).menuVal;
         GameSprite s = instance.getSprite();
         int x = 0, y = 0;
         if (s != null) {
@@ -767,7 +765,7 @@ public class ActionLibrary {
 
     // main1
     private static void create_object(Action a, Instance instance, Instance other) {
-        int id = Integer.parseInt(a.arguments.get(0).val);
+        int id = a.arguments.get(0).resVal;
         if (id < 0) {
             System.out.println("cannot create object with id " + id);
             return;
@@ -777,8 +775,8 @@ public class ActionLibrary {
             System.out.println("Unknown object " + id);
             return;
         }
-        double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
         if (a.relative) {
             x += instance.x;
             y += instance.y;
@@ -787,7 +785,7 @@ public class ActionLibrary {
     }
 
     private static void create_object_motion(Action a, Instance instance, Instance other) {
-        int id = Integer.parseInt(a.arguments.get(0).val);
+        int id = a.arguments.get(0).resVal;
         if (id < 0) {
             System.out.println("cannot create object with id " + id);
             return;
@@ -797,10 +795,10 @@ public class ActionLibrary {
             System.out.println("Unknown object " + id);
             return;
         }
-        double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-        double speed = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
-        double dir = GmlParser.getExpression(a.arguments.get(4).val, instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        double speed = GmlParser.getExpression(a.arguments.get(3).exprVal, instance, other);
+        double dir = GmlParser.getExpression(a.arguments.get(4).exprVal, instance, other);
 
         if (a.relative) {
             x += instance.x;
@@ -811,10 +809,10 @@ public class ActionLibrary {
 
     private static void create_object_random(Action a, Instance instance, Instance other) {
         int[] ids = new int[4];
-        ids[0] = Integer.parseInt(a.arguments.get(0).val);
-        ids[1] = Integer.parseInt(a.arguments.get(1).val);
-        ids[2] = Integer.parseInt(a.arguments.get(2).val);
-        ids[3] = Integer.parseInt(a.arguments.get(3).val);
+        ids[0] = a.arguments.get(0).resVal;
+        ids[1] = a.arguments.get(1).resVal;
+        ids[2] = a.arguments.get(2).resVal;
+        ids[3] = a.arguments.get(3).resVal;
         ArrayList<GameObject> objs = new ArrayList<GameObject>(4);
         for (int i : ids) {
             if (i < 0)
@@ -832,8 +830,8 @@ public class ActionLibrary {
         }
         int r = (int) (Math.random() * objs.size());
         GameObject o = objs.get(r);
-        double x = GmlParser.getExpression(a.arguments.get(4).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(5).val, instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(4).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(5).exprVal, instance, other);
         if (a.relative) {
             x += instance.x;
             y += instance.y;
@@ -842,7 +840,7 @@ public class ActionLibrary {
     }
 
     private static void change_object(Action a, Instance instance, Instance other) {
-        int id = Integer.parseInt(a.arguments.get(0).val);
+        int id = a.arguments.get(0).resVal;
         int performEvents = Integer.parseInt(a.arguments.get(1).val);
         GameObject g = RuneroGame.game.getObject(id);
         if (g == null) {
@@ -862,9 +860,9 @@ public class ActionLibrary {
 
     private static void set_sprite(Action a, Instance instance, Instance other) {
         // Use -1 if you do not want to change the current subimage shown.
-        int sprite = Integer.parseInt(a.arguments.get(0).val);
-        double subimg = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double speed = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        int sprite = a.arguments.get(0).resVal;
+        double subimg = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double speed = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
         instance.sprite_index = sprite;
         if (subimg >= 0)
             instance.image_index = subimg;
@@ -879,10 +877,10 @@ public class ActionLibrary {
 
     private static void transform_sprite(Action a, Instance instance, Instance other) {
         // xscale, yscale, angle, mirror (menu)
-        double xscale = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double yscale = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double angle = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-        int mirror = Integer.parseInt(a.arguments.get(3).val);
+        double xscale = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double yscale = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double angle = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        int mirror = a.arguments.get(3).menuVal;
         // no mirroring|mirror horizontally|flip vertically|mirror and flip
         if (mirror == 1 || mirror == 2) {
             xscale = -xscale;
@@ -896,16 +894,16 @@ public class ActionLibrary {
     }
 
     private static void color_sprite(Action a, Instance instance, Instance other) {
-        int color = Integer.parseInt(a.arguments.get(0).val);
-        double alpha = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        instance.image_blend = GmlParser.convertGmColor(color);
+        Color color = a.arguments.get(0).colorVal;
+        double alpha = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        instance.image_blend = color;
         instance.image_alpha = alpha;
     }
 
     // not used anymore
     private static void set_sprite_old(Action a, Instance instance, Instance other) {
-        int sprite = Integer.parseInt(a.arguments.get(0).val);
-        double scale = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        int sprite = a.arguments.get(0).resVal;
+        double scale = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
         instance.sprite_index = sprite;
         instance.image_xscale = scale;
         instance.image_yscale = scale;
@@ -923,15 +921,15 @@ public class ActionLibrary {
 
     // main2
     private static void set_alarm(Action a, Instance instance, Instance other) {
-        int steps = (int) Math.round(GmlParser.getExpression(a.arguments.get(0).val, instance, other));
-        int number = Integer.parseInt(a.arguments.get(1).val);
+        int steps = (int) Math.round(GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other));
+        int number = a.arguments.get(1).menuVal;
         instance.alarm[number] = steps;
     }
 
     private static void sleep(Action a, Instance instance, Instance other) {
-        double seconds = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        int redraw = Integer.parseInt(a.arguments.get(0).val);
-        if (redraw == 1) {
+        double seconds = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        boolean redraw = a.arguments.get(0).boolVal;
+        if (redraw) {
             // TODO: REDRAW
         }
         try {
@@ -942,14 +940,14 @@ public class ActionLibrary {
         }
     }
 
-    /*
+    /*TODO:
     SET_TIMELINE
     POSITION_TIMELINE
     */
     private static void show_message(Action a, Instance instance, Instance other) {
         // TODO: real function, not this hack
         // also todo, # newlines, \# escape
-        String msg = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
+        String msg = GmlParser.getExpressionString(a.arguments.get(0), instance, other);
         JOptionPane.showMessageDialog(null, msg);
     }
 
@@ -959,68 +957,55 @@ public class ActionLibrary {
 
     private static void show_video(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void restart_game(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void end_game(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void save_game(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void load_game(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void replace_sprite(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void replace_sound(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void replace_background(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     // GM8 Splash functions that SUCK
     private static void splash_text(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void splash_image(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void splash_web(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void splash_video(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void splash_settings(Action a, Instance instance, Instance other) {
         // TODO: This
-        // TODO: Support 'Both' Argument types
     }
 
     private static void variable(Action a, Instance instance, Instance other) {
@@ -1031,9 +1016,9 @@ public class ActionLibrary {
     }
 
     private static void draw_variable(Action a, Instance instance, Instance other) {
-        Variable var = GmlParser.getVariable(a.arguments.get(0).val, instance, other);
-        double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        VariableVal var = GmlParser.solve(a.arguments.get(0).exprVal, instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
         if (a.relative) {
             x += instance.x;
             y += instance.y;
@@ -1044,7 +1029,7 @@ public class ActionLibrary {
 
     // score
     private static void set_score(Action a, Instance instance, Instance other) {
-        double newScore = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double newScore = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
         if (a.relative) {
             RuneroGame.game.score += newScore;
         } else {
@@ -1054,8 +1039,8 @@ public class ActionLibrary {
 
     private static void draw_score(Action a, Instance instance, Instance other) {
         // x, y, caption
-        double x = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
         if (a.relative) {
             x += instance.x;
             y += instance.y;
@@ -1072,7 +1057,7 @@ public class ActionLibrary {
     }
 
     private static void set_life(Action a, Instance instance, Instance other) {
-        double newLife = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        double newLife = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
         if (a.relative) {
             RuneroGame.game.lives += newLife;
         } else {
@@ -1081,8 +1066,8 @@ public class ActionLibrary {
     }
 
     private static void draw_life(Action a, Instance instance, Instance other) {
-        double x = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
         if (a.relative) {
             x += instance.x;
             y += instance.y;
@@ -1098,9 +1083,9 @@ public class ActionLibrary {
             return;
         }
 
-        double x = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        int sprite = Integer.parseInt(a.arguments.get(2).val);
+        double x = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        int sprite = a.arguments.get(2).resVal;
         GameSprite s = RuneroGame.game.getSprite(sprite);
         if (s == null) {
             System.out.println("Can't draw life images; unkown sprite index " + sprite);
@@ -1124,7 +1109,7 @@ public class ActionLibrary {
 
     private static void set_health(Action a, Instance instance, Instance other) {
         // 0 - 100 ... supposedly
-        RuneroGame.game.health = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
+        RuneroGame.game.health = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
     }
 
     private static void draw_health(Action a, Instance instance, Instance other) {
@@ -1137,11 +1122,11 @@ public class ActionLibrary {
     }
 
     private static void set_caption(Action a, Instance instance, Instance other) {
-        boolean showScore = Integer.parseInt(a.arguments.get(0).val) == 1;
+        boolean showScore = a.arguments.get(0).menuVal == 1;
         String captionScore = a.arguments.get(1).val;
-        boolean showLives = Integer.parseInt(a.arguments.get(2).val) == 1;
+        boolean showLives = a.arguments.get(2).menuVal == 1;
         String captionLives = a.arguments.get(3).val;
-        boolean showHealth = Integer.parseInt(a.arguments.get(4).val) == 1;
+        boolean showHealth = a.arguments.get(4).menuVal == 1;
         String captionHealth = a.arguments.get(5).val;
         RuneroGame.game.show_score = showScore;
         RuneroGame.game.show_lives = showLives;
@@ -1173,14 +1158,14 @@ public class ActionLibrary {
     CD_RESUME
     CD_IF_EXISTS
     CD_IF_PLAYING
-    SET_MOUSE
+  TODO:  SET_MOUSE
     */
     private static void open_webpage(Action a, Instance instance, Instance other) {
         // Note: URL is supposed to be an expression OR a string, an expression when
         // it starts with a single or double quote. This is the same for show_message
         // however, I have tried it in Game Maker and it does not seem to work.
         // BROKEN IN GM7, WORKS IN GM6.1
-        String url = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
+        String url = GmlParser.getExpressionString(a.arguments.get(0), instance, other);
         try {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
         } catch (IOException e) {
@@ -1190,9 +1175,9 @@ public class ActionLibrary {
 
     // draw
     private static void draw_sprite(Action a, Instance instance, Instance other) {
-        int sprite = Integer.parseInt(a.arguments.get(0).val);
-        double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        int sprite = a.arguments.get(0).resVal;
+        double x = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
         GameSprite s = RuneroGame.game.getSprite(sprite);
         if (s == null) {
             System.out.println("Can't draw sprite; unkown sprite index " + sprite);
@@ -1216,10 +1201,10 @@ public class ActionLibrary {
     }
 
     private static void draw_background(Action a, Instance instance, Instance other) {
-        int background = Integer.parseInt(a.arguments.get(0).val);
-        int x = (int) Math.round(GmlParser.getExpression(a.arguments.get(1).val, instance, other));
-        int y = (int) Math.round(GmlParser.getExpression(a.arguments.get(2).val, instance, other));
-        boolean tiled = Integer.parseInt(a.arguments.get(3).val) == 1;
+        int background = a.arguments.get(0).resVal;
+        double x = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        boolean tiled = a.arguments.get(3).boolVal;
 
         GameBackground bg = RuneroGame.game.getBackground(background);
         if (bg == null) {
@@ -1234,9 +1219,9 @@ public class ActionLibrary {
     }
 
     private static void draw_text(Action a, Instance instance, Instance other) {
-        String text = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
-        double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
+        String text = GmlParser.getExpressionString(a.arguments.get(0), instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
 
         if (a.relative) {
             x += instance.x;
@@ -1246,12 +1231,12 @@ public class ActionLibrary {
     }
 
     private static void draw_text_scaled(Action a, Instance instance, Instance other) {
-        String text = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
-        double x = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double y = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-        double xscale = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
-        double yscale = GmlParser.getExpression(a.arguments.get(4).val, instance, other);
-        double angle = GmlParser.getExpression(a.arguments.get(5).val, instance, other);
+        String text = GmlParser.getExpressionString(a.arguments.get(0), instance, other);
+        double x = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double y = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        double xscale = GmlParser.getExpression(a.arguments.get(3).exprVal, instance, other);
+        double yscale = GmlParser.getExpression(a.arguments.get(4).exprVal, instance, other);
+        double angle = GmlParser.getExpression(a.arguments.get(5).exprVal, instance, other);
 
         if (a.relative) {
             x += instance.x;
@@ -1261,11 +1246,11 @@ public class ActionLibrary {
     }
 
     private static void draw_rectangle(Action a, Instance instance, Instance other) {
-        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
-        boolean filled = Integer.parseInt(a.arguments.get(4).val) == 0;
+        double x1 = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).exprVal, instance, other);
+        boolean filled = a.arguments.get(4).menuVal == 0;
         if (a.relative) {
             x1 += instance.x;
             x2 += instance.x;
@@ -1279,13 +1264,15 @@ public class ActionLibrary {
     }
 
     private static void draw_gradient_hor(Action a, Instance instance, Instance other) {
-        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
-        Color c1 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(4).val));
-        Color c2 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(5).val));
-        if (a.relative) {
+        double x1 = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).exprVal, instance, other);
+        Color c1 = a.arguments.get(4).colorVal;
+        Color c2 = a.arguments.get(5).colorVal;
+
+        
+           if (a.relative) {
             x1 += instance.x;
             x2 += instance.x;
             y1 += instance.y;
@@ -1296,12 +1283,12 @@ public class ActionLibrary {
     }
 
     private static void draw_gradient_vert(Action a, Instance instance, Instance other) {
-        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
-        Color c1 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(4).val));
-        Color c2 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(5).val));
+        double x1 = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).exprVal, instance, other);
+        Color c1 = a.arguments.get(4).colorVal;
+        Color c2 = a.arguments.get(5).colorVal;
         if (a.relative) {
             x1 += instance.x;
             x2 += instance.x;
@@ -1312,11 +1299,11 @@ public class ActionLibrary {
     }
 
     private static void draw_ellipse(Action a, Instance instance, Instance other) {
-        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
-        boolean filled = Integer.parseInt(a.arguments.get(4).val) == 0;
+        double x1 = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).exprVal, instance, other);
+        boolean filled = a.arguments.get(4).menuVal == 0;
         if (a.relative) {
             x1 += instance.x;
             x2 += instance.x;
@@ -1330,12 +1317,12 @@ public class ActionLibrary {
     }
 
     private static void draw_ellipse_gradient(Action a, Instance instance, Instance other) {
-        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
-        Color c1 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(4).val));
-        Color c2 = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(5).val));
+        double x1 = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).exprVal, instance, other);
+        Color c1 = a.arguments.get(4).colorVal;
+        Color c2 = a.arguments.get(5).colorVal;
         if (a.relative) {
             x1 += instance.x;
             x2 += instance.x;
@@ -1346,10 +1333,10 @@ public class ActionLibrary {
     }
 
     private static void draw_line(Action a, Instance instance, Instance other) {
-        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
+        double x1 = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).exprVal, instance, other);
         if (a.relative) {
             x1 += instance.x;
             x2 += instance.x;
@@ -1360,11 +1347,11 @@ public class ActionLibrary {
     }
 
     private static void draw_arrow(Action a, Instance instance, Instance other) {
-        double x1 = GmlParser.getExpression(a.arguments.get(0).val, instance, other);
-        double y1 = GmlParser.getExpression(a.arguments.get(1).val, instance, other);
-        double x2 = GmlParser.getExpression(a.arguments.get(2).val, instance, other);
-        double y2 = GmlParser.getExpression(a.arguments.get(3).val, instance, other);
-        double tipSize = GmlParser.getExpression(a.arguments.get(4).val, instance, other);
+        double x1 = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
+        double y1 = GmlParser.getExpression(a.arguments.get(1).exprVal, instance, other);
+        double x2 = GmlParser.getExpression(a.arguments.get(2).exprVal, instance, other);
+        double y2 = GmlParser.getExpression(a.arguments.get(3).exprVal, instance, other);
+        double tipSize = GmlParser.getExpression(a.arguments.get(4).exprVal, instance, other);
         if (a.relative) {
             x1 += instance.x;
             x2 += instance.x;
@@ -1380,9 +1367,8 @@ public class ActionLibrary {
     }
 
     private static void set_font(Action a, Instance instance, Instance other) {
-        int fontId = Integer.parseInt(a.arguments.get(0).val);
-        g.fontAlign = Integer.parseInt(a.arguments.get(1).val);
-        // TODO: Font align in draw text functions
+        int fontId = a.arguments.get(0).resVal;
+        g.fontAlign = a.arguments.get(1).menuVal;
         GameFont font = RuneroGame.game.getFont(fontId);
         if (font == null)
             return;
@@ -1395,7 +1381,7 @@ public class ActionLibrary {
     }
 
     private static void take_snapshot(Action a, Instance instance, Instance other) {
-        String fname = GmlParser.getExpressionString(a.arguments.get(0).val, instance, other);
+        String fname = GmlParser.getExpressionString(a.arguments.get(0), instance, other);
         g.saveScreenshot(new File(fname));
     }
 

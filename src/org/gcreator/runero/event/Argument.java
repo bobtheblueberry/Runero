@@ -10,6 +10,8 @@
 
 package org.gcreator.runero.event;
 
+import java.awt.Color;
+
 import org.gcreator.runero.res.Code;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
@@ -45,7 +47,14 @@ public class Argument {
     public final int kind;
     public String val;
     public Code code;
-    public boolean ref = false;
+    
+    // Values parsed from the string
+    public boolean boolVal;
+    public Color colorVal;
+    public int menuVal = -1;
+    public boolean bothIsExpr; // is expression for 'both' types
+    public org.gcreator.runero.gml.exec.ExprArgument exprVal;
+    public int resVal = -1;
 
     public Argument(int kind) {
         this.kind = kind;
@@ -78,33 +87,4 @@ public class Argument {
         }
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (!(obj instanceof Argument))
-            return false;
-        Argument other = (Argument) obj;
-        if (kind != other.kind)
-            return false;
-        if (ref && !other.ref) {
-            return false;
-        }
-        if (val == null) {
-            if (other.val != null)
-                return false;
-        } else if (!val.equals(other.val))
-            return false;
-        return true;
-    }
-
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + kind;
-        result = prime * result + ((val == null) ? 0 : val.hashCode());
-        return result;
-    }
 }

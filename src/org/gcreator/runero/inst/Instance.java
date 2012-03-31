@@ -8,7 +8,7 @@ import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gml.GmlInterpreter;
-import org.gcreator.runero.gml.Variable;
+import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameSprite;
@@ -80,7 +80,7 @@ public class Instance implements Comparable<Instance> {
 
     public GameObject obj;
     public int id;
-    public Hashtable<String, Variable> variables;
+    public Hashtable<String, VariableVal> variables;
 
     public Instance(double x, double y, int id, GameObject obj) {
         this.id = id;
@@ -97,7 +97,7 @@ public class Instance implements Comparable<Instance> {
         this.persistent = obj.persistent; // TODO: Persistence for objects
         this.parentId = obj.parentId;
         this.mask_index = obj.maskId;
-        this.variables = new Hashtable<String, Variable>();
+        this.variables = new Hashtable<String, VariableVal>();
         updateImageNumber();
     }
 
@@ -145,7 +145,7 @@ public class Instance implements Comparable<Instance> {
                 x = xprevious;
                 y = yprevious;
             }
-
+        
         GmlInterpreter.performEvent(event, this);
     }
 

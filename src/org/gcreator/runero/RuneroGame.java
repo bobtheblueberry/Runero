@@ -9,7 +9,7 @@ import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gfx.RuneroDisplay;
 import org.gcreator.runero.gfx.TextureLoader;
 import org.gcreator.runero.gml.GmlLibrary;
-import org.gcreator.runero.gml.Variable;
+import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.inst.RoomInstance;
 import org.gcreator.runero.res.*;
 
@@ -40,7 +40,7 @@ public class RuneroGame {
     public ArrayList<GameTimeline> timelines;
 
     public GameInformation gameInfo;
-    public Hashtable<String, Variable> globalVars;
+    public Hashtable<String, VariableVal> globalVars;
 
     // Game Maker Global Game Variables....
     public double room_speed = 30;
@@ -61,7 +61,7 @@ public class RuneroGame {
         RuneroGame.game = this;
         library = new GmlLibrary();
         eventManager = new EventManager();
-        globalVars = new Hashtable<String, Variable>();
+        globalVars = new Hashtable<String, VariableVal>();
         tex = new TextureLoader();
         gameStart();
     }
@@ -74,12 +74,7 @@ public class RuneroGame {
             System.exit(1);
         }
         // Go to the first room
-        // this code is for ME, TESTING
-        int roomi = 3;
-        if (rooms.size() > roomi)
-            room = new RoomInstance(this, rooms.get(roomi));
-        else
-            room = new RoomInstance(this, rooms.get(0));
+        room = new RoomInstance(this, rooms.get(0));
         room.init(true);
     }
 

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.gcreator.runero.gml.exec.ExprArgument;
 import org.gcreator.runero.inst.Instance;
 
 public class GmlParser {
@@ -17,13 +18,13 @@ public class GmlParser {
 
     }
 
-    public static Variable getVariable(String name, Instance instance, Instance other) {
+    public static VariableVal getVariable(String name, Instance instance, Instance other) {
 
         // first check to see if it is a defined variable
         // then check to see if its a constant * variable
 
         // name could be like other.x
-        return new Variable("Josh Write me a Parser");
+        return new VariableVal("Josh Write me a Parser");
     }
 
     /**
@@ -35,95 +36,23 @@ public class GmlParser {
      * @param expr
      * @return 
      */
-    public static String getExpressionString(String expr, Instance instance, Instance other) {
-        
-        //TODO: This, lol!
-        return expr;
+    public static String getExpressionString(org.gcreator.runero.event.Argument a, Instance instance, Instance other) {
+        if (a.bothIsExpr) {
+            VariableVal v = solve(a.exprVal, instance, other);
+            if (v.isReal)
+                return "" + v.realVal;
+            return v.val;
+        }
+        return a.val;
     }
 
-    /**
-     * Evaluates an expression
-     * 
-     * @param instance the instance
-     * @param s the expression
-     * @param other the 'other' if this is a collision event
-     * @return
-     */
-    // TODO: Implement this!
-    public static double getExpression(String s, Instance instance, Instance other) {
-
-        try {
-            return Double.parseDouble(s);
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid double " + s);
-            return 0;
-        }
-        /*
-        // object_specialmoon.x/y
-        Pattern regex = Pattern.compile("([A-Za-z0-9_]+)\\.([_a-zA-Z0-9])$"); // Doesnt work for 1.8 etc.
-        Matcher match = regex.matcher(s);
-        if (match.find()) {
-            String obj = match.group(1);
-            int id = -1;
-            for (GameObject g : RuneroGame.game.objects) {
-                if (g.getName().equals(obj)) {
-                    id = g.getId();
-                }
-            }
-            if (id >= 0) {
-                if (RuneroGame.room.hasObjectGroup(id)) {
-                    // use the first instance like crappy game maker does
-                    ObjectGroup g = RuneroGame.room.getObjectGroup(id);
-                    if (g.instances.size() == 0)
-                        System.out.println("There are no " + obj + " left in this room!");
-                    else
-                        return getDoubleVariable(g.instances.get(0), match.group(2));
-                } else {
-                    System.out.println("Room has no objects with id " + id + " (" + obj + ")");
-                }
-            } else {
-                
-                System.out.println("Cannot find object " + obj + "  (" + s + ")" + " from instance "
-                        + instance.obj.getName() + " Expression " + s);
-            }
-        } else
-            return getDouble(s);
-        return 0;*/
-    }
-
-    public static double getDouble(String s) {
-        Pattern regex = Pattern.compile("random\\((\\-?[0-9]+(\\.[0-9]+)?)\\)");
-        Matcher match = regex.matcher(s);
-        if (match.find()) {
-            // Random number
-            // System.out.println("GMLParser: random number " + s);
-            double d;
-            if (match.groupCount() > 2) {
-                d = Double.parseDouble(match.group(1) + match.group(2));
-            } else {
-                d = Integer.parseInt(match.group(1));
-            }
-            return Math.random() * d;
-        } else {
-            regex = Pattern.compile("[0-9]+(\\.[0-9]+)?");
-            match = regex.matcher(s);
-            if (match.matches()) {
-                return Double.parseDouble(s);
-            }
-        }
-     //   System.out.println("Invalid double " + s);
-
+    public static double getExpression(ExprArgument a, Instance instance, Instance other) {
         return 0;
     }
 
-    // What a hack lol
-    public static double getDoubleVariable(Instance i, String varname) {
-        if (varname.equals("x"))
-            return i.x;
-        if (varname.equals("y"))
-            return i.y;
-        System.out.println("Unknown var " + varname);
-        return 0;
+    public static VariableVal solve(ExprArgument a, Instance Instance, Instance other) {
+
+        return new VariableVal("nope");
     }
 
     // Thank you LateralGM (IsmAvatar, Clam, Quadduc)

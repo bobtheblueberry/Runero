@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class With implements Statement {
 
-    public Argument who;
+    public ExprArgument who;
     public ArrayList<Statement> code; 
     
     @Override

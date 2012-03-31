@@ -17,7 +17,7 @@ public class Expression {
     public Constant constant; // string/number constants
     public VariableRef variable; // variables
     public Function function; // used for function types
-    public Argument parenthesis; // used for parenthesis types
+    public ExprArgument parenthesis; // used for parenthesis types
     public Operator op; // Used for operator types
     
     
@@ -40,7 +40,7 @@ public class Expression {
         function = f;
     }
     
-    public Expression(Argument par) {
+    public Expression(ExprArgument par) {
         this.type = Type.PARENTHESIS;
         parenthesis = par;
     }
