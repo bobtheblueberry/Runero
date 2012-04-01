@@ -54,6 +54,7 @@ public class RuneroGame {
     public String caption_score; // The caption used for the score.
     public String caption_lives; // The caption used for the number of lives.
     public String caption_health; // The caption used for the health.
+    public int room_index; // the current room index; 'room' in GML
 
 
     public RuneroGame() {
@@ -130,9 +131,33 @@ public class RuneroGame {
         return null;
     }
 
+    public void updateCaption() {
+        // score lives health
+        String caption = "";
+        int i = 0;
+        if (show_score) {
+            caption = caption_score + score;
+            i++;
+        }
+        if (show_lives) {
+            if (i > 0)
+                caption += " ";
+            caption += caption_lives + lives;
+            i++;
+        }
+        if (show_health) {
+            if (i > 0)
+                caption += " ";
+            caption += caption_health + health;
+            i++;
+        }
+        if (i > 0)
+            GraphicsLibrary.gfx.setTitle(caption);
+    }
     
     public void update() {
         room.step();
+        updateCaption();
     }
 
     public void render() {

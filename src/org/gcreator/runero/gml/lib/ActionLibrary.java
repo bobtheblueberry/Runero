@@ -13,11 +13,13 @@ import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReturnValue;
 import org.gcreator.runero.gml.VariableVal;
+import org.gcreator.runero.gml.exec.Constant;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameSprite;
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.opengl.Texture;
 
 /**
@@ -359,10 +361,10 @@ public class ActionLibrary {
             // This is actually handled by the action executor class.
             return ReturnValue.FAILURE;
         case CODE:
-            //TODO: This
+            // TODO: This
             return ReturnValue.FAILURE;
         case EXECUTE_SCRIPT:
-            //TODO: this
+            // TODO: this
             return ReturnValue.FAILURE;
         case VARIABLE:
             variable(act, instance, other);
@@ -457,7 +459,7 @@ public class ActionLibrary {
 
             return ReturnValue.FAILURE;
         case SET_MOUSE:
-            //TODO: set mouse
+            // TODO: set mouse
             return ReturnValue.FAILURE;
         case OPEN_WEBPAGE:
             open_webpage(act, instance, other);
@@ -515,64 +517,176 @@ public class ActionLibrary {
         return ReturnValue.FAILURE;
     }
 
-    // There are 18 question actions as of GM7
     public static boolean executeQuestion(Action act, Instance instance, Instance other) {
+        boolean b = executeQuestion_(act, instance, other);
+        if (act.not)
+            b = !b;
+        return b;
+    }
+
+    // There are 18 question actions as of GM7
+    private static boolean executeQuestion_(Action act, Instance instance, Instance other) {
         switch (act.lib.id) {
         case IF_EMPTY:
-
-            return false;
+            return if_empty(act, instance, other);
         case IF_COLLISION:
-
-            return false;
+            return if_collision(act, instance, other);
         case IF_OBJECT:
-
-            return false;
+            return if_object(act, instance, other);
         case IF_NUMBER:
-
-            return false;
+            return if_number(act, instance, other);
         case IF_DICE:
-
-            return false;
+            return if_dice(act, instance, other);
         case IF_QUESTION:
-
-            return false;
+            return if_action(act, instance, other);
         case IF:
-
-            return false;
+            return if_action(act, instance, other);
         case IF_MOUSE:
-
-            return false;
+            return if_mouse(act, instance, other);
         case IF_ALIGNED:
             return false;
         case IF_SOUND:
-
-            return false;
+            return if_sound(act, instance, other);
         case IF_SCORE:
-            return false;
+            return if_score(act, instance, other);
         case IF_VARIABLE:
-
-            return false;
+            return if_variable(act, instance, other);
         case IF_LIFE:
-
-            return false;
+            return if_life(act, instance, other);
         case IF_HEALTH:
-            return false;
+            return if_health(act, instance, other);
         case IF_PREVIOUS_ROOM:
-
-            return false;
+            return if_previous_room(act, instance, other);
         case IF_NEXT_ROOM:
-
+            return if_next_room(act, instance, other);
+        case CD_IF_EXISTS:
             return false;
-        case CD_IF_EXISTS: // use executeQuestion()
-
+        case CD_IF_PLAYING:
             return false;
-        case CD_IF_PLAYING: // use executeQuestion()
-
-            return false;
-
         }
-        System.out.println("Error! $14F");
         return false;
+    }
+
+    /**
+     * 
+     * @param var1
+     * @param var2
+     * @param op 0 = equal, 1 = smaller than, 2 = greater than
+     * @return
+     */
+    private static boolean compare(VariableVal var1, VariableVal var2, int op) {
+        if (op == 0) {
+            return var1.equals(var2);
+        } else {
+            if (var1.isReal && var2.isReal) {
+                if (op == 1)
+                    return var1.realVal < var2.realVal;
+                else
+                    return var1.realVal > var2.realVal;
+            }
+            // Cannot compare string values like that
+        }
+        return false;
+    }
+
+    private static boolean if_variable(Action act, Instance instance, Instance other) {
+        // variable,value,comparator menu
+        // equal to|smaller than|larger than
+        VariableVal var = GmlParser.solve(act.arguments.get(0).exprVal, instance, other);
+        VariableVal val = GmlParser.solve(act.arguments.get(1).exprVal, instance, other);
+        int op = act.arguments.get(2).menuVal;
+        return compare(var, val, op);
+    }
+
+    private static boolean if_life(Action act, Instance instance, Instance other) {
+        // value, operation {equal to|smaller than|larger than}
+        VariableVal lives = VariableVal.Real(RuneroGame.game.lives);
+        VariableVal val = GmlParser.solve(act.arguments.get(0).exprVal, instance, other);
+        int op = act.arguments.get(1).menuVal;
+        return compare(lives, val, op);
+    }
+
+    private static boolean if_health(Action act, Instance instance, Instance other) {
+        VariableVal health = VariableVal.Real(RuneroGame.game.health);
+        VariableVal val = GmlParser.solve(act.arguments.get(0).exprVal, instance, other);
+        int op = act.arguments.get(1).menuVal;
+        return compare(health, val, op);
+    }
+
+    private static boolean if_score(Action act, Instance instance, Instance other) {
+        VariableVal score = VariableVal.Real(RuneroGame.game.score);
+        VariableVal val = GmlParser.solve(act.arguments.get(0).exprVal, instance, other);
+        int op = act.arguments.get(1).menuVal;
+        return compare(score, val, op);
+    }
+
+    private static boolean if_previous_room(Action act, Instance instance, Instance other) {
+        return RuneroGame.game.room_index > 0; // should work
+    }
+
+    private static boolean if_next_room(Action act, Instance instance, Instance other) {
+        return RuneroGame.game.room_index < RuneroGame.game.rooms.size() - 1;
+    }
+
+    private static boolean if_sound(Action act, Instance instance, Instance other) {
+        // sound resource
+        // TODO This, and sound system
+        return false;
+    }
+
+    private static boolean if_mouse(Action act, Instance instance, Instance other) {
+        // no|left|right|middle
+        int index = act.arguments.get(0).menuVal;
+        if (index == 0) {
+            return !Mouse.isButtonDown(0) && Mouse.isButtonDown(1) && Mouse.isButtonDown(2);
+        } else
+            return Mouse.isButtonDown(index - 1);
+    }
+
+    private static boolean if_dice(Action act, Instance instance, Instance other) {
+        // sides
+        double sides = GmlParser.getExpression(act.arguments.get(0).exprVal, instance, other);
+        return Math.random() * sides < 1;
+    }
+
+    private static boolean if_number(Action act, Instance instance, Instance other) {
+        // object, number, operation{Equal to|Smaller than|Larger than}
+        int object = act.arguments.get(2).resVal;
+        double number = GmlParser.getExpression(act.arguments.get(1).exprVal, instance, other);
+        int op = act.arguments.get(2).menuVal;
+
+        if (!RuneroGame.room.hasObjectGroup(object))
+            return false;
+        int objNum = RuneroGame.room.getObjectGroup(object).instances.size();
+        if (op == 0)
+            return objNum == number;
+        else if (op == 1)
+            return objNum < number;
+        else
+            // 2
+            return objNum > number;
+    }
+
+    private static boolean if_object(Action act, Instance instance, Instance other) {
+        // TODO this, and collision checking system
+        return false;
+    }
+
+    private static boolean if_collision(Action act, Instance instance, Instance other) {
+        // TODO this, and collision checking system
+        return false;
+    }
+
+    private static boolean if_empty(Action act, Instance instance, Instance other) {
+        // TODO this, and collision checking system
+        return false;
+    }
+
+    private static boolean if_action(Action act, Instance instance, Instance other) {
+        Constant val = act.arguments.get(0).exprVal.solve(instance, other);
+        if (val.type == Constant.STRING)
+            return false;
+        return val.dVal > 0.5;// JUST LIKE GAME MAKER DOES!
     }
 
     private static void action_move(Action a, Instance instance, Instance other) {
@@ -737,7 +851,7 @@ public class ActionLibrary {
             if (newx < -x) {
                 newx = w + x;
             } else if (newx > w) {
-                newx = - x;
+                newx = -x;
             }
             instance.x = newx;
         }
@@ -747,7 +861,7 @@ public class ActionLibrary {
             if (newy < -y) {
                 newy = h + y;
             } else if (newy > h) {
-                newy = - y;
+                newy = -y;
             }
             instance.y = newy;
         }
@@ -1158,7 +1272,7 @@ public class ActionLibrary {
     CD_RESUME
     CD_IF_EXISTS
     CD_IF_PLAYING
-  TODO:  SET_MOUSE
+    TODO:  SET_MOUSE
     */
     private static void open_webpage(Action a, Instance instance, Instance other) {
         // Note: URL is supposed to be an expression OR a string, an expression when
@@ -1271,8 +1385,7 @@ public class ActionLibrary {
         Color c1 = a.arguments.get(4).colorVal;
         Color c2 = a.arguments.get(5).colorVal;
 
-        
-           if (a.relative) {
+        if (a.relative) {
             x1 += instance.x;
             x2 += instance.x;
             y1 += instance.y;

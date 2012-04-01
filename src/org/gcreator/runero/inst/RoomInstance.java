@@ -51,7 +51,7 @@ public class RoomInstance {
             EventExecutor.executeEvent(game.eventManager.otherGameStart, this);
 
         if (room.creation_code != null) {
-            // GMLScript.executeCode(room.creation_code);
+            //TODO: GMLScript.executeCode(room.creation_code);
         }
 
         System.out.println("New room " + room.getName() + "(" + width + "," + height + ")");
@@ -96,7 +96,7 @@ public class RoomInstance {
             Instance i = new Instance(si);
             // do instance creation code
             if (si.creationCode != null) {
-                // GMLScript.executeCode(i, si.creationCode);
+                // TODO: GMLScript.executeCode(i, si.creationCode);
             }
             getObjectGroup(i.obj.getId()).instances.add(i);
             instance_count++;
@@ -127,7 +127,6 @@ public class RoomInstance {
      * 
      */
     public void destoryInstance(Instance instance) {
-
         instance.isDead = true;
         // destroy event
         if (instance.obj.hasEvent(MainEvent.EV_DESTROY)) {
@@ -290,6 +289,7 @@ public class RoomInstance {
                 if (i.obj.hasEvent(MainEvent.EV_DRAW)) {
                     i.performEvent(i.obj.getMainEvent(MainEvent.EV_DRAW).events.get(0));
                 } else {
+                    System.out.println("Drawing instance of " + i.obj.getName());
                     i.draw(g);
                 }
             }

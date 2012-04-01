@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.gcreator.runero.gml.exec.Constant;
 import org.gcreator.runero.gml.exec.ExprArgument;
 import org.gcreator.runero.inst.Instance;
 
@@ -47,12 +48,28 @@ public class GmlParser {
     }
 
     public static double getExpression(ExprArgument a, Instance instance, Instance other) {
+        try {
+            Constant c = a.solve();
+
+            if (c == null) {
+                System.err.println("Error reading argument: " + a.debugVal);
+                return 0;
+            }
+            if (c.type == Constant.STRING) {
+                System.err.println("WARNING: String value for non-string expression");
+            }
+            return c.dVal;
+        } catch (Exception exc) {
+            System.err.println("Error parsing argument: " + a.expressions.size() + "; " + a.debugVal);
+            exc.printStackTrace();
+        }
         return 0;
     }
 
-    public static VariableVal solve(ExprArgument a, Instance Instance, Instance other) {
-
-        return new VariableVal("nope");
+    public static VariableVal solve(ExprArgument a, Instance instance, Instance other) {
+        Constant c = a.solve(instance, other);
+        VariableVal v = (c.type == Constant.NUMBER) ? VariableVal.Real(c.dVal) : new VariableVal(c.sVal);
+        return v;
     }
 
     // Thank you LateralGM (IsmAvatar, Clam, Quadduc)

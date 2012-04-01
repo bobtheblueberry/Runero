@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.gcreator.runero.gml.exec.Expression.Type;
+import org.gcreator.runero.inst.Instance;
 
 /**
  * An argument is a series of expressions
@@ -13,6 +14,7 @@ import org.gcreator.runero.gml.exec.Expression.Type;
  */
 public class ExprArgument {
     public ArrayList<Expression> expressions;
+    public String debugVal = "";
 
     public ExprArgument() {
         expressions = new ArrayList<Expression>();
@@ -25,6 +27,11 @@ public class ExprArgument {
     int i;
 
     public Constant solve() {
+        // TODO: variable and function system
+        return solve(null, null);
+    }
+
+    public Constant solve(Instance instance, Instance other) {
         if (expressions.size() == 0)
             return null;
         Constant c = null;
@@ -35,9 +42,10 @@ public class ExprArgument {
             } else if (e.type == Type.VARIABLE) {
                 // TODO: solve variable
                 // solve(e.variable);
+                exp.add(new Thing(new Constant(567)));
             } else if (e.type == Type.FUNCTION) {
                 // TODO: solve function
-
+                exp.add(new Thing(new Constant(123)));
             } else if (e.type == Type.PARENTHESIS) {
                 exp.add(new Thing(e.parenthesis.solve()));
             } else if (e.type == Type.OPERATOR) {
@@ -92,7 +100,6 @@ public class ExprArgument {
         } else {
             c = exp.get(0).c;
         }
-
         return c;
     }
 
@@ -105,6 +112,7 @@ public class ExprArgument {
                 continue;
             Thing p = exp.get(i - 1);
             Thing n = exp.get(i + 1);
+            // TODO: value type checking
             if (t.op == Operator.MULTIPLY) {
                 t = new Thing(new Constant(p.c.dVal * n.c.dVal));
             } else if (t.op == Operator.DIVIDE) {
@@ -114,7 +122,13 @@ public class ExprArgument {
             } else if (t.op == Operator.MODULO) {
                 t = new Thing(new Constant(p.c.dVal % n.c.dVal));
             } else if (t.op == Operator.PLUS) {
-                t = new Thing(new Constant(p.c.dVal + n.c.dVal));
+                // Game Maker bitches if you try to do number + string but we don't need to
+                if (p.c.type == Constant.STRING || n.c.type == Constant.STRING) {
+                    String s = "" + ((p.c.type == Constant.STRING) ? p.c.sVal : p.c.dVal)
+                            + ((n.c.type == Constant.STRING) ? n.c.sVal : n.c.dVal);
+                    t = new Thing(new Constant(s));
+                } else
+                    t = new Thing(new Constant(p.c.dVal + n.c.dVal));
             } else if (t.op == Operator.MINUS) {
                 t = new Thing(new Constant(p.c.dVal - n.c.dVal));
             } else if (t.op == Operator.BITW_LEFT) {
@@ -130,9 +144,23 @@ public class ExprArgument {
             } else if (t.op == Operator.LESS_EQUAL) {
                 t = new Thing(getBool(p.c.dVal <= n.c.dVal));
             } else if (t.op == Operator.EQUALS) {
+            boolean strp = p.c.type == Constant.STRING;
+            boolean strn = n.c.type == Constant.STRING;
+            if (strp ^ strn)
+                t = new Thing(getBool(false));
+            else if (strp && strn)
+                t = new Thing(getBool(p.c.sVal.equals(n.c.sVal)));
+            else
                 t = new Thing(getBool(p.c.dVal == n.c.dVal));
             } else if (t.op == Operator.NOT_EQUAL) {
-                t = new Thing(getBool(p.c.dVal != n.c.dVal));
+                boolean strp = p.c.type == Constant.STRING;
+                boolean strn = n.c.type == Constant.STRING;
+                if (strp ^ strn)
+                    t = new Thing(getBool(true));
+                else if (strp && strn)
+                    t = new Thing(getBool(!p.c.sVal.equals(n.c.sVal)));
+                else
+                    t = new Thing(getBool(p.c.dVal != n.c.dVal));
             } else if (t.op == Operator.BITW_AND) {
                 t = new Thing(new Constant(Math.round(p.c.dVal) & Math.round(n.c.dVal)));
             } else if (t.op == Operator.BITW_XOR) {
@@ -146,6 +174,8 @@ public class ExprArgument {
             } else if (t.op == Operator.XOR) {
                 t = new Thing(new Constant(getBool(p.c.dVal) ^ getBool(n.c.dVal)));
             }
+            exp.add(i, t);
+            exp.remove(i + 1);
             exp.remove(i + 1);
             exp.remove(i - 1);
             i--;
@@ -177,6 +207,13 @@ public class ExprArgument {
         public Thing(Operator op) {
             this.op = op;
             isOp = true;
+        }
+
+        public String toString() {
+            if (isOp)
+                return "" + op;
+            else
+                return c.toString();
         }
 
         Constant c;

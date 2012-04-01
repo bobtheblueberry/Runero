@@ -24,4 +24,11 @@ public class Constant {
         type = STRING;
         sVal = s;
     }
+    
+    public String toString() {
+        if (type == NUMBER)
+            return dVal + "";
+        else
+            return sVal;
+    }
 }

@@ -7,6 +7,7 @@ do{a=(0).x+0end until"a"="b" // 123
 // 123
 
 {
+va0123 = 2;
   for (i=0; i<=9; i+=1) list[i] = i+1;
 }
 

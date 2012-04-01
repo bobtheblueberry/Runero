@@ -470,9 +470,12 @@ public class ResourceLoader {
             } else if (la.kind == Argument.ARG_EXPRESSION) {
                 expr = true;
             }
-            
-            if (expr)
+
+            if (expr) {
+                // System.out.println("Argument for " + r.name + " index " + i + ": " + arg.val + ":");
                 arg.exprVal = CodeManager.getArgument(arg.val);
+                // System.out.println("E: " + arg.exprVal.debugVal);
+            }
         }
 
     }

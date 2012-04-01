@@ -30,6 +30,10 @@ public class GraphicsLibrary {
 
     public final static GraphicsLibrary gfx = new GraphicsLibrary();
 
+    public void setTitle(String s) {
+        Display.setTitle(s);
+    }
+    
     public void setColor(Color c) {
         glColor4d(c.getRed() / 255.0, c.getGreen() / 255.0, c.getBlue() / 255.0, c.getAlpha() / 255.0);
     }

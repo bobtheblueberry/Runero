@@ -279,7 +279,7 @@ public class GmlCompiler {
         i--;
         return getArgument(false);
     }
-    
+
     /**
      * gets an argument 
      * 
@@ -298,8 +298,10 @@ public class GmlCompiler {
                 // useless
             } else {
                 Expression e = getUnaryExpression(first.token);
-                if (e != null)
+                if (e != null) {
                     a.add(e);
+                    a.debugVal += e.op + " ";
+                }
             }
             first = next();
         }
@@ -309,6 +311,7 @@ public class GmlCompiler {
         }
 
         a.add(getExpression(first));
+        a.debugVal += first + ", ";
         boolean reqOp = true;
         while (hasNext()) {
             TokenWord next = next();
@@ -321,42 +324,56 @@ public class GmlCompiler {
                     TokenWord n2 = next();
                     if (isOperator(n2.token)) { // x = y - ~y
                         unary = true;
+                        reqOp = true;
                     } else {
                         unary = false;
                     }
-                    regress();// f is not used, we are just peeking
+                    regress();// n2 is not used, we are just peeking
+                } else {
+                    // NOT and BITW_INVERT
+                    unary = true;
+                    reqOp = true;
+                    TokenWord n2 = next();
+                    if (isOperator(n2.token)) { // x = y - ~y
+                        reqOp = true;
+                    } else {
+                        reqOp = false;
+                    }
+                    regress();// n2 is not used, we are just peeking
                 }
             }
 
             if (allowSemicolon && next.token == SEMICOLON) {
                 break;
             }
-            if ((reqOp || unary) && op) {
-                if (unary) {
-                    Expression e = getUnaryExpression(next.token);
-                    if (e != null)
-                        a.add(e);
-                } else {
-                    a.add(getExpression(next));
+            if (unary) {
+                Expression e = getUnaryExpression(next.token);
+                if (e != null) {
+                    a.add(e);
+                    a.debugVal += next + ", ";
                 }
-            } else if (!op && !reqOp && isValue(next.token) && hasNext()) {
+            } else if (op && reqOp) {
                 a.add(getExpression(next));
+                a.debugVal += next + ", ";
+                reqOp = false;
+            } else if (!op && !reqOp && isValue(next.token)) {
+                a.add(getExpression(next));
+                reqOp = true;
+                a.debugVal += next + ", ";
                 // check to see if there is more things to add
-                next = next();
-                if (next.token != SEMICOLON)
-                    regress();
+                if (hasNext()) {
+                    next = next();
+                    if (next.token != SEMICOLON || !allowSemicolon)
+                        regress();
 
-                if (next.token == SEMICOLON || !isOperator(next.token))
-                    break; // end of statement
+                    if (allowSemicolon && (next.token == SEMICOLON || !isOperator(next.token)))
+                        break; // end of statement
+                }
             } else {
                 // end of statement
                 regress();
                 break;
             }
-            if (unary)
-                reqOp = false;
-            else
-                reqOp = !reqOp;
         }
         return a;
     }
@@ -433,6 +450,7 @@ public class GmlCompiler {
                     continue;
                 }
                 a.expressions.add(getExpression(w));
+                a.debugVal += w + ", ";
             }
             f.args.add(a);
         }
@@ -441,8 +459,10 @@ public class GmlCompiler {
 
     private ExprArgument getExpression(TokenGroup g) {
         ExprArgument a = new ExprArgument();
-        for (TokenWord t : g.tokens)
+        for (TokenWord t : g.tokens) {
             a.add(getExpression(t));
+            a.debugVal += t + ", ";
+        }
         return a;
     }
 
