@@ -1,14 +1,18 @@
 package org.gcreator.runero.inst;
 
 import java.awt.Color;
-import java.util.Hashtable;
 
 import org.gcreator.runero.RuneroGame;
+import org.gcreator.runero.Runner;
 import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gml.GmlInterpreter;
+import org.gcreator.runero.gml.GmlParser;
+import org.gcreator.runero.gml.ReferenceTable;
 import org.gcreator.runero.gml.VariableVal;
+import org.gcreator.runero.gml.exec.Constant;
+import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameSprite;
@@ -42,7 +46,7 @@ public class Instance implements Comparable<Instance> {
     public double timeline_speed;
 
     public double path_endaction;
-    public double path_index;
+    public double path_index = -1;
     public double path_orientation;
     public double path_position;
     public double path_positionprevious;
@@ -55,32 +59,16 @@ public class Instance implements Comparable<Instance> {
     public double xstart, ystart;
     public double xprevious, yprevious;
     public int image_number = 0; // * cannot be set manually
+    public int id;
 
     public int parentId; // not accessed directly in GML, must use GML function
     /**
      * When an instance is marked as dead then it does nothing and waits to be destroyed
      */
     public boolean isDead;
-    /*
-    object_index*
-    id*
-    bbox_bottom*
-    bbox_left*
-    bbox_right*
-    bbox_top*
-
-    image_number*
-
-    sprite_height*
-    sprite_width*
-    sprite_xoffset*
-    sprite_yoffset*
-
-     * */
 
     public GameObject obj;
-    public int id;
-    public Hashtable<String, VariableVal> variables;
+    public ReferenceTable<VariableVal> variables;
 
     public Instance(double x, double y, int id, GameObject obj) {
         this.id = id;
@@ -97,7 +85,7 @@ public class Instance implements Comparable<Instance> {
         this.persistent = obj.persistent; // TODO: Persistence for objects
         this.parentId = obj.parentId;
         this.mask_index = obj.maskId;
-        this.variables = new Hashtable<String, VariableVal>();
+        this.variables = new ReferenceTable<VariableVal>();
         updateImageNumber();
     }
 
@@ -127,6 +115,291 @@ public class Instance implements Comparable<Instance> {
         return (int) Math.round(image_index);
     }
 
+    public void setVar(Variable v, Constant value, Instance other) {
+        // TODO: Pre-runtime checking...
+        String name = v.name;
+        if (name.equals("path_index")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("object_index")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("id")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("sprite_width")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("sprite_height")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("sprite_xoffset")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("sprite_yoffset")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("image_number")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("bbox_left")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("bbox_right")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("bbox_top")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        } else if (name.equals("bbox_bottom")) {
+            Runner.Error(this.toString() + ": Cannot set constant variable: " + name);
+        }
+
+        boolean builtin = false;
+        if (name.equals("alarm")) {
+            if (v.isArray) {
+                Constant c = v.arrayIndex.solve(this, other);
+                if (c.type != Constant.NUMBER) {
+                    Runner.Error("Invalid alarm index <String>");
+                    return;
+                }
+                int index = (int)c.dVal;
+                if (index > 11 || index < 0) {
+                    Runner.Error("Invalid alarm index: " + index);
+                    return;
+                }
+                alarm[index] = (int)value.dVal;
+            } else 
+                alarm[0] = (int)value.dVal;
+        } else if (name.equals("x")) {
+            builtin = true;
+            x = value.dVal;
+        } else if (name.equals("y")) {
+            builtin = true;
+            y = value.dVal;
+        } else if (name.equals("xprevious")) {
+            builtin = true;
+            xprevious = value.dVal;
+        } else if (name.equals("yprevious")) {
+            builtin = true;
+            yprevious = value.dVal;
+        } else if (name.equals("xstart")) {
+            builtin = true;
+            xstart = value.dVal;
+        } else if (name.equals("ystart")) {
+            builtin = true;
+            ystart = value.dVal;
+        } else if (name.equals("hspeed")) {
+            builtin = true;
+            hspeed = value.dVal;
+        } else if (name.equals("vspeed")) {
+            builtin = true;
+            vspeed = value.dVal;
+        } else if (name.equals("direction")) {
+            builtin = true;
+            direction = value.dVal;
+        } else if (name.equals("speed")) {
+            builtin = true;
+            speed = value.dVal;
+        } else if (name.equals("friction")) {
+            builtin = true;
+            friction = value.dVal;
+        } else if (name.equals("gravity")) {
+            builtin = true;
+            gravity = value.dVal;
+        } else if (name.equals("gravity_direction")) {
+            builtin = true;
+            gravity_direction = value.dVal;
+        } else if (name.equals("solid")) {
+            builtin = true;
+            solid = value.dVal > 0.5;
+        } else if (name.equals("persistent")) {
+            builtin = true;
+            persistent = value.dVal > 0.5;
+        } else if (name.equals("mask_index")) {
+            builtin = true;
+            mask_index = (int) Math.round(value.dVal);
+        } else if (name.equals("timeline_index")) {
+            builtin = true;
+            timeline_index = value.dVal;
+        } else if (name.equals("timeline_position")) {
+            builtin = true;
+            timeline_position = value.dVal;
+        } else if (name.equals("timeline_speed")) {
+            builtin = true;
+            timeline_speed = value.dVal;
+        } else if (name.equals("visible")) {
+            builtin = true;
+            visible = value.dVal > 0.5;
+        } else if (name.equals("sprite_index")) {
+            builtin = true;
+            sprite_index = value.dVal;
+        } else if (name.equals("image_index")) {
+            builtin = true;
+            image_index = value.dVal;
+        } else if (name.equals("image_speed")) {
+            builtin = true;
+            image_speed = value.dVal;
+        } else if (name.equals("depth")) {
+            builtin = true;
+            depth = value.dVal;
+        } else if (name.equals("image_xscale")) {
+            builtin = true;
+            image_xscale = value.dVal;
+        } else if (name.equals("image_yscale")) {
+            builtin = true;
+            image_yscale = value.dVal;
+        } else if (name.equals("image_angle")) {
+            builtin = true;
+            image_angle = value.dVal;
+        } else if (name.equals("image_alpha")) {
+            builtin = true;
+            image_alpha = value.dVal;
+        } else if (name.equals("image_blend")) {
+            builtin = true;
+            image_blend = new Color((int) value.dVal);
+        }
+        if (builtin && value.type != Constant.NUMBER) {
+            Runner.Error("Cannot set built-in object variable '" + name + " to <String>");
+            return;
+        }
+        if (v.isArray) {
+            variables.put(GmlParser.getArrayName(v, this, other), new VariableVal(value));
+            return;
+        } else
+            variables.put(name, new VariableVal(value));
+    }
+
+    public VariableVal getVariable(Variable v, Instance other) {
+        String name = v.name;
+        if (v.isExpression) { // should not happen
+            return null;
+        }
+        VariableVal val = getVar(name);
+        if (val != null && v.isArray) { // x[123]
+            System.out.println("Error! Cannot use built in variable as array");
+            return val; // return val anyway
+        } else if (val != null) {
+            return val;
+        }
+        if (v.isArray) {
+            return variables.get(GmlParser.getArrayName(v, this, other));
+        } else
+            return variables.get(name);
+    }
+
+    private VariableVal getVar(String name) {
+        if (name.equals("x")) {
+            return VariableVal.Real(x);
+        } else if (name.equals("y")) {
+            return VariableVal.Real(y);
+        } else if (name.equals("xprevious")) {
+            return VariableVal.Real(xprevious);
+        } else if (name.equals("yprevious")) {
+            return VariableVal.Real(yprevious);
+        } else if (name.equals("xstart")) {
+            return VariableVal.Real(xstart);
+        } else if (name.equals("ystart")) {
+            return VariableVal.Real(ystart);
+        } else if (name.equals("hspeed")) {
+            return VariableVal.Real(hspeed);
+        } else if (name.equals("vspeed")) {
+            return VariableVal.Real(vspeed);
+        } else if (name.equals("direction")) {
+            return VariableVal.Real(direction);
+        } else if (name.equals("speed")) {
+            return VariableVal.Real(speed);
+        } else if (name.equals("friction")) {
+            return VariableVal.Real(friction);
+        } else if (name.equals("gravity")) {
+            return VariableVal.Real(gravity);
+        } else if (name.equals("gravity_direction")) {
+            return VariableVal.Real(gravity_direction);
+        } else if (name.equals("object_index")) {
+            return VariableVal.Real(obj.getId());
+        } else if (name.equals("id")) {
+            return VariableVal.Real(id);
+        } else if (name.equals("solid")) {
+            return VariableVal.Bool(solid);
+        } else if (name.equals("persistent")) {
+            return VariableVal.Bool(persistent);
+        } else if (name.equals("mask_index")) {
+            return VariableVal.Real(mask_index);
+        } else if (name.equals("timeline_index")) {
+            return VariableVal.Real(timeline_index);
+        } else if (name.equals("timeline_position")) {
+            return VariableVal.Real(timeline_position);
+        } else if (name.equals("timeline_speed")) {
+            return VariableVal.Real(timeline_speed);
+        } else if (name.equals("visible")) {
+            return VariableVal.Bool(visible);
+        } else if (name.equals("sprite_index")) {
+            return VariableVal.Real(sprite_index);
+        } else if (name.equals("sprite_width")) {
+            GameSprite s = getSprite();
+            if (s == null)
+                return VariableVal.ZERO;
+            return VariableVal.Real(s.width);
+        } else if (name.equals("sprite_height")) {
+            GameSprite s = getSprite();
+            if (s == null)
+                return VariableVal.ZERO;
+            return VariableVal.Real(s.height);
+        } else if (name.equals("sprite_xoffset")) {
+            GameSprite s = getSprite();
+            if (s == null)
+                return VariableVal.ZERO;
+            return VariableVal.Real(s.x);
+        } else if (name.equals("sprite_yoffset")) {
+            GameSprite s = getSprite();
+            if (s == null)
+                return VariableVal.ZERO;
+            return VariableVal.Real(s.y);
+        } else if (name.equals("image_number")) {
+            return VariableVal.Real(image_number);
+        } else if (name.equals("image_index")) {
+            return VariableVal.Real(image_index);
+        } else if (name.equals("image_speed")) {
+            return VariableVal.Real(image_speed);
+        } else if (name.equals("depth")) {
+            return VariableVal.Real(depth);
+        } else if (name.equals("image_xscale")) {
+            return VariableVal.Real(image_xscale);
+        } else if (name.equals("image_yscale")) {
+            return VariableVal.Real(image_yscale);
+        } else if (name.equals("image_angle")) {
+            return VariableVal.Real(image_angle);
+        } else if (name.equals("image_alpha")) {
+            return VariableVal.Real(image_alpha);
+        } else if (name.equals("image_blend")) {
+            return VariableVal.Real((image_blend == null) ? 0 : image_blend.getRGB());
+        } else if (name.equals("bbox_left")) {
+            GameSprite s = getSprite();
+            if (s == null)
+                return VariableVal.ZERO;
+            return VariableVal.Real(s.left);
+        } else if (name.equals("bbox_right")) {
+            GameSprite s = getSprite();
+            if (s == null)
+                return VariableVal.ZERO;
+            return VariableVal.Real(s.right);
+        } else if (name.equals("bbox_top")) {
+            GameSprite s = getSprite();
+            if (s == null)
+                return VariableVal.ZERO;
+            return VariableVal.Real(s.top);
+        } else if (name.equals("bbox_bottom")) {
+            GameSprite s = getSprite();
+            if (s == null)
+                return VariableVal.ZERO;
+            return VariableVal.Real(s.bottom);
+        } else if (name.equals("path_index")) {
+            return VariableVal.Real(path_index);
+        } else if (name.equals("path_position")) {
+            return VariableVal.Real(path_position);
+        } else if (name.equals("path_positionprevious")) {
+            return VariableVal.Real(path_positionprevious);
+        } else if (name.equals("path_speed")) {
+            return VariableVal.Real(path_speed);
+        } else if (name.equals("path_scale")) {
+            return VariableVal.Real(path_scale);
+        } else if (name.equals("path_orientation")) {
+            return VariableVal.Real(path_orientation);
+        } else if (name.equals("path_endaction")) {
+            return VariableVal.Real(path_endaction);
+        }
+        return null;
+    }
+
     /**
      * Performs event
      * 
@@ -145,7 +418,7 @@ public class Instance implements Comparable<Instance> {
                 x = xprevious;
                 y = yprevious;
             }
-        
+
         GmlInterpreter.performEvent(event, this);
     }
 
@@ -234,7 +507,7 @@ public class Instance implements Comparable<Instance> {
             System.out.println("Null image for sprite " + s.getName() + " index " + image_index);
             return;
         }
-        g.drawTexture(img,  x - s.x, y - s.y);
+        g.drawTexture(img, x - s.x, y - s.y);
     }
 
     public double getSpeed() {

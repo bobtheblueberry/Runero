@@ -9,6 +9,7 @@ import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gfx.RuneroDisplay;
 import org.gcreator.runero.gfx.TextureLoader;
 import org.gcreator.runero.gml.GmlLibrary;
+import org.gcreator.runero.gml.ReferenceTable;
 import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.inst.RoomInstance;
 import org.gcreator.runero.res.*;
@@ -41,6 +42,7 @@ public class RuneroGame {
 
     public GameInformation gameInfo;
     public Hashtable<String, VariableVal> globalVars;
+    public ReferenceTable<VariableVal> constants;
 
     // Game Maker Global Game Variables....
     public double room_speed = 30;

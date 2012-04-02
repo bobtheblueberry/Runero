@@ -20,6 +20,8 @@ import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.gml.CodeManager;
 import org.gcreator.runero.gml.GmlParser;
+import org.gcreator.runero.gml.ReferenceTable;
+import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.res.Code;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
@@ -62,6 +64,8 @@ public class ResourceLoader {
 
         loadGameInfo();
         System.out.println("Loaded Game info");
+        loadConstants();
+        System.out.println("Loaded Constants");
 
         // DEBUG TREE
         /*
@@ -105,6 +109,26 @@ public class ResourceLoader {
 
                 System.exit(0);
         */
+    }
+
+    private void loadConstants() throws IOException {
+        // Load constants
+        game.constants = new ReferenceTable<VariableVal>();
+        File f = new File("constants");
+
+        BufferedReader r = new BufferedReader(new FileReader(f));
+        String line;
+        while ((line = r.readLine()) != null) {
+            String[] vals = line.split("\\s+", 2);
+            double n;
+            if (vals[1].startsWith("#")) {
+                n = Integer.parseInt(vals[1].substring(1), 16);
+            } else {
+                n = Double.parseDouble(vals[1]);
+            }
+            game.constants.put(vals[0], VariableVal.Real(n));
+        }
+        r.close();
     }
 
     private void loadFonts() throws IOException {

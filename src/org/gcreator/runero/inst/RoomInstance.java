@@ -31,7 +31,7 @@ public class RoomInstance {
     public int height;
 
     private int instance_count;
-    private int instance_nextid = 100000;
+    private static int instance_nextid = 100000;
 
     public RoomInstance(RuneroGame game, GameRoom room) {
         this.game = game;

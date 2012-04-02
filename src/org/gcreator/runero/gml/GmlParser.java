@@ -1,11 +1,10 @@
 package org.gcreator.runero.gml;
 
 import java.awt.Color;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.gcreator.runero.gml.exec.Constant;
 import org.gcreator.runero.gml.exec.ExprArgument;
+import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.inst.Instance;
 
 public class GmlParser {
@@ -72,6 +71,22 @@ public class GmlParser {
         return v;
     }
 
+    public static String getArrayName(Variable v, Instance instance, Instance other) {
+        //TODO: add some sort of real array
+        if (!v.isArray)
+            return v.name;
+        Constant c = v.arrayIndex.solve(instance, other);
+        if (c.type != Constant.NUMBER) {
+            System.err.println("Error: Array Index <String>");
+            return null;
+        }
+        int x = (int) c.dVal;
+        if (x == 0) {
+            return v.name;// How GM does it
+        }
+        return v.name + "*" + x;
+    }
+    
     // Thank you LateralGM (IsmAvatar, Clam, Quadduc)
     public static Color convertGmColor(int col) {
         return new Color(col & 0xFF, (col & 0xFF00) >> 8, (col & 0xFF0000) >> 16);
