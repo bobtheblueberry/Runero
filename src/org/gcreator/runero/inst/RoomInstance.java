@@ -1,5 +1,6 @@
 package org.gcreator.runero.inst;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -23,22 +24,29 @@ import org.newdawn.slick.opengl.Texture;
 
 public class RoomInstance {
 
-    public GameRoom room;
+    public GameRoom               room;
     public ArrayList<ObjectGroup> instanceGroups;
-    public RuneroGame game;
+    public RuneroGame             game;
 
-    public int width;
-    public int height;
+    public int                    width;
+    public int                    height;
+    public Color                  background_color;
+    public boolean                draw_background_color;
+    public String                 caption;
 
-    private int instance_count;
-    private static int instance_nextid = 100000;
+    private int                   instance_count;
+    private static int            instance_nextid = 100000;
 
-    public RoomInstance(RuneroGame game, GameRoom room) {
-        this.game = game;
-        this.room = room;
-        this.width = room.getWidth();
-        this.height = room.getHeight();
-    }
+    public RoomInstance(RuneroGame game, GameRoom room)
+        {
+            this.game = game;
+            this.room = room;
+            this.width = room.getWidth();
+            this.height = room.getHeight();
+            this.background_color = room.background_color;
+            this.draw_background_color = room.draw_background_color;
+            this.caption = room.caption;
+        }
 
     public void init(boolean gameStart) {
         loadInstances();
@@ -51,7 +59,7 @@ public class RoomInstance {
             EventExecutor.executeEvent(game.eventManager.otherGameStart, this);
 
         if (room.creation_code != null) {
-            //TODO: GMLScript.executeCode(room.creation_code);
+            // TODO: GMLScript.executeCode(room.creation_code);
         }
 
         System.out.println("New room " + room.getName() + "(" + width + "," + height + ")");
@@ -103,6 +111,10 @@ public class RoomInstance {
             instance_nextid = Math.max(instance_nextid + 1, i.id + 1);
         }
         sortInstances();
+    }
+
+    public int getInstanceCount() {
+        return instance_count;
     }
 
     private void sortInstances() {
@@ -179,7 +191,7 @@ public class RoomInstance {
 
         // TODO: alarm events
 
-        // keyboard
+        // keyboard TODO: these are all broken
         if (game.eventManager.hasKeyboardEvents)
             for (Event e : game.eventManager.keyboardEvents) {
                 int type = Event.getGmKeyName(e.type);
@@ -277,8 +289,8 @@ public class RoomInstance {
     }
 
     public void render(GraphicsLibrary g) {
-        if (room.draw_background_color) {
-            g.setColor(room.background_color);
+        if (draw_background_color) {
+            g.setColor(background_color);
             g.fillRect(0, 0, width, height);
         }
         // draw backgrounds
@@ -288,10 +300,8 @@ public class RoomInstance {
             for (Instance i : og.instances) {
                 if (i.obj.hasEvent(MainEvent.EV_DRAW)) {
                     i.performEvent(i.obj.getMainEvent(MainEvent.EV_DRAW).events.get(0));
-                } else {
-                    System.out.println("Drawing instance of " + i.obj.getName());
+                } else
                     i.draw(g);
-                }
             }
 
         // Draw Foregrounds

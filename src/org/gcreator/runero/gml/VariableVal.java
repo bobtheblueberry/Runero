@@ -15,6 +15,7 @@ public class VariableVal extends ReturnValue {
     public boolean isReal = false;
     public double realVal = 0;
     public static final VariableVal ZERO = Real(0);
+    public static final VariableVal ONE = Real(1);
 
     public boolean isTrue() {
         return !isString && realVal == 1;
@@ -27,6 +28,13 @@ public class VariableVal extends ReturnValue {
     public VariableVal(String s) {
         super(Type.VARIABLE);
         this.val = s;
+    }
+
+    public void set(Constant c) {
+        this.isString = c.type == Constant.STRING;
+        this.isReal = c.type == Constant.NUMBER;
+        this.val = (isString) ? c.sVal : null;
+        this.realVal = (isReal) ? c.dVal : 0;
     }
 
     public VariableVal(Constant value) {
@@ -48,7 +56,11 @@ public class VariableVal extends ReturnValue {
     }
 
     public static VariableVal Bool(boolean val) {
-        return Real(val ? 1 : 0);
+        return val ? ONE : ZERO;
+    }
+
+    public Constant getConstant() {
+        return (isReal) ? new Constant(realVal) : new Constant(val);
     }
 
     public boolean equals(Object o) {

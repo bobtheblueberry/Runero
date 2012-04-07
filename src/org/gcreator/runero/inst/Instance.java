@@ -152,14 +152,14 @@ public class Instance implements Comparable<Instance> {
                     Runner.Error("Invalid alarm index <String>");
                     return;
                 }
-                int index = (int)c.dVal;
+                int index = (int) c.dVal;
                 if (index > 11 || index < 0) {
                     Runner.Error("Invalid alarm index: " + index);
                     return;
                 }
-                alarm[index] = (int)value.dVal;
-            } else 
-                alarm[0] = (int)value.dVal;
+                alarm[index] = (int) value.dVal;
+            } else
+                alarm[0] = (int) value.dVal;
         } else if (name.equals("x")) {
             builtin = true;
             x = value.dVal;
@@ -180,16 +180,16 @@ public class Instance implements Comparable<Instance> {
             ystart = value.dVal;
         } else if (name.equals("hspeed")) {
             builtin = true;
-            hspeed = value.dVal;
+            setHspeed(value.dVal);
         } else if (name.equals("vspeed")) {
             builtin = true;
-            vspeed = value.dVal;
+            setVspeed(value.dVal);
         } else if (name.equals("direction")) {
             builtin = true;
-            direction = value.dVal;
+            setDirection(value.dVal);
         } else if (name.equals("speed")) {
             builtin = true;
-            speed = value.dVal;
+            setSpeed(value.dVal);
         } else if (name.equals("friction")) {
             builtin = true;
             friction = value.dVal;
@@ -223,6 +223,7 @@ public class Instance implements Comparable<Instance> {
         } else if (name.equals("sprite_index")) {
             builtin = true;
             sprite_index = value.dVal;
+            updateImageNumber();
         } else if (name.equals("image_index")) {
             builtin = true;
             image_index = value.dVal;
@@ -247,6 +248,9 @@ public class Instance implements Comparable<Instance> {
         } else if (name.equals("image_blend")) {
             builtin = true;
             image_blend = new Color((int) value.dVal);
+        } else if (name.equals("image_single")) {
+            builtin = true;
+            image_single = value.dVal;
         }
         if (builtin && value.type != Constant.NUMBER) {
             Runner.Error("Cannot set built-in object variable '" + name + " to <String>");
@@ -418,7 +422,6 @@ public class Instance implements Comparable<Instance> {
                 x = xprevious;
                 y = yprevious;
             }
-
         GmlInterpreter.performEvent(event, this);
     }
 
@@ -432,6 +435,10 @@ public class Instance implements Comparable<Instance> {
         if (mask_index < 0)
             return null;
         return RuneroGame.game.getSprite((int) Math.round(mask_index));
+    }
+
+    public void setDirection(double newDir) {
+        motion_set(newDir, speed);
     }
 
     public void setSpeed(double newSpeed) {

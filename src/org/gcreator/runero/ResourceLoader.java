@@ -27,6 +27,7 @@ import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameInformation;
 import org.gcreator.runero.res.GameObject;
+import org.gcreator.runero.res.GameResource;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameRoom.Tile;
 import org.gcreator.runero.res.GameSprite;
@@ -39,14 +40,15 @@ import org.lateralgm.resources.library.RLibAction.LibArgument;
 
 public class ResourceLoader {
 
-    RuneroGame game;
+    RuneroGame              game;
     LinkedList<Preloadable> preloadables;
 
-    public ResourceLoader(RuneroGame game) {
-        this.game = game;
-        preloadables = new LinkedList<Preloadable>();
-        actionFolder = new File(game.GameFolder, "actions/");
-    }
+    public ResourceLoader(RuneroGame game)
+        {
+            this.game = game;
+            preloadables = new LinkedList<Preloadable>();
+            actionFolder = new File(game.GameFolder, "actions/");
+        }
 
     public void loadResources() throws IOException {
         loadRooms();
@@ -54,8 +56,7 @@ public class ResourceLoader {
         loadBackgrounds();
         System.out.println("Loaded background data");
         loadObjects();
-        if (game.eventManager.hasCollisionEvents)
-            Collections.sort(game.eventManager.collision);
+        if (game.eventManager.hasCollisionEvents) Collections.sort(game.eventManager.collision);
         System.out.println("Loaded object data");
         loadSprites();
         System.out.println("Loaded sprite data");
@@ -65,6 +66,17 @@ public class ResourceLoader {
         loadGameInfo();
         System.out.println("Loaded Game info");
         loadConstants();
+        // Resource name Constants
+        addResourceConstants(game.sprites);
+        addResourceConstants(game.sounds);
+        addResourceConstants(game.backgrounds);
+        addResourceConstants(game.paths);
+        addResourceConstants(game.scripts);
+        addResourceConstants(game.fonts);
+        addResourceConstants(game.timelines);
+        addResourceConstants(game.objects);
+        addResourceConstants(game.rooms);
+
         System.out.println("Loaded Constants");
 
         // DEBUG TREE
@@ -109,6 +121,12 @@ public class ResourceLoader {
 
                 System.exit(0);
         */
+    }
+
+    private void addResourceConstants(ArrayList<? extends GameResource> res) {
+        if (res == null) return;
+        for (GameResource r : res)
+            game.constants.put(r.getName(), VariableVal.Real(r.getId()));
     }
 
     private void loadConstants() throws IOException {
@@ -452,8 +470,7 @@ public class ResourceLoader {
                 arg.val = "Resource; ID: " + arg.resVal;
             } else if (type == 1) {
                 arg.val = in.readStr();
-            } else if (type == 2)
-                arg.code = new Code(in.readStr());
+            } else if (type == 2) arg.code = new Code(in.readStr());
             act.arguments.add(arg);
         }
         act.appliesTo = in.read4();
@@ -465,7 +482,14 @@ public class ResourceLoader {
     }
 
     private void lexAction(Action a, RLibAction r) {
-        for (int i = 0; i < r.libArguments.length; i++) {
+        int start = 0;
+        if (a.lib.actionKind == Action.ACT_VARIABLE) {
+            start = 1;
+            Argument arg = a.arguments.get(0);// variable
+            arg.variableVal = CodeManager.getVariable(arg.val);
+        }
+
+        for (int i = start; i < r.libArguments.length; i++) {
             LibArgument la = r.libArguments[i];
             Argument arg = a.arguments.get(i);
             if (arg.val == null) {
@@ -482,14 +506,15 @@ public class ResourceLoader {
             } else if (la.kind == Argument.ARG_BOTH) {
                 for (int j = 0; j < arg.val.length(); j++) {
                     char c = arg.val.charAt(j);
-                    if (c == ' ')
-                        continue;
+                    if (c == ' ') continue;
                     else if (c == '\'' || c == '"') {
                         arg.bothIsExpr = true;
                         expr = true;
                         break;
-                    } else
+                    } else {
+                        arg.bothIsExpr = false;
                         break;
+                    }
                 }
             } else if (la.kind == Argument.ARG_EXPRESSION) {
                 expr = true;
@@ -554,19 +579,14 @@ public class ResourceLoader {
             qa.actionEnd = index + 1;
             if (next.lib.question) {
                 questionIndent(e, index + 1, next);
-                if (next.elseAction != null)
-                    qa.end = qa.actionEnd = next.elseAction.actionEnd;
-                else
-                    qa.end = qa.actionEnd = next.ifAction.actionEnd;
+                if (next.elseAction != null) qa.end = qa.actionEnd = next.elseAction.actionEnd;
+                else qa.end = qa.actionEnd = next.ifAction.actionEnd;
 
-                if (next.ifAction.isBlock)
-                    qa.end++;
+                if (next.ifAction.isBlock) qa.end++;
             } else if (next.lib.actionKind == Action.ACT_REPEAT) {
                 next.repeatAction = actionIndent(e, index + 1);
-                if (next.repeatAction.isBlock)
-                    qa.end = qa.actionEnd = next.repeatAction.actionEnd + 1;
-                else
-                    qa.end = qa.actionEnd = next.repeatAction.actionEnd;
+                if (next.repeatAction.isBlock) qa.end = qa.actionEnd = next.repeatAction.actionEnd + 1;
+                else qa.end = qa.actionEnd = next.repeatAction.actionEnd;
             }
             return qa;
         }
@@ -584,7 +604,7 @@ public class ResourceLoader {
             }
             if (a.lib.actionKind == Action.ACT_END) {
                 if (i == index + 2)
-                    // empty block
+                // empty block
                     qa.isFake = true;
 
                 qa.end = i - 1;
@@ -599,9 +619,10 @@ public class ResourceLoader {
     private static class FileFilter implements FilenameFilter {
         String ext;
 
-        public FileFilter(String ext) {
-            this.ext = ext;
-        }
+        public FileFilter(String ext)
+            {
+                this.ext = ext;
+            }
 
         @Override
         public boolean accept(File dir, String name) {

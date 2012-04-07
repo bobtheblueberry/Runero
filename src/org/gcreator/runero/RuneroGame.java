@@ -1,18 +1,33 @@
 package org.gcreator.runero;
 
+import java.awt.Color;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Calendar;
 
 import org.gcreator.runero.event.EventManager;
 import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gfx.RuneroDisplay;
 import org.gcreator.runero.gfx.TextureLoader;
 import org.gcreator.runero.gml.GmlLibrary;
+import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReferenceTable;
 import org.gcreator.runero.gml.VariableVal;
+import org.gcreator.runero.gml.exec.Constant;
+import org.gcreator.runero.gml.exec.Variable;
+import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.inst.RoomInstance;
-import org.gcreator.runero.res.*;
+import org.gcreator.runero.res.GameBackground;
+import org.gcreator.runero.res.GameFont;
+import org.gcreator.runero.res.GameInformation;
+import org.gcreator.runero.res.GameObject;
+import org.gcreator.runero.res.GamePath;
+import org.gcreator.runero.res.GameRoom;
+import org.gcreator.runero.res.GameScript;
+import org.gcreator.runero.res.GameSound;
+import org.gcreator.runero.res.GameSprite;
+import org.gcreator.runero.res.GameTimeline;
+import org.lwjgl.input.Mouse;
 
 /**
  * Game Engine base
@@ -41,7 +56,8 @@ public class RuneroGame {
     public ArrayList<GameTimeline> timelines;
 
     public GameInformation gameInfo;
-    public Hashtable<String, VariableVal> globalVars;
+    public ReferenceTable<VariableVal> globalVars;
+    public ReferenceTable<VariableVal> globalDotVars;
     public ReferenceTable<VariableVal> constants;
 
     // Game Maker Global Game Variables....
@@ -57,14 +73,23 @@ public class RuneroGame {
     public String caption_lives; // The caption used for the number of lives.
     public String caption_health; // The caption used for the health.
     public int room_index; // the current room index; 'room' in GML
+    public int cursor_sprite;
+    public String keyboard_string = "";
+    public int mouse_button;
+    public int mouse_lastbutton;
+    public int keyboard_key;
+    public int keyboard_lastkey;
+    public String keyboard_lastchar = "";
 
+    public int fps = 100002;
 
     public RuneroGame() {
         super();
         RuneroGame.game = this;
         library = new GmlLibrary();
         eventManager = new EventManager();
-        globalVars = new Hashtable<String, VariableVal>();
+        globalVars = new ReferenceTable<VariableVal>();
+        globalDotVars = new ReferenceTable<VariableVal>();
         tex = new TextureLoader();
         gameStart();
     }
@@ -78,6 +103,7 @@ public class RuneroGame {
         }
         // Go to the first room
         room = new RoomInstance(this, rooms.get(0));
+        GraphicsLibrary.gfx.setTitle(room.caption);
         room.init(true);
     }
 
@@ -135,28 +161,24 @@ public class RuneroGame {
 
     public void updateCaption() {
         // score lives health
-        String caption = "";
+        String caption = room.room.caption;
         int i = 0;
         if (show_score) {
-            caption = caption_score + score;
+            caption += " " + caption_score + score;
             i++;
         }
         if (show_lives) {
-            if (i > 0)
-                caption += " ";
-            caption += caption_lives + lives;
+            caption += " " + caption_lives + lives;
             i++;
         }
         if (show_health) {
-            if (i > 0)
-                caption += " ";
-            caption += caption_health + health;
+            caption += " " + caption_health + health;
             i++;
         }
         if (i > 0)
             GraphicsLibrary.gfx.setTitle(caption);
     }
-    
+
     public void update() {
         room.step();
         updateCaption();
@@ -164,5 +186,267 @@ public class RuneroGame {
 
     public void render() {
         room.render(GraphicsLibrary.gfx);
+    }
+
+    public VariableVal[] arguments;
+
+    /**
+     * Tries to set a variable is there is such.
+     * For example, caption = "Billy May Craze"
+     * 
+     *  
+     * @param v
+     * @param val
+     * @return whether not the variable was set
+     */
+    public boolean setVariable(Variable v, Constant val) {
+        String name = v.name;
+
+        // TODO: argument[] argument0...15
+        if (name.equals("caption")) {
+            room.caption = val.sVal;
+            return true;
+        } else if (name.equals("score")) {
+            score = val.dVal;
+            return true;
+        } else if (name.equals("room_speed")) {
+            room_speed = val.dVal;
+            return true;
+        } else if (name.equals("room")) {
+            // TODO: SET ROOM!!!
+            room_index = (int) val.dVal;
+            return true;
+        } else if (name.equals("room_caption")) {
+            room.caption = val.sVal;
+            return true;
+        } else if (name.equals("room_persistent")) {
+            room.room.persistent = val.dVal > 0;
+            return true;
+        } else if (name.equals("score")) {
+            score = val.dVal;
+            return true;
+        } else if (name.equals("lives")) {
+            lives = val.dVal;
+            return true;
+        } else if (name.equals("health")) {
+            health = val.dVal;
+            return true;
+        } else if (name.equals("show_score")) {
+            show_score = val.dVal > 0.5;
+            return true;
+        } else if (name.equals("show_lives")) {
+            show_lives = val.dVal > 0.5;
+            return true;
+        } else if (name.equals("show_health")) {
+            show_health = val.dVal > 0.5;
+            return true;
+        } else if (name.equals("caption_score")) {
+            caption_score = val.sVal;
+            return true;
+        } else if (name.equals("caption_lives")) {
+            caption_lives = val.sVal;
+            return true;
+        } else if (name.equals("caption_health")) {
+            caption_health = val.sVal;
+            return true;
+        } else if (name.equals("error_occurred")) {
+            Runner.error_occurred = val.dVal > 0.5;
+            return true;
+        } else if (name.equals("error_last")) {
+            Runner.error_last = val.sVal;
+            return true;
+        } else if (name.equals("keyboard_key")) {
+            keyboard_key = (int) val.dVal;
+            return true;
+        } else if (name.equals("keyboard_lastkey")) {
+            keyboard_lastkey = (int) val.dVal;
+            return true;
+        } else if (name.equals("keyboard_lastchar")) {
+            keyboard_lastchar = val.sVal;
+            return true;
+        } else if (name.equals("keyboard_string")) {
+            keyboard_string = val.sVal;
+            return true;
+        } else if (name.equals("mouse_button")) {
+            mouse_button = (int) val.dVal;
+            return true;
+        } else if (name.equals("mouse_lastbutton")) {
+            mouse_lastbutton = (int) val.dVal;
+            return true;
+        } else if (name.equals("cursor_sprite")) {
+            // TODO: update cursor
+            cursor_sprite = (int) val.dVal;
+            return true;
+        } else if (name.equals("background_color")) {
+            room.background_color = new Color((int) val.dVal);
+            return true;
+        } else if (name.equals("background_showcolor")) {
+            room.draw_background_color = val.dVal > 0.5;
+            return true;
+        }
+
+        /*TODO:
+         * background_visible[0..7] 
+        background_foreground[0..7] 
+        background_index[0..7] 
+        background_x[0..7] 
+        background_y[0...7] 
+        background_width[0...7]* 
+        background_height[0...7]* 
+        background_htiled[0..7] 
+        background_vtiled[0..7] 
+        background_xscale[0..7] 
+        background_yscale[0..7] 
+        background_hspeed[0..7] 
+        background_vspeed[0..7] 
+        background_blend[0..7] 
+        background_alpha[0..7] 
+         * */
+        return false;
+    }
+
+    public VariableVal getVariable(Variable v, Instance instance, Instance other) {
+        String name = v.name;
+        if (v.isArray)
+            name = GmlParser.getArrayName(v, instance, other);
+        if (name.equals("gamemaker_registered")) {
+            VariableVal.Real(1);
+        }// else if (name.equals("argument_relative")) {
+         // VariableVal.Real(argument_relative);
+         // }
+         // else if (name.equals("argument")) {
+         // VariableVal.Real(arguments);
+         // }
+
+        // TODO: Fix arguments
+        else if (name.equals("argument0")) {
+            return arguments[0];
+        } else if (name.equals("argument1")) {
+            return arguments[1];
+        } else if (name.equals("argument2")) {
+            return arguments[2];
+        } else if (name.equals("argument3")) {
+            return arguments[3];
+        } else if (name.equals("argument4")) {
+            return arguments[4];
+        } else if (name.equals("argument5")) {
+            return arguments[5];
+        } else if (name.equals("argument6")) {
+            return arguments[6];
+        } else if (name.equals("argument7")) {
+            return arguments[7];
+        } else if (name.equals("argument8")) {
+            return arguments[8];
+        } else if (name.equals("argument9")) {
+            return arguments[9];
+        } else if (name.equals("argument10")) {
+            return arguments[10];
+        } else if (name.equals("argument11")) {
+            return arguments[11];
+        } else if (name.equals("argument12")) {
+            return arguments[12];
+        } else if (name.equals("argument13")) {
+            return arguments[13];
+        } else if (name.equals("argument14")) {
+            return arguments[14];
+        } else if (name.equals("argument15")) {
+            return arguments[15];
+        }
+
+        else if (name.equals("instance_count")) {
+            return VariableVal.Real(room.getInstanceCount());
+        } else if (name.equals("instance_id")) {// TODO: this is an array
+            return VariableVal.Real(0);
+        } else if (name.equals("room_speed")) {
+            return VariableVal.Real(room_speed);
+        } else if (name.equals("fps")) {
+            return VariableVal.Real(fps);
+        } else if (name.equals("current_time")) {
+            return VariableVal.Real(System.currentTimeMillis() / 1000);
+        } else if (name.equals("current_year")) {
+            return VariableVal.Real(Calendar.getInstance().get(Calendar.YEAR));
+        } else if (name.equals("current_month")) {
+            return VariableVal.Real(Calendar.getInstance().get(Calendar.MONTH));
+        } else if (name.equals("current_day")) {
+            return VariableVal.Real(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+        } else if (name.equals("current_weekday")) {
+            return VariableVal.Real(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+        } else if (name.equals("current_hour")) {
+            return VariableVal.Real(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+        } else if (name.equals("current_minute")) {
+            return VariableVal.Real(Calendar.getInstance().get(Calendar.MINUTE));
+        } else if (name.equals("current_second")) {
+            return VariableVal.Real(Calendar.getInstance().get(Calendar.SECOND));
+        } else if (name.equals("room")) {
+            return VariableVal.Real(room_index);
+        } else if (name.equals("room_first")) {
+            return VariableVal.Real(roomOrder[0]);
+        } else if (name.equals("room_last")) {
+            return VariableVal.Real(roomOrder[roomOrder.length - 1]);
+        } else if (name.equals("room_width")) {
+            return VariableVal.Real(room.width);
+        } else if (name.equals("room_height")) {
+            return VariableVal.Real(room.height);
+        } else if (name.equals("room_caption")) {
+            return new VariableVal(room.caption);
+        } else if (name.equals("room_persistent")) {
+            return VariableVal.Bool(room.room.persistent);
+        } else if (name.equals("score")) {
+            return VariableVal.Real(score);
+        } else if (name.equals("lives")) {
+            return VariableVal.Real(lives);
+        } else if (name.equals("health")) {
+            return VariableVal.Real(health);
+        } else if (name.equals("show_score")) {
+            return VariableVal.Bool(show_score);
+        } else if (name.equals("show_lives")) {
+            return VariableVal.Bool(show_lives);
+        } else if (name.equals("show_health")) {
+            return VariableVal.Bool(show_health);
+        } else if (name.equals("caption_score")) {
+            return new VariableVal(caption_score);
+        } else if (name.equals("caption_lives")) {
+            return new VariableVal(caption_lives);
+        } else if (name.equals("caption_health")) {
+            return new VariableVal(caption_health);
+        } else if (name.equals("error_occurred")) {
+            return VariableVal.Bool(Runner.error_occurred);
+        } else if (name.equals("error_last")) {
+            return new VariableVal(Runner.error_last);
+        } else if (name.equals("keyboard_key")) {
+            return VariableVal.Real('c');// TODO ...
+        } else if (name.equals("keyboard_lastkey")) {
+            return VariableVal.Real('c');
+        } else if (name.equals("keyboard_lastchar")) {
+            return VariableVal.Real('c');
+        } else if (name.equals("keyboard_string")) {
+            return new VariableVal("keyboard_string");// TODO
+        } else if (name.equals("mouse_x")) {
+            return VariableVal.Real(Mouse.getX());
+        } else if (name.equals("mouse_y")) {
+            return VariableVal.Real(Mouse.getY());
+        } else if (name.equals("mouse_button")) {
+            return VariableVal.Real(0);
+        } else if (name.equals("mouse_lastbutton")) {
+            return VariableVal.Real(0);
+        } else if (name.equals("cursor_sprite")) {
+            return VariableVal.Real(cursor_sprite);
+        } else if (name.equals("background_color")) {
+            return VariableVal.Real(room.background_color.getRGB());
+        } else if (name.equals("background_showcolor")) {
+            return VariableVal.Bool(room.draw_background_color);
+        } else if (name.equals("game_id")) {
+            return VariableVal.Real(0);// TODO: Game id
+        } else if (name.equals("working_directory")) {
+            return new VariableVal(System.getProperty("user.dir"));
+        } else if (name.equals("temp_directory")) {
+            return new VariableVal(System.getProperty("user.dir")); // TODO: Change
+        } else if (name.equals("program_directory")) {
+            return new VariableVal(System.getProperty("user.dir"));
+        } else if (name.equals("secure_mode")) {
+            return VariableVal.Real(0); // ff that stuff
+        }
+
+        return null;
     }
 }

@@ -58,8 +58,9 @@ public class ErrorDialog extends JDialog implements ActionListener {
         JOptionPane wtfwjd = new JOptionPane(new Object[] { message, scroll }, JOptionPane.ERROR_MESSAGE,
                 JOptionPane.DEFAULT_OPTION, null, new JButton[] { copy, ok });
         add(wtfwjd);
-        pack();
+        setSize(640, 480);
         setLocationRelativeTo(parent);
+        setVisible(true);
     }
 
     protected static String throwableToString(Throwable e) {

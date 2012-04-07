@@ -75,6 +75,8 @@ public class GmlInterpreter {
                     return executeBlock(act.ifAction, instance, e, i);
                 } else if (act.elseAction != null) {
                     return executeBlock(act.elseAction, instance, e, i);
+                } else {
+                    i = act.ifAction.actionEnd;
                 }
             }
             break;

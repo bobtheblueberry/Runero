@@ -12,6 +12,7 @@ package org.gcreator.runero.event;
 
 import java.awt.Color;
 
+import org.gcreator.runero.gml.exec.VariableRef;
 import org.gcreator.runero.res.Code;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
@@ -55,6 +56,7 @@ public class Argument {
     public boolean bothIsExpr; // is expression for 'both' types
     public org.gcreator.runero.gml.exec.ExprArgument exprVal;
     public int resVal = -1;
+    public VariableRef variableVal;// for set variable action #611
 
     public Argument(int kind) {
         this.kind = kind;

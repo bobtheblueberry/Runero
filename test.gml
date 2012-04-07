@@ -1,14 +1,30 @@
 
+/* NOOO NOT THE SWITCH STATEMENT
+switch (keyboard_key)
+{
+  case vk_left:
+  case vk_numpad4:
+    x -= 4; break;
+  case vk_right:
+  case vk_numpad6:
+    x += 4; break;
+}
+*/
+
+
+xy[i] = 2;
+
+
 
  x = y b = 2 n = 5 g = 2 var h i j ; a += b for (i = 0 i < 55 i += 1) x = 1 do y =x div 2 until i < 2 y = 2 x =
      show_message('bbbb')
-    
+    yx[55] = 2
 do{a=(0).x+0end until"a"="b" // 123
 // 123
 
 {
 va0123 = 2;
-  for (i=0; i<=9; i+=1) list[i] = i+1;
+  for (i=0; i<=9; i+=1) list[iQC5] = i+1;
 }
 
 do x = 2 until y > 3 
@@ -29,22 +45,13 @@ with (ball)
   y = random(room_height);
 }
 
-/* NOOO NOT THE SWITCH STATEMENT
-switch (keyboard_key)
-{
-  case vk_left:
-  case vk_numpad4:
-    x -= 4; break;
-  case vk_right:
-  case vk_numpad6:
-    x += 4; break;
-}
-*/
+
+
 cheese.is.a.real.noob = 1
 cheese.          is.  real . noob        =2
-cheese.is.a[1].noob.b1234y[1,2]=2
+cheese.is.a[1].noob.b1234y[1]=2
 
-x[1 + 2 / 5 % 6 ^ 3, 6 /2+round(2.5) + 2 + x[7,4]] = 1
+x[1 + 2 / 5 % 6 ^ 3/*, 6 /2+round(2.5) + 2 + x[7]*/] = 1
 y[200 /y - 2*2000] = 2 
 
 // This scripts shows a message and pauses the game

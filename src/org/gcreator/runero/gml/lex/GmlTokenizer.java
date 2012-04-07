@@ -1,19 +1,18 @@
 package org.gcreator.runero.gml.lex;
 
+import static org.gcreator.runero.gml.lex.Token.*;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Stack;
 
-import org.gcreator.runero.gml.exec.Statement;
+import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.gml.lex.GmlLexer.CharData;
 import org.gcreator.runero.gml.lex.TokenVariable.TokenVariableSub;
-
-import static org.gcreator.runero.gml.lex.Token.*;
 
 /**
  * Awesome GML Lexer/Parser that is so great
@@ -133,89 +132,92 @@ public class GmlTokenizer {
     // -- .othervar.var.var [ASSIGNMENT] EXPR
     // ASSIGNMENT = [EXPR] { func(ARGS...), instance.x + 2 - x, "BOB" + 2, 12.0, $0FFAA}
 
-    LinkedList<TokenWord> tokenList;
-    CharData[] data;
+    LinkedList<TokenWord>           tokenList;
+    CharData[]                      data;
 
     public static TokenWord[] process(CharData[] data) {
         return new GmlTokenizer(data).twords;
     }
-    
-    private GmlTokenizer(CharData[] data) {
-        this.data = data;
-        tokenList = new LinkedList<TokenWord>();
-        phase2();
-        debugLine = -1;
-        debugPos = -2;
-        tokenList = phase25(tokenList);
-        tokenList = phase26(tokenList);
-        twords = tokenList.toArray(new TokenWord[tokenList.size()]);
-    }
-    
+
+    private GmlTokenizer(CharData[] data)
+        {
+            this.data = data;
+            tokenList = new LinkedList<TokenWord>();
+            phase2();
+            debugLine = -1;
+            debugPos = -2;
+            tokenList = phase25(tokenList);
+            tokenList = phase26(tokenList);
+            twords = tokenList.toArray(new TokenWord[tokenList.size()]);
+        }
+
     TokenWord[] twords;
-    
+
     /**
      * Testing code
      * 
      * 
      * @throws IOException
      */
-    private GmlTokenizer() throws IOException {
+    private GmlTokenizer() throws IOException
+        {
 
-        boolean ignoreComments = true;
+            boolean ignoreComments = true;
 
-        File test = new File("test.gml");
-        data = GmlLexer.process(new BufferedInputStream(new FileInputStream(test)));
+            File test = new File("test.gml");
+            data = GmlLexer.process(new BufferedInputStream(new FileInputStream(test)));
 
-        if (data == null || data.length == 0) {
-            System.out.println("No data");
-            return;
-        }
+            if (data == null || data.length == 0) {
+                System.out.println("No data");
+                return;
+            }
 
-        System.out.println("================= PHASE ONE =================");
-        for (CharData c : data) {
-            String line;
-            String s2 = "";
-            if (c.isString) {
-                line = ANSI.BLUE + "\"";
-                s2 = "\"";
-            } else if (c.isComment) {
-                if (ignoreComments)
-                    continue;
+            System.out.println("================= PHASE ONE =================");
+            for (CharData c : data) {
+                String line;
+                String s2 = "";
+                if (c.isString) {
+                    line = ANSI.BLUE + "\"";
+                    s2 = "\"";
+                } else if (c.isComment) {
+                    if (ignoreComments)
+                        continue;
+                    else
+                        line = "" + ANSI.GREEN;
+                } else if (c.isWord)
+                    line = "" + ANSI.MAGENTA;
+                else if (c.isNumber)
+                    line = "" + ANSI.YELLOW;
+                else if (c.isWhitespace)
+                    line = "" + ANSI.BLACK;
                 else
-                    line = "" + ANSI.GREEN;
-            } else if (c.isWord)
-                line = "" + ANSI.MAGENTA;
-            else if (c.isNumber)
-                line = "" + ANSI.YELLOW;
-            else if (c.isWhitespace)
-                line = "" + ANSI.BLACK;
-            else
-                line = "" + ANSI.CYAN;
-            String str = c.getData();
-            if (!c.isString && str.equals(""))
-                System.out.print(ANSI.RED + "$");
-            else
-                System.out.print(line + c.getData() + s2);
+                    line = "" + ANSI.CYAN;
+                String str = c.getData();
+                if (!c.isString && str.equals(""))
+                    System.out.print(ANSI.RED + "$");
+                else
+                    System.out.print(line + c.getData() + s2);
+            }
+            System.out.println(ANSI.BLACK);
+
+            System.out.println("================= PHASE TWO =================");
+            tokenList = new LinkedList<TokenWord>();
+            phase2();
+            debugLine = -1;
+            debugPos = -2;
+            System.out.println("================= PHASE 2.5 =================");
+            tokenList = phase25(tokenList);
+            System.out.println("================= PHASE 2.6 =================");
+            tokenList = phase26(tokenList);
+            // printTree();
+
+            System.out.println("================ PHASE THREE ================");
+            TokenWord[] twords = new TokenWord[tokenList.size()];
+            twords = tokenList.toArray(twords);
+            GmlCompiler.interpretGml(twords);
         }
-        System.out.println(ANSI.BLACK);
 
-        System.out.println("================= PHASE TWO =================");
-        tokenList = new LinkedList<TokenWord>();
-        phase2();
-        debugLine = -1;
-        debugPos = -2;
-        System.out.println("================= PHASE 2.5 =================");
-        tokenList = phase25(tokenList);
-        System.out.println("================= PHASE 2.6 =================");
-        tokenList = phase26(tokenList);
-        // printTree();
-
-        System.out.println("================ PHASE THREE ================");
-        TokenWord[] twords = new TokenWord[tokenList.size()];
-        twords = tokenList.toArray(twords);
-        GmlCompiler.interpretGml(twords);
-    }
-
+    @SuppressWarnings("unused")
     private void printTree() {
         for (TokenWord tw : tokenList)
             printToken(tw);
@@ -245,12 +247,12 @@ public class GmlTokenizer {
         }
     }
 
-    int debugPos;
-    int debugLine;
+    int               debugPos;
+    int               debugLine;
 
     // part of phase2
     Stack<TokenGroup> groups;
-    TokenGroup tg;
+    TokenGroup        tg;
 
     /**
      * Creates a string of tokens from the lexer data
@@ -411,19 +413,18 @@ public class GmlTokenizer {
         for (int i = 0; i < tokensOrig.size(); i++) {
             TokenWord tw = tokensOrig.get(i);
             boolean cond = true;
-            if (tw.token == PAR_OPEN) {
+            if (tw.token == PAR_OPEN) { // ( ) . x but not ( 1 2 3 ) cause that messed up like for ( a;b;c)
                 if (tw instanceof TokenWordPair) // function
                     cond = false;
                 if (i + 1 > tokensOrig.size())
                     cond = false;
                 else {
                     TokenWord next = tokensOrig.get(i + 1);
-                    if (next.token != DOT) 
+                    if (next.token != DOT)
                         cond = false;
                 }
             }
-            if (cond && (tw.token == WORD || tw.token == ARRAY || tw.token == PAR_OPEN)) { // WORD DOT WORD DOT (1234)?
-
+            if (tw.token == WORD || tw.token == ARRAY || (cond && tw.token == PAR_OPEN)) { // WORD DOT WORD DOT (1234)?
                 TokenVariable var = new TokenVariable(tw);
                 var.add(getVariable(tw));
                 tw = var;
@@ -447,6 +448,14 @@ public class GmlTokenizer {
             } else if (tw instanceof TokenWordPair) {
                 TokenWordPair g = (TokenWordPair) tw;
                 g.child.tokens = phase26(g.child.tokens);
+            } else if (tw instanceof TokenVariable) {
+                TokenVariable v = (TokenVariable) tw;
+                for (TokenVariableSub s : v.variables) {
+                    if (s.isArray)
+                        s.arrayIndex.tokens = phase26(s.arrayIndex.tokens);
+                    else if (s.isExpression)
+                        s.expression.tokens = phase26(s.expression.tokens);
+                }
             }
         }
         return tokens;
@@ -478,38 +487,39 @@ public class GmlTokenizer {
 
     final class ANSI {
 
-        public static final String SANE = "\u001B[0m";
+        public static final String SANE               = "\u001B[0m";
 
-        public static final String HIGH_INTENSITY = "\u001B[1m";
-        public static final String LOW_INTESITY = "\u001B[2m";
+        public static final String HIGH_INTENSITY     = "\u001B[1m";
+        public static final String LOW_INTESITY       = "\u001B[2m";
 
-        public static final String ITALIC = "\u001B[3m";
-        public static final String UNDERLINE = "\u001B[4m";
-        public static final String BLINK = "\u001B[5m";
-        public static final String RAPID_BLINK = "\u001B[6m";
-        public static final String REVERSE_VIDEO = "\u001B[7m";
-        public static final String INVISIBLE_TEXT = "\u001B[8m";
+        public static final String ITALIC             = "\u001B[3m";
+        public static final String UNDERLINE          = "\u001B[4m";
+        public static final String BLINK              = "\u001B[5m";
+        public static final String RAPID_BLINK        = "\u001B[6m";
+        public static final String REVERSE_VIDEO      = "\u001B[7m";
+        public static final String INVISIBLE_TEXT     = "\u001B[8m";
 
-        public static final String BLACK = "\u001B[30m";
-        public static final String RED = "\u001B[31m";
-        public static final String GREEN = "\u001B[32m";
-        public static final String YELLOW = "\u001B[33m";
-        public static final String BLUE = "\u001B[34m";
-        public static final String MAGENTA = "\u001B[35m";
-        public static final String CYAN = "\u001B[36m";
-        public static final String WHITE = "\u001B[37m";
+        public static final String BLACK              = "\u001B[30m";
+        public static final String RED                = "\u001B[31m";
+        public static final String GREEN              = "\u001B[32m";
+        public static final String YELLOW             = "\u001B[33m";
+        public static final String BLUE               = "\u001B[34m";
+        public static final String MAGENTA            = "\u001B[35m";
+        public static final String CYAN               = "\u001B[36m";
+        public static final String WHITE              = "\u001B[37m";
 
-        public static final String BACKGROUND_BLACK = "\u001B[40m";
-        public static final String BACKGROUND_RED = "\u001B[41m";
-        public static final String BACKGROUND_GREEN = "\u001B[42m";
-        public static final String BACKGROUND_YELLOW = "\u001B[43m";
-        public static final String BACKGROUND_BLUE = "\u001B[44m";
+        public static final String BACKGROUND_BLACK   = "\u001B[40m";
+        public static final String BACKGROUND_RED     = "\u001B[41m";
+        public static final String BACKGROUND_GREEN   = "\u001B[42m";
+        public static final String BACKGROUND_YELLOW  = "\u001B[43m";
+        public static final String BACKGROUND_BLUE    = "\u001B[44m";
         public static final String BACKGROUND_MAGENTA = "\u001B[45m";
-        public static final String BACKGROUND_CYAN = "\u001B[46m";
-        public static final String BACKGROUND_WHITE = "\u001B[47m";
+        public static final String BACKGROUND_CYAN    = "\u001B[46m";
+        public static final String BACKGROUND_WHITE   = "\u001B[47m";
 
-        private ANSI() {
-        } // disable automatic constructor
+        private ANSI()
+            {
+            } // disable automatic constructor
 
     }
 }

@@ -12,8 +12,10 @@ import org.gcreator.runero.event.Action;
 import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReturnValue;
+import org.gcreator.runero.gml.VariableManager;
 import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.gml.exec.Constant;
+import org.gcreator.runero.gml.exec.VariableRef;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
@@ -30,148 +32,148 @@ import org.newdawn.slick.opengl.Texture;
  */
 public class ActionLibrary {
     // move
-    public static final int ACTION_MOVE = 101;
-    public static final int SET_MOTION = 102;
-    public static final int MOVE_POINT = 105;
-    public static final int SET_HSPEED = 103;
-    public static final int SET_VSPEED = 104;
-    public static final int SET_GRAVITY = 107;
-    public static final int REVERSE_XDIR = 113;
-    public static final int REVERSE_YDIR = 114;
-    public static final int SET_FRICTION = 108;
-    public static final int MOVE_TO = 109;
-    public static final int MOVE_START = 110;
-    public static final int MOVE_RANDOM = 111;
-    public static final int SNAP = 117;
-    public static final int WRAP = 112;
-    public static final int MOVE_CONTACT = 116;
-    public static final int BOUNCE = 115;
-    public static final int PATH = 119;
-    public static final int PATH_END = 124;
-    public static final int PATH_POSITION = 122;
-    public static final int PATH_SPEED = 123;
-    public static final int STEP_LINEAR = 120;
-    public static final int STEP_POTENTIAL = 121;
+    public static final int        ACTION_MOVE           = 101;
+    public static final int        SET_MOTION            = 102;
+    public static final int        MOVE_POINT            = 105;
+    public static final int        SET_HSPEED            = 103;
+    public static final int        SET_VSPEED            = 104;
+    public static final int        SET_GRAVITY           = 107;
+    public static final int        REVERSE_XDIR          = 113;
+    public static final int        REVERSE_YDIR          = 114;
+    public static final int        SET_FRICTION          = 108;
+    public static final int        MOVE_TO               = 109;
+    public static final int        MOVE_START            = 110;
+    public static final int        MOVE_RANDOM           = 111;
+    public static final int        SNAP                  = 117;
+    public static final int        WRAP                  = 112;
+    public static final int        MOVE_CONTACT          = 116;
+    public static final int        BOUNCE                = 115;
+    public static final int        PATH                  = 119;
+    public static final int        PATH_END              = 124;
+    public static final int        PATH_POSITION         = 122;
+    public static final int        PATH_SPEED            = 123;
+    public static final int        STEP_LINEAR           = 120;
+    public static final int        STEP_POTENTIAL        = 121;
     // main1
-    public static final int CREATE_OBJECT = 201;
-    public static final int CREATE_OBJECT_MOTION = 206;
-    public static final int CREATE_OBJECT_RANDOM = 207;
-    public static final int CHANGE_OBJECT = 202;
-    public static final int KILL_OBJECT = 203;
-    public static final int KILL_POSITION = 204;
-    public static final int SET_SPRITE = 541;
-    public static final int TRANSFORM_SPRITE = 542;
-    public static final int COLOR_SPRITE = 543;
-    public static final int SET_SPRITE_OLD = 205; // DEPRECATED
-    public static final int BEGIN_SOUND = 211;
-    public static final int END_SOUND = 212;
-    public static final int IF_SOUND = 213;
-    public static final int PREVIOUS_ROOM = 221;
-    public static final int NEXT_ROOM = 222;
-    public static final int CURRENT_ROOM = 223;
-    public static final int ANOTHER_ROOM = 224;
-    public static final int IF_PREVIOUS_ROOM = 225;
-    public static final int IF_NEXT_ROOM = 226;
+    public static final int        CREATE_OBJECT         = 201;
+    public static final int        CREATE_OBJECT_MOTION  = 206;
+    public static final int        CREATE_OBJECT_RANDOM  = 207;
+    public static final int        CHANGE_OBJECT         = 202;
+    public static final int        KILL_OBJECT           = 203;
+    public static final int        KILL_POSITION         = 204;
+    public static final int        SET_SPRITE            = 541;
+    public static final int        TRANSFORM_SPRITE      = 542;
+    public static final int        COLOR_SPRITE          = 543;
+    public static final int        SET_SPRITE_OLD        = 205;                // DEPRECATED
+    public static final int        BEGIN_SOUND           = 211;
+    public static final int        END_SOUND             = 212;
+    public static final int        IF_SOUND              = 213;
+    public static final int        PREVIOUS_ROOM         = 221;
+    public static final int        NEXT_ROOM             = 222;
+    public static final int        CURRENT_ROOM          = 223;
+    public static final int        ANOTHER_ROOM          = 224;
+    public static final int        IF_PREVIOUS_ROOM      = 225;
+    public static final int        IF_NEXT_ROOM          = 226;
     // main2
-    public static final int SET_ALARM = 301;
-    public static final int SLEEP = 302;
-    public static final int SET_TIMELINE = 303;
-    public static final int POSITION_TIMELINE = 304;
-    public static final int MESSAGE = 321;
-    public static final int SHOW_INFO = 322;
-    public static final int SHOW_VIDEO = 323;
+    public static final int        SET_ALARM             = 301;
+    public static final int        SLEEP                 = 302;
+    public static final int        SET_TIMELINE          = 303;
+    public static final int        POSITION_TIMELINE     = 304;
+    public static final int        MESSAGE               = 321;
+    public static final int        SHOW_INFO             = 322;
+    public static final int        SHOW_VIDEO            = 323;
     // Game Maker 8 Splash functions
-    public static final int SPLASH_TEXT = 324;
-    public static final int SPLASH_IMAGE = 325;
-    public static final int SPLASH_WEB = 326;
-    public static final int SPLASH_VIDEO = 327;
-    public static final int SPLASH_SETTINGS = 328;
+    public static final int        SPLASH_TEXT           = 324;
+    public static final int        SPLASH_IMAGE          = 325;
+    public static final int        SPLASH_WEB            = 326;
+    public static final int        SPLASH_VIDEO          = 327;
+    public static final int        SPLASH_SETTINGS       = 328;
 
-    public static final int RESTART_GAME = 331;
-    public static final int END_GAME = 332;
-    public static final int SAVE_GAME = 333;
-    public static final int LOAD_GAME = 334;
-    public static final int REPLACE_SPRITE = 803;
-    public static final int REPLACE_SOUND = 804;
-    public static final int REPLACE_BACKGROUND = 805;
+    public static final int        RESTART_GAME          = 331;
+    public static final int        END_GAME              = 332;
+    public static final int        SAVE_GAME             = 333;
+    public static final int        LOAD_GAME             = 334;
+    public static final int        REPLACE_SPRITE        = 803;
+    public static final int        REPLACE_SOUND         = 804;
+    public static final int        REPLACE_BACKGROUND    = 805;
     // control
-    public static final int IF_EMPTY = 401;
-    public static final int IF_COLLISION = 402;
-    public static final int IF_OBJECT = 403;
-    public static final int IF_NUMBER = 404;
-    public static final int IF_DICE = 405;
-    public static final int IF_QUESTION = 407;
-    public static final int IF = 408;
-    public static final int IF_MOUSE = 409;
-    public static final int IF_ALIGNED = 410;
-    public static final int START_BLOCK = 422; // not used
-    public static final int ELSE = 421; // not used
-    public static final int EXIT = 425; // not used
-    public static final int END_BLOCK = 424; // useless
-    public static final int REPEAT = 423; // very useless
-    public static final int INHERITED = 604;
-    public static final int CODE = 603; // not actually used
-    public static final int EXECUTE_SCRIPT = 601;
-    public static final int COMMENT = 605;
-    public static final int VARIABLE = 611;
-    public static final int IF_VARIABLE = 612;
-    public static final int DRAW_VARIABLE = 613;
+    public static final int        IF_EMPTY              = 401;
+    public static final int        IF_COLLISION          = 402;
+    public static final int        IF_OBJECT             = 403;
+    public static final int        IF_NUMBER             = 404;
+    public static final int        IF_DICE               = 405;
+    public static final int        IF_QUESTION           = 407;
+    public static final int        IF                    = 408;
+    public static final int        IF_MOUSE              = 409;
+    public static final int        IF_ALIGNED            = 410;
+    public static final int        START_BLOCK           = 422;                // not used
+    public static final int        ELSE                  = 421;                // not used
+    public static final int        EXIT                  = 425;                // not used
+    public static final int        END_BLOCK             = 424;                // useless
+    public static final int        REPEAT                = 423;                // very useless
+    public static final int        INHERITED             = 604;
+    public static final int        CODE                  = 603;                // not actually used
+    public static final int        EXECUTE_SCRIPT        = 601;
+    public static final int        COMMENT               = 605;
+    public static final int        VARIABLE              = 611;
+    public static final int        IF_VARIABLE           = 612;
+    public static final int        DRAW_VARIABLE         = 613;
     // score
-    public static final int SET_SCORE = 701;
-    public static final int IF_SCORE = 702;
-    public static final int DRAW_SCORE = 703;
-    public static final int HIGHSCORE_SHOW = 709;
-    public static final int HIGHSCORE_CLEAR = 707;
-    public static final int SET_LIFE = 711;
-    public static final int IF_LIFE = 712;
-    public static final int DRAW_LIFE = 713;
-    public static final int DRAW_LIFE_IMAGES = 714;
-    public static final int SET_HEALTH = 721;
-    public static final int IF_HEALTH = 722;
-    public static final int DRAW_HEALTH = 723;
-    public static final int SET_CAPTION = 731;
+    public static final int        SET_SCORE             = 701;
+    public static final int        IF_SCORE              = 702;
+    public static final int        DRAW_SCORE            = 703;
+    public static final int        HIGHSCORE_SHOW        = 709;
+    public static final int        HIGHSCORE_CLEAR       = 707;
+    public static final int        SET_LIFE              = 711;
+    public static final int        IF_LIFE               = 712;
+    public static final int        DRAW_LIFE             = 713;
+    public static final int        DRAW_LIFE_IMAGES      = 714;
+    public static final int        SET_HEALTH            = 721;
+    public static final int        IF_HEALTH             = 722;
+    public static final int        DRAW_HEALTH           = 723;
+    public static final int        SET_CAPTION           = 731;
     // extra i.e. never going to be implemented
-    public static final int PART_SYST_CREATE = 820;
-    public static final int PART_SYST_DESTROY = 821;
-    public static final int PART_SYST_CLEAR = 822;
-    public static final int PART_TYPE_CREATE_OLD = 825; // DEPRECATED
-    public static final int PART_TYPE_CREATE = 823;
-    public static final int PART_TYPE_COLOR = 824;
-    public static final int PART_TYPE_LIFE = 826;
-    public static final int PART_TYPE_SPEED = 827;
-    public static final int PART_TYPE_GRAVITY = 828;
-    public static final int PART_TYPE_SECONDARY = 829;
-    public static final int PART_EMIT_CREATE = 831;
-    public static final int PART_EMIT_DESTROY = 832;
-    public static final int PART_EMIT_BURST = 833;
-    public static final int PART_EMIT_STREAM = 834;
-    public static final int CD_PLAY = 808;
-    public static final int CD_STOP = 809;
-    public static final int CD_PAUSE = 810;
-    public static final int CD_RESUME = 811;
-    public static final int CD_IF_EXISTS = 812;
-    public static final int CD_IF_PLAYING = 813;
-    public static final int SET_MOUSE = 801;
-    public static final int OPEN_WEBPAGE = 807;
+    public static final int        PART_SYST_CREATE      = 820;
+    public static final int        PART_SYST_DESTROY     = 821;
+    public static final int        PART_SYST_CLEAR       = 822;
+    public static final int        PART_TYPE_CREATE_OLD  = 825;                // DEPRECATED
+    public static final int        PART_TYPE_CREATE      = 823;
+    public static final int        PART_TYPE_COLOR       = 824;
+    public static final int        PART_TYPE_LIFE        = 826;
+    public static final int        PART_TYPE_SPEED       = 827;
+    public static final int        PART_TYPE_GRAVITY     = 828;
+    public static final int        PART_TYPE_SECONDARY   = 829;
+    public static final int        PART_EMIT_CREATE      = 831;
+    public static final int        PART_EMIT_DESTROY     = 832;
+    public static final int        PART_EMIT_BURST       = 833;
+    public static final int        PART_EMIT_STREAM      = 834;
+    public static final int        CD_PLAY               = 808;
+    public static final int        CD_STOP               = 809;
+    public static final int        CD_PAUSE              = 810;
+    public static final int        CD_RESUME             = 811;
+    public static final int        CD_IF_EXISTS          = 812;
+    public static final int        CD_IF_PLAYING         = 813;
+    public static final int        SET_MOUSE             = 801;
+    public static final int        OPEN_WEBPAGE          = 807;
     // draw
-    public static final int DRAW_SPRITE = 501;
-    public static final int DRAW_BACKGROUND = 502;
-    public static final int DRAW_TEXT = 514;
-    public static final int DRAW_TEXT_SCALED = 519;
-    public static final int DRAW_RECTANGLE = 511;
-    public static final int DRAW_GRADIENT_HOR = 516;
-    public static final int DRAW_GRADIENT_VERT = 517;
-    public static final int DRAW_ELLIPSE = 512;
-    public static final int DRAW_ELLIPSE_GRADIENT = 518;
-    public static final int DRAW_LINE = 513;
-    public static final int DRAW_ARROW = 515;
-    public static final int SET_COLOR = 524;
-    public static final int SET_FONT = 526;
-    public static final int FULLSCREEN = 531;
-    public static final int TAKE_SNAPSHOT = 802;
-    public static final int EFFECT = 532;
+    public static final int        DRAW_SPRITE           = 501;
+    public static final int        DRAW_BACKGROUND       = 502;
+    public static final int        DRAW_TEXT             = 514;
+    public static final int        DRAW_TEXT_SCALED      = 519;
+    public static final int        DRAW_RECTANGLE        = 511;
+    public static final int        DRAW_GRADIENT_HOR     = 516;
+    public static final int        DRAW_GRADIENT_VERT    = 517;
+    public static final int        DRAW_ELLIPSE          = 512;
+    public static final int        DRAW_ELLIPSE_GRADIENT = 518;
+    public static final int        DRAW_LINE             = 513;
+    public static final int        DRAW_ARROW            = 515;
+    public static final int        SET_COLOR             = 524;
+    public static final int        SET_FONT              = 526;
+    public static final int        FULLSCREEN            = 531;
+    public static final int        TAKE_SNAPSHOT         = 802;
+    public static final int        EFFECT                = 532;
 
-    private static GraphicsLibrary g = GraphicsLibrary.gfx;
+    private static GraphicsLibrary g                     = GraphicsLibrary.gfx;
 
     public static ReturnValue executeAction(Action act, Instance instance) {
         return executeAction(act, instance, null);
@@ -198,321 +200,321 @@ public class ActionLibrary {
 
         switch (act.lib.id) {
         // move
-        case ACTION_MOVE:
-            action_move(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_MOTION:
-            set_motion(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case MOVE_POINT:
-            move_point(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_HSPEED:
-            set_hspeed(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_VSPEED:
-            set_vspeed(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_GRAVITY:
-            set_gravity(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case REVERSE_XDIR:
-            reverse_xdir(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case REVERSE_YDIR:
-            reverse_ydir(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_FRICTION:
-            set_friction(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case MOVE_TO:
-            move_to(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case MOVE_START:
-            move_start(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case MOVE_RANDOM:
-            move_random(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SNAP:
-            snap(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case WRAP:
-            wrap(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case MOVE_CONTACT:
-            // TODO: This, and collision system
-            return ReturnValue.FAILURE;
-        case BOUNCE:
-            // TODO: This, and collision system
-            return ReturnValue.FAILURE;
-        case PATH:
-            // TODO: Paths
-            return ReturnValue.FAILURE;
-        case PATH_END:
+            case ACTION_MOVE:
+                action_move(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_MOTION:
+                set_motion(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case MOVE_POINT:
+                move_point(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_HSPEED:
+                set_hspeed(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_VSPEED:
+                set_vspeed(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_GRAVITY:
+                set_gravity(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case REVERSE_XDIR:
+                reverse_xdir(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case REVERSE_YDIR:
+                reverse_ydir(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_FRICTION:
+                set_friction(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case MOVE_TO:
+                move_to(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case MOVE_START:
+                move_start(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case MOVE_RANDOM:
+                move_random(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SNAP:
+                snap(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case WRAP:
+                wrap(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case MOVE_CONTACT:
+                // TODO: This, and collision system
+                return ReturnValue.FAILURE;
+            case BOUNCE:
+                // TODO: This, and collision system
+                return ReturnValue.FAILURE;
+            case PATH:
+                // TODO: Paths
+                return ReturnValue.FAILURE;
+            case PATH_END:
 
-            return ReturnValue.FAILURE;
-        case PATH_POSITION:
+                return ReturnValue.FAILURE;
+            case PATH_POSITION:
 
-            return ReturnValue.FAILURE;
-        case PATH_SPEED:
+                return ReturnValue.FAILURE;
+            case PATH_SPEED:
 
-            return ReturnValue.FAILURE;
-        case STEP_LINEAR:
-            // TODO: Stepping
-            return ReturnValue.FAILURE;
-        case STEP_POTENTIAL:
+                return ReturnValue.FAILURE;
+            case STEP_LINEAR:
+                // TODO: Stepping
+                return ReturnValue.FAILURE;
+            case STEP_POTENTIAL:
 
-            return ReturnValue.FAILURE;
-            // main1
-        case CREATE_OBJECT:
-            create_object(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case CREATE_OBJECT_MOTION:
-            create_object_motion(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case CREATE_OBJECT_RANDOM:
-            create_object_random(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case CHANGE_OBJECT:
-            change_object(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case KILL_OBJECT:
-            kill_object(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case KILL_POSITION: // TODO: Implement this!
-            kill_position(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_SPRITE:
-            set_sprite(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case TRANSFORM_SPRITE:
-            transform_sprite(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case COLOR_SPRITE:
-            color_sprite(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_SPRITE_OLD: // Deprecated
-            set_sprite_old(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case BEGIN_SOUND:
+                return ReturnValue.FAILURE;
+                // main1
+            case CREATE_OBJECT:
+                create_object(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case CREATE_OBJECT_MOTION:
+                create_object_motion(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case CREATE_OBJECT_RANDOM:
+                create_object_random(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case CHANGE_OBJECT:
+                change_object(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case KILL_OBJECT:
+                kill_object(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case KILL_POSITION: // TODO: Implement this!
+                kill_position(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_SPRITE:
+                set_sprite(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case TRANSFORM_SPRITE:
+                transform_sprite(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case COLOR_SPRITE:
+                color_sprite(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_SPRITE_OLD: // Deprecated
+                set_sprite_old(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case BEGIN_SOUND:
 
-            return ReturnValue.FAILURE;
-        case END_SOUND:
+                return ReturnValue.FAILURE;
+            case END_SOUND:
 
-            return ReturnValue.FAILURE;
-        case PREVIOUS_ROOM:
+                return ReturnValue.FAILURE;
+            case PREVIOUS_ROOM:
 
-            return ReturnValue.FAILURE;
-        case NEXT_ROOM:
+                return ReturnValue.FAILURE;
+            case NEXT_ROOM:
 
-            return ReturnValue.FAILURE;
-        case CURRENT_ROOM:
+                return ReturnValue.FAILURE;
+            case CURRENT_ROOM:
 
-            return ReturnValue.FAILURE;
-        case ANOTHER_ROOM:
+                return ReturnValue.FAILURE;
+            case ANOTHER_ROOM:
 
-            return ReturnValue.FAILURE;
-            // main2
-        case SET_ALARM:
-            set_alarm(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SLEEP:
-            sleep(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_TIMELINE:
+                return ReturnValue.FAILURE;
+                // main2
+            case SET_ALARM:
+                set_alarm(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SLEEP:
+                sleep(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_TIMELINE:
 
-            return ReturnValue.FAILURE;
-        case POSITION_TIMELINE:
+                return ReturnValue.FAILURE;
+            case POSITION_TIMELINE:
 
-            return ReturnValue.FAILURE;
-        case MESSAGE:
-            show_message(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SHOW_INFO:
-            show_info(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SHOW_VIDEO:
-            show_video(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case RESTART_GAME:
-            restart_game(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case END_GAME:
-            end_game(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SAVE_GAME:
-            save_game(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case LOAD_GAME:
-            load_game(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case REPLACE_SPRITE:
-            replace_sprite(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case REPLACE_SOUND:
-            replace_sound(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case REPLACE_BACKGROUND:
-            replace_background(act, instance, other);
-            return ReturnValue.SUCCESS;
-            // control
-        case INHERITED:
-            // This is actually handled by the action executor class.
-            return ReturnValue.FAILURE;
-        case CODE:
-            // TODO: This
-            return ReturnValue.FAILURE;
-        case EXECUTE_SCRIPT:
-            // TODO: this
-            return ReturnValue.FAILURE;
-        case VARIABLE:
-            variable(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_VARIABLE:
-            draw_variable(act, instance, other);
-            return ReturnValue.SUCCESS;
-            // score
-        case SET_SCORE:
-            set_score(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_SCORE:
-            draw_score(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case HIGHSCORE_SHOW:
-            highscore_show(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case HIGHSCORE_CLEAR:
-            highscore_clear(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_LIFE:
-            set_life(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_LIFE:
-            draw_life(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_LIFE_IMAGES:
-            draw_life_images(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_HEALTH:
-            set_health(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_HEALTH:
-            draw_health(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_CAPTION:
-            set_caption(act, instance, other);
-            return ReturnValue.SUCCESS;
-            // extra i.e. never going to be implemented
-        case PART_SYST_CREATE:
+                return ReturnValue.FAILURE;
+            case MESSAGE:
+                show_message(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SHOW_INFO:
+                show_info(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SHOW_VIDEO:
+                show_video(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case RESTART_GAME:
+                restart_game(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case END_GAME:
+                end_game(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SAVE_GAME:
+                save_game(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case LOAD_GAME:
+                load_game(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case REPLACE_SPRITE:
+                replace_sprite(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case REPLACE_SOUND:
+                replace_sound(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case REPLACE_BACKGROUND:
+                replace_background(act, instance, other);
+                return ReturnValue.SUCCESS;
+                // control
+            case INHERITED:
+                // This is actually handled by the action executor class.
+                return ReturnValue.FAILURE;
+            case CODE:
+                // TODO: This
+                return ReturnValue.FAILURE;
+            case EXECUTE_SCRIPT:
+                // TODO: this
+                return ReturnValue.FAILURE;
+            case VARIABLE:
+                variable(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_VARIABLE:
+                draw_variable(act, instance, other);
+                return ReturnValue.SUCCESS;
+                // score
+            case SET_SCORE:
+                set_score(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_SCORE:
+                draw_score(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case HIGHSCORE_SHOW:
+                highscore_show(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case HIGHSCORE_CLEAR:
+                highscore_clear(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_LIFE:
+                set_life(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_LIFE:
+                draw_life(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_LIFE_IMAGES:
+                draw_life_images(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_HEALTH:
+                set_health(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_HEALTH:
+                draw_health(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_CAPTION:
+                set_caption(act, instance, other);
+                return ReturnValue.SUCCESS;
+                // extra i.e. never going to be implemented
+            case PART_SYST_CREATE:
 
-            return ReturnValue.FAILURE;
-        case PART_SYST_DESTROY:
+                return ReturnValue.FAILURE;
+            case PART_SYST_DESTROY:
 
-            return ReturnValue.FAILURE;
-        case PART_SYST_CLEAR:
+                return ReturnValue.FAILURE;
+            case PART_SYST_CLEAR:
 
-            return ReturnValue.FAILURE;
-        case PART_TYPE_CREATE_OLD:
+                return ReturnValue.FAILURE;
+            case PART_TYPE_CREATE_OLD:
 
-            return ReturnValue.FAILURE;
-        case PART_TYPE_CREATE:
+                return ReturnValue.FAILURE;
+            case PART_TYPE_CREATE:
 
-            return ReturnValue.FAILURE;
-        case PART_TYPE_COLOR:
+                return ReturnValue.FAILURE;
+            case PART_TYPE_COLOR:
 
-            return ReturnValue.FAILURE;
-        case PART_TYPE_LIFE:
+                return ReturnValue.FAILURE;
+            case PART_TYPE_LIFE:
 
-            return ReturnValue.FAILURE;
-        case PART_TYPE_SPEED:
+                return ReturnValue.FAILURE;
+            case PART_TYPE_SPEED:
 
-            return ReturnValue.FAILURE;
-        case PART_TYPE_GRAVITY:
+                return ReturnValue.FAILURE;
+            case PART_TYPE_GRAVITY:
 
-            return ReturnValue.FAILURE;
-        case PART_TYPE_SECONDARY:
+                return ReturnValue.FAILURE;
+            case PART_TYPE_SECONDARY:
 
-            return ReturnValue.FAILURE;
-        case PART_EMIT_CREATE:
+                return ReturnValue.FAILURE;
+            case PART_EMIT_CREATE:
 
-            return ReturnValue.FAILURE;
-        case PART_EMIT_DESTROY:
+                return ReturnValue.FAILURE;
+            case PART_EMIT_DESTROY:
 
-            return ReturnValue.FAILURE;
-        case PART_EMIT_BURST:
+                return ReturnValue.FAILURE;
+            case PART_EMIT_BURST:
 
-            return ReturnValue.FAILURE;
-        case PART_EMIT_STREAM:
+                return ReturnValue.FAILURE;
+            case PART_EMIT_STREAM:
 
-            return ReturnValue.FAILURE;
-        case CD_PLAY:
+                return ReturnValue.FAILURE;
+            case CD_PLAY:
 
-            return ReturnValue.FAILURE;
-        case CD_STOP:
+                return ReturnValue.FAILURE;
+            case CD_STOP:
 
-            return ReturnValue.FAILURE;
-        case CD_PAUSE:
+                return ReturnValue.FAILURE;
+            case CD_PAUSE:
 
-            return ReturnValue.FAILURE;
-        case CD_RESUME:
+                return ReturnValue.FAILURE;
+            case CD_RESUME:
 
-            return ReturnValue.FAILURE;
-        case SET_MOUSE:
-            // TODO: set mouse
-            return ReturnValue.FAILURE;
-        case OPEN_WEBPAGE:
-            open_webpage(act, instance, other);
-            return ReturnValue.SUCCESS;
-            // draw
-        case DRAW_SPRITE:
-            draw_sprite(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_BACKGROUND:
-            draw_background(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_TEXT:
-            draw_text(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_TEXT_SCALED:
-            draw_text_scaled(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_RECTANGLE:
-            draw_rectangle(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_GRADIENT_HOR:
-            draw_gradient_hor(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_GRADIENT_VERT:
-            draw_gradient_vert(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_ELLIPSE:
-            draw_ellipse(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_ELLIPSE_GRADIENT:
-            draw_ellipse_gradient(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_LINE:
-            draw_line(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case DRAW_ARROW:
-            draw_arrow(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_COLOR:
-            set_color(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case SET_FONT:
-            set_font(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case FULLSCREEN:
-            fullscreen(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case TAKE_SNAPSHOT:
-            take_snapshot(act, instance, other);
-            return ReturnValue.SUCCESS;
-        case EFFECT:
-            effect(act, instance, other);
-            return ReturnValue.SUCCESS;
+                return ReturnValue.FAILURE;
+            case SET_MOUSE:
+                // TODO: set mouse
+                return ReturnValue.FAILURE;
+            case OPEN_WEBPAGE:
+                open_webpage(act, instance, other);
+                return ReturnValue.SUCCESS;
+                // draw
+            case DRAW_SPRITE:
+                draw_sprite(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_BACKGROUND:
+                draw_background(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_TEXT:
+                draw_text(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_TEXT_SCALED:
+                draw_text_scaled(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_RECTANGLE:
+                draw_rectangle(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_GRADIENT_HOR:
+                draw_gradient_hor(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_GRADIENT_VERT:
+                draw_gradient_vert(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_ELLIPSE:
+                draw_ellipse(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_ELLIPSE_GRADIENT:
+                draw_ellipse_gradient(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_LINE:
+                draw_line(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case DRAW_ARROW:
+                draw_arrow(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_COLOR:
+                set_color(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case SET_FONT:
+                set_font(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case FULLSCREEN:
+                fullscreen(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case TAKE_SNAPSHOT:
+                take_snapshot(act, instance, other);
+                return ReturnValue.SUCCESS;
+            case EFFECT:
+                effect(act, instance, other);
+                return ReturnValue.SUCCESS;
         }
         return ReturnValue.FAILURE;
     }
@@ -527,42 +529,42 @@ public class ActionLibrary {
     // There are 18 question actions as of GM7
     private static boolean executeQuestion_(Action act, Instance instance, Instance other) {
         switch (act.lib.id) {
-        case IF_EMPTY:
-            return if_empty(act, instance, other);
-        case IF_COLLISION:
-            return if_collision(act, instance, other);
-        case IF_OBJECT:
-            return if_object(act, instance, other);
-        case IF_NUMBER:
-            return if_number(act, instance, other);
-        case IF_DICE:
-            return if_dice(act, instance, other);
-        case IF_QUESTION:
-            return if_action(act, instance, other);
-        case IF:
-            return if_action(act, instance, other);
-        case IF_MOUSE:
-            return if_mouse(act, instance, other);
-        case IF_ALIGNED:
-            return false;
-        case IF_SOUND:
-            return if_sound(act, instance, other);
-        case IF_SCORE:
-            return if_score(act, instance, other);
-        case IF_VARIABLE:
-            return if_variable(act, instance, other);
-        case IF_LIFE:
-            return if_life(act, instance, other);
-        case IF_HEALTH:
-            return if_health(act, instance, other);
-        case IF_PREVIOUS_ROOM:
-            return if_previous_room(act, instance, other);
-        case IF_NEXT_ROOM:
-            return if_next_room(act, instance, other);
-        case CD_IF_EXISTS:
-            return false;
-        case CD_IF_PLAYING:
-            return false;
+            case IF_EMPTY:
+                return if_empty(act, instance, other);
+            case IF_COLLISION:
+                return if_collision(act, instance, other);
+            case IF_OBJECT:
+                return if_object(act, instance, other);
+            case IF_NUMBER:
+                return if_number(act, instance, other);
+            case IF_DICE:
+                return if_dice(act, instance, other);
+            case IF_QUESTION:
+                return if_question(act, instance, other);
+            case IF:
+                return if_expression(act, instance, other);
+            case IF_MOUSE:
+                return if_mouse(act, instance, other);
+            case IF_ALIGNED:
+                return false;
+            case IF_SOUND:
+                return if_sound(act, instance, other);
+            case IF_SCORE:
+                return if_score(act, instance, other);
+            case IF_VARIABLE:
+                return if_variable(act, instance, other);
+            case IF_LIFE:
+                return if_life(act, instance, other);
+            case IF_HEALTH:
+                return if_health(act, instance, other);
+            case IF_PREVIOUS_ROOM:
+                return if_previous_room(act, instance, other);
+            case IF_NEXT_ROOM:
+                return if_next_room(act, instance, other);
+            case CD_IF_EXISTS:
+                return false;
+            case CD_IF_PLAYING:
+                return false;
         }
         return false;
     }
@@ -649,6 +651,13 @@ public class ActionLibrary {
         return Math.random() * sides < 1;
     }
 
+    private static boolean if_question(Action act, Instance instance, Instance other) {
+        String msg = GmlParser.getExpressionString(act.arguments.get(0), instance, other);
+        // TODO: real function, not this hack
+        int opt = JOptionPane.showConfirmDialog(null, msg, "Confirm", JOptionPane.YES_NO_OPTION);
+        return opt == JOptionPane.YES_OPTION;
+    }
+
     private static boolean if_number(Action act, Instance instance, Instance other) {
         // object, number, operation{Equal to|Smaller than|Larger than}
         int object = act.arguments.get(2).resVal;
@@ -682,7 +691,7 @@ public class ActionLibrary {
         return false;
     }
 
-    private static boolean if_action(Action act, Instance instance, Instance other) {
+    private static boolean if_expression(Action act, Instance instance, Instance other) {
         Constant val = act.arguments.get(0).exprVal.solve(instance, other);
         if (val.type == Constant.STRING)
             return false;
@@ -1124,9 +1133,9 @@ public class ActionLibrary {
 
     private static void variable(Action a, Instance instance, Instance other) {
         // variable name, value, relative
-        String name = a.arguments.get(0).val;
-        String val = a.arguments.get(1).val;
-        GmlParser.setVariable(name, val, a.relative, instance, other);
+        VariableRef r = a.arguments.get(0).variableVal;
+        Constant val = a.arguments.get(1).exprVal.solve(instance, other);
+        VariableManager.setVariable(r, val, a.relative, instance, other);
     }
 
     private static void draw_variable(Action a, Instance instance, Instance other) {

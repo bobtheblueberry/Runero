@@ -7,4 +7,13 @@ public class Variable {
     
     public boolean isExpression;
     public ExprArgument expression;
+    
+    public String toString() {
+        if (isExpression) {
+            return "(Expr) " + expression;
+        } else if (isArray) {
+            return "(Array) " + name + "(" + arrayIndex + ")";
+        } else
+            return (name == null) ? "<null>" : name;
+    }
 }

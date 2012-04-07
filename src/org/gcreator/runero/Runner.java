@@ -7,16 +7,29 @@ import org.gcreator.runero.gfx.RuneroDisplay;
 public class Runner {
 
     public static ResourceLoader rl;
+    public static boolean error_occurred = false;
+    public static String error_last = "";
 
-    public static void Error(String message) {
-        new ErrorDialog(null, "Runtime Error", message, (String)null);
+    public static void Error(final String message) {
+        error_occurred = true;
+        error_last = message;
+        
+        StackTraceElement[] e = new Throwable().getStackTrace();
+        String s = "";
+        for (StackTraceElement el : e)
+            s += el + "\n";
+        new ErrorDialog(null, "Runtime Error", message, s);
     }
 
     public static void Error(String message, String debugInfo) {
+        error_occurred = true;
+        error_last = message;
         new ErrorDialog(null, "Runtime Error", message, debugInfo);
     }
     
     public static void Error(String message, Throwable error) {
+        error_occurred = true;
+        error_last = message;
         new ErrorDialog(null, "Runtime Error", message, error);
     }
 

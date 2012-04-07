@@ -3,6 +3,9 @@ package org.gcreator.runero.gml.exec;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.gcreator.runero.Runner;
+import org.gcreator.runero.gml.VariableManager;
+import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.gml.exec.Expression.Type;
 import org.gcreator.runero.inst.Instance;
 
@@ -40,9 +43,12 @@ public class ExprArgument {
             if (e.type == Type.NUMBER || e.type == Type.STRING) {
                 exp.add(new Thing(e.constant));
             } else if (e.type == Type.VARIABLE) {
-                // TODO: solve variable
-                // solve(e.variable);
-                exp.add(new Thing(new Constant(567)));
+                VariableVal v = VariableManager.findVariable(e.variable, instance, other);
+                if (v == null) {
+                    Runner.Error("Unknown variable " + e.variable);
+                    continue;
+                }
+                exp.add(new Thing(v.getConstant()));
             } else if (e.type == Type.FUNCTION) {
                 // TODO: solve function
                 exp.add(new Thing(new Constant(123)));

@@ -7,6 +7,7 @@ public class Assignment implements Statement {
     }
     
     public final OPERATION op;
+    public VariableRef variable;
     public ExprArgument value;
     
     public Assignment(OPERATION op) {

@@ -71,26 +71,29 @@ public class GmlCompiler {
             return null;
         } else if (w.token == FUNCTION) {
             return getFunction((TokenWordPair) w);
-        } else if (w.token == VARIABLE || w.token == ARRAY) {
+        } else if (w.token == ARRAY) {
+            System.err.println("what why is array here noooo");
+            return null;
+        } else if (w.token == VARIABLE) {
             TokenWord next = next();
             if (next.token == ASSIGN_EQUAL || next.token == EQUAL) { // := =
-                return getAssignment(Assignment.OPERATION.SET);
+                return getAssignment(w, Assignment.OPERATION.SET);
             } else if (next.token == PLUS_EQUAL) { // +=
-                return getAssignment(Assignment.OPERATION.ADD);
+                return getAssignment(w, Assignment.OPERATION.ADD);
             } else if (next.token == MINUS_EQUAL) { // -=
-                return getAssignment(Assignment.OPERATION.SUB);
+                return getAssignment(w, Assignment.OPERATION.SUB);
             } else if (next.token == MULTIPLY_EQUAL) { // *=
-                return getAssignment(Assignment.OPERATION.MULTIPLY);
+                return getAssignment(w, Assignment.OPERATION.MULTIPLY);
             } else if (next.token == DIVIDE_EQUAL) { // /=
-                return getAssignment(Assignment.OPERATION.DIVIDE);
+                return getAssignment(w, Assignment.OPERATION.DIVIDE);
             } else if (next.token == MOD_EQUAL) { // %=
-                return getAssignment(Assignment.OPERATION.MOD);
+                return getAssignment(w, Assignment.OPERATION.MOD);
             } else if (next.token == AND_EQUAL) { // &=
-                return getAssignment(Assignment.OPERATION.AND);
+                return getAssignment(w, Assignment.OPERATION.AND);
             } else if (next.token == OR_EQUALS) { // |=
-                return getAssignment(Assignment.OPERATION.OR);
+                return getAssignment(w, Assignment.OPERATION.OR);
             } else if (next.token == XOR_EQUAL) { // ^=
-                return getAssignment(Assignment.OPERATION.XOR);
+                return getAssignment(w, Assignment.OPERATION.XOR);
             } else {
                 error("Unexpected " + next);
                 return null;
@@ -156,8 +159,14 @@ public class GmlCompiler {
         return d;
     }
 
+    @SuppressWarnings("unused")
     private Statement getSwitch() {
-        // TODO Auto-generated method stub
+        TokenWord expr = next();
+        Expression ex = getExpression(expr);
+        ArrayList<Statement> code = getBlock();
+
+        // TODO Switch statement (fun fun fun!)
+        // look for default: case: .... break/return/exit
         return null;
     }
 
@@ -269,8 +278,9 @@ public class GmlCompiler {
         return list;
     }
 
-    private Assignment getAssignment(Assignment.OPERATION op) {
+    private Assignment getAssignment(TokenWord var, Assignment.OPERATION op) {
         Assignment a = new Assignment(op);
+        a.variable = getVariable(var);
         a.value = getArgument(true);
         return a;
     }
@@ -278,6 +288,11 @@ public class GmlCompiler {
     public ExprArgument getArgument() {
         i--;
         return getArgument(false);
+    }
+
+    public VariableRef getVariable() {
+        i--;
+        return getVariable(tokens[0]);
     }
 
     /**
@@ -475,24 +490,7 @@ public class GmlCompiler {
             TokenWordPair func = (TokenWordPair) t;
             return new Expression(getFunction(func));
         } else if (t.token == VARIABLE) {
-            TokenVariable v = (TokenVariable) t;
-            VariableRef var = new VariableRef();
-            for (TokenVariableSub s : v.variables) {
-                Variable vv = new Variable();
-                if (s.isExpression) {
-                    vv.isExpression = true;
-                    vv.expression = getExpression(s.expression);
-                } else if (s.isArray) {
-                    vv.name = s.name;
-                    vv.isArray = true;
-                    vv.arrayIndex = getExpression(s.arrayIndex);
-                } else {
-                    vv.name = vv.name;
-                }
-                var.ref.add(vv);
-            }
-            return new Expression(var);
-
+            return new Expression(getVariable(t));
         } else if (t.token == PAR_OPEN) {
             return new Expression(getExpression((TokenGroup) t));
         } else if (t.token == AND)
@@ -533,7 +531,7 @@ public class GmlCompiler {
             return new Expression(Operator.BITW_AND);
         else if (t.token == BITW_OR)
             return new Expression(Operator.BITW_OR);
-        else if (t.token == XOR)
+        else if (t.token == BITW_XOR)
             return new Expression(Operator.BITW_XOR);
         else if (t.token == BITW_LEFT)
             return new Expression(Operator.BITW_LEFT);
@@ -544,6 +542,32 @@ public class GmlCompiler {
         regress();
         error("Unexpected in expression: " + t);
         return null;
+    }
+
+    private VariableRef getVariable(TokenWord t) {
+        if (t.token != VARIABLE) {
+            System.out.println("Not a variable! " + t);
+            return null;
+        }
+        TokenVariable v = (TokenVariable) t;
+        VariableRef var = new VariableRef();
+        for (TokenVariableSub s : v.variables) {
+            Variable vv = new Variable();
+            if (s.isExpression) {
+                vv.isExpression = true;
+                vv.expression = getExpression(s.expression);
+            } else if (s.isArray) {
+                vv.name = s.name;
+                vv.isArray = true;
+                vv.arrayIndex = getExpression(s.arrayIndex);
+            } else {
+                vv.name = s.name;
+            }
+            System.out.println("adding " + vv);
+            var.ref.add(vv);
+        }
+        return var;
+
     }
 
     private void error(String msg) {
