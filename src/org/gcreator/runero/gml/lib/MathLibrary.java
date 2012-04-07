@@ -3,6 +3,7 @@ package org.gcreator.runero.gml.lib;
 import java.util.Arrays;
 import java.util.Random;
 
+import org.gcreator.runero.Runner;
 import org.gcreator.runero.gml.FunctionLibrary;
 import org.gcreator.runero.gml.ReturnValue;
 import org.gcreator.runero.gml.VariableVal;
@@ -65,7 +66,7 @@ public class MathLibrary extends FunctionLibrary {
                 && !fn.equals("is_string") && !fn.equals("choose"))
             for (VariableVal v : args) {
                 if (!v.isReal) {
-                    System.err.println("Math Library given String for function " + fn);
+                    Runner.Error("Math Library given String for function " + fn);
                     return null;
                 }
             }

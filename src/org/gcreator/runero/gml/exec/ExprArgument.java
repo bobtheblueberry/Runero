@@ -51,7 +51,7 @@ public class ExprArgument {
                 exp.add(new Thing(v.getConstant()));
             } else if (e.type == Type.FUNCTION) {
                 // TODO: solve function
-                exp.add(new Thing(new Constant(123)));
+                exp.add(new Thing(new Constant(0)));
             } else if (e.type == Type.PARENTHESIS) {
                 exp.add(new Thing(e.parenthesis.solve()));
             } else if (e.type == Type.OPERATOR) {

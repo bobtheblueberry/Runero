@@ -10,7 +10,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Stack;
 
-import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.gml.lex.GmlLexer.CharData;
 import org.gcreator.runero.gml.lex.TokenVariable.TokenVariableSub;
 

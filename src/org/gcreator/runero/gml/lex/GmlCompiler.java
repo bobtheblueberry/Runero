@@ -563,7 +563,6 @@ public class GmlCompiler {
             } else {
                 vv.name = s.name;
             }
-            System.out.println("adding " + vv);
             var.ref.add(vv);
         }
         return var;

@@ -41,82 +41,80 @@ public class GmlInterpreter {
 
     private static int performAction(Action act, Event e, Instance instance, int i) {
         switch (act.lib.actionKind) {
-        case Action.ACT_NORMAL:
+            case Action.ACT_NORMAL:
+            case Action.ACT_VARIABLE:
 
-            if (act.lib.actionKind == ActionLibrary.INHERITED) {
-                // TODO: inherited events automatically
-                if (instance.parentId >= 0) {
-                    if (instance.parentId == instance.obj.getId()) {
-                        System.out.println("cant be yo own daddy bro");
-                        break;
-                    }
-                    GameObject parent = RuneroGame.game.getObject(instance.parentId);
-                    if (parent == null) {
-                        System.out.println("cannot event inherited; null parent");
-                        break;
-                    }
-                    // look for parent event
-                    if (!parent.hasEvent(e.parent.mainEvent)) {
-                        break;
-                    }
-                    for (Event event : parent.getMainEvent(e.parent.mainEvent).events) {
-                        if (event.type == e.type) {
-                            event.collisionObject = e.collisionObject;
-                            performEvent(event, instance);
+                if (act.lib.actionKind == ActionLibrary.INHERITED) {
+                    // TODO: inherited events automatically
+                    if (instance.parentId >= 0) {
+                        if (instance.parentId == instance.obj.getId()) {
+                            System.out.println("cant be yo own daddy bro");
+                            break;
                         }
+                        GameObject parent = RuneroGame.game.getObject(instance.parentId);
+                        if (parent == null) {
+                            System.out.println("cannot event inherited; null parent");
+                            break;
+                        }
+                        // look for parent event
+                        if (!parent.hasEvent(e.parent.mainEvent)) {
+                            break;
+                        }
+                        for (Event event : parent.getMainEvent(e.parent.mainEvent).events) {
+                            if (event.type == e.type) {
+                                event.collisionObject = e.collisionObject;
+                                performEvent(event, instance);
+                            }
+                        }
+                    }
+                    break;
+                }
+
+                boolean result = performAction(act, instance, e);
+                if (act.lib.question) {
+                    if (result) {
+                        return executeBlock(act.ifAction, instance, e, i);
+                    } else if (act.elseAction != null) {
+                        return executeBlock(act.elseAction, instance, e, i);
+                    } else {
+                        i = act.ifAction.actionEnd;
                     }
                 }
                 break;
-            }
-
-            boolean result = performAction(act, instance, e);
-            if (act.lib.question) {
-                if (result) {
-                    return executeBlock(act.ifAction, instance, e, i);
-                } else if (act.elseAction != null) {
-                    return executeBlock(act.elseAction, instance, e, i);
-                } else {
-                    i = act.ifAction.actionEnd;
-                }
-            }
-            break;
-        case Action.ACT_BEGIN:
-            // { should not happen
-            break;
-        case Action.ACT_END:
-            // } should not happen
-            break;
-        case Action.ACT_ELSE:
-            // else the game programmer is an idiot
-            break;
-        case Action.ACT_EXIT:
-            // stop performing event.
-            return -1;
-        case Action.ACT_REPEAT:
-            // TODO: Check to see what types GM uses
-            int times = Integer.parseInt(act.arguments.get(0).val);
-            int last = i;
-            for (int t = 0; t < times; t++)
-                last = executeBlock(act.repeatAction, instance, e, i);
-            return last;
-        case Action.ACT_VARIABLE:
-            // Handled by ActionLibrary
-            break;
-        case Action.ACT_CODE:
-            // Execute code
-            break;
-        case Action.ACT_PLACEHOLDER:
-            // Useless
-            break;
-        case Action.ACT_SEPARATOR:
-            // Useless
-            break;
-        case Action.ACT_LABEL:
-            // Also useless
-            break;
-        default:
-            System.err.println("This can't ever happen");
-            break;
+            case Action.ACT_BEGIN:
+                // { should not happen
+                break;
+            case Action.ACT_END:
+                // } should not happen
+                break;
+            case Action.ACT_ELSE:
+                // else the game programmer is an idiot
+                break;
+            case Action.ACT_EXIT:
+                // stop performing event.
+                return -1;
+            case Action.ACT_REPEAT:
+                // TODO: Check to see what types GM uses
+                int times = Integer.parseInt(act.arguments.get(0).val);
+                int last = i;
+                for (int t = 0; t < times; t++)
+                    last = executeBlock(act.repeatAction, instance, e, i);
+                return last;
+            case Action.ACT_CODE:
+                // Execute code
+                break;
+            case Action.ACT_PLACEHOLDER:
+                // Useless
+                break;
+            case Action.ACT_SEPARATOR:
+                // Useless
+                break;
+            case Action.ACT_LABEL:
+                // Also useless
+                break;
+            default:
+                System.err.println("This can't ever happen");
+                break;
         }
         return i;
     }
