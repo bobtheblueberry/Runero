@@ -8,7 +8,6 @@ import org.gcreator.runero.gml.Constant;
 import org.gcreator.runero.gml.VariableManager;
 import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.gml.exec.Expression.Type;
-import org.gcreator.runero.gml.lib.FunctionManager;
 import org.gcreator.runero.inst.Instance;
 
 /**
@@ -32,11 +31,6 @@ public class ExprArgument {
 
     int i;
 
-    public Constant solve() {
-        // TODO: variable and function system
-        return solve(null, null);
-    }
-
     public Constant solve(Instance instance, Instance other) {
         if (expressions.size() == 0)
             return null;
@@ -49,7 +43,7 @@ public class ExprArgument {
                 VariableVal v = VariableManager.findVariable(e.variable, instance, other);
                 if (v == null) {
                     Runner.Error("Unknown variable " + e.variable);
-                    continue;
+                    exp.add(new Thing(new Constant(0)));
                 }
                 exp.add(new Thing(v.getConstant()));
             } else if (e.type == Type.FUNCTION) {
@@ -57,10 +51,10 @@ public class ExprArgument {
                 if (res == null) {
                     System.err.println("unimplemented/unknown function " + e.function.name);
                     exp.add(new Thing(new Constant(0)));
-                }
-                exp.add(new Thing(res));
+                } else
+                    exp.add(new Thing(res));
             } else if (e.type == Type.PARENTHESIS) {
-                exp.add(new Thing(e.parenthesis.solve()));
+                exp.add(new Thing(e.parenthesis.solve(instance, other)));
             } else if (e.type == Type.OPERATOR) {
                 exp.add(new Thing(e.op));
             }
@@ -110,6 +104,8 @@ public class ExprArgument {
         performOp(Operator.XOR, exp);
         if (exp.size() > 1) {
             System.err.println("WHAT?? " + exp);
+        } else if (exp.isEmpty()) {
+            System.err.println("Empty! Noo: " + debugVal);
         } else {
             c = exp.get(0).c;
         }

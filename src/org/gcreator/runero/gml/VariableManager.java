@@ -37,7 +37,6 @@ public class VariableManager {
     }
 
     public static void setVariable(VariableRef r, Constant val, Instance instance, Instance other) {
-        System.out.println("SET VAR " + r + "=" + val);
         Variable v = r.ref.get(0);
         if (r.ref.size() == 1) {
             String name = v.name;
@@ -65,14 +64,17 @@ public class VariableManager {
                 return;
             // guess we'll set it for the instance..
             instance.setVar(v, val, other);
+        } else {
+            System.out.println("TODO: Set variable ");
+            // TODO: THIS
         }
 
     }
 
     public static VariableVal findVariable(VariableRef r, Instance instance, Instance other) {
-        System.out.println("Searching for variable " + r);
         Variable v = r.ref.get(0);
         VariableVal val = getVariable(v, instance, other);
+        
         if (r.ref.size() == 1) {
             if (v.isExpression) {
                 Runner.Error("Invalid variable reference");
@@ -80,6 +82,7 @@ public class VariableManager {
             }
             return val;
         }
+        // else
         int prev = (int) val.realVal;
         VariableVal value = null;
         for (int i = 1; i < r.ref.size(); i++) {

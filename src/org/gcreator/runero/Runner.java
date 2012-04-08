@@ -18,6 +18,8 @@ public class Runner {
         String s = "";
         for (StackTraceElement el : e)
             s += el + "\n";
+        System.err.println(message);
+        System.err.println(s);
         new ErrorDialog(null, "Runtime Error", message, s);
     }
 

@@ -29,7 +29,7 @@ public class GmlParser {
 
     public static double getExpression(ExprArgument a, Instance instance, Instance other) {
         try {
-            Constant c = a.solve();
+            Constant c = a.solve(instance, other);
 
             if (c == null) {
                 System.err.println("Error reading argument: " + a.debugVal);

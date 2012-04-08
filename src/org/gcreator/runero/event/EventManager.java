@@ -464,64 +464,40 @@ public class EventManager {
     private void addAlarmEvent(Event e) {
         switch (e.type) {
         case Event.EV_ALARM0:
-            if (alarm0 == null)
-                alarm0 = new LinkedList<Event>();
-            alarm0.add(e);
+            alarms[0].add(e);
             break;
         case Event.EV_ALARM1:
-            if (alarm1 == null)
-                alarm1 = new LinkedList<Event>();
-            alarm1.add(e);
+            alarms[1].add(e);
             break;
         case Event.EV_ALARM2:
-            if (alarm2 == null)
-                alarm2 = new LinkedList<Event>();
-            alarm2.add(e);
+            alarms[2].add(e);
             break;
         case Event.EV_ALARM3:
-            if (alarm3 == null)
-                alarm3 = new LinkedList<Event>();
-            alarm3.add(e);
+            alarms[3].add(e);
             break;
         case Event.EV_ALARM4:
-            if (alarm4 == null)
-                alarm4 = new LinkedList<Event>();
-            alarm4.add(e);
+            alarms[4].add(e);
             break;
         case Event.EV_ALARM5:
-            if (alarm5 == null)
-                alarm5 = new LinkedList<Event>();
-            alarm5.add(e);
+            alarms[5].add(e);
             break;
         case Event.EV_ALARM6:
-            if (alarm6 == null)
-                alarm6 = new LinkedList<Event>();
-            alarm6.add(e);
+            alarms[6].add(e);
             break;
         case Event.EV_ALARM7:
-            if (alarm7 == null)
-                alarm7 = new LinkedList<Event>();
-            alarm7.add(e);
+            alarms[7].add(e);
             break;
         case Event.EV_ALARM8:
-            if (alarm8 == null)
-                alarm8 = new LinkedList<Event>();
-            alarm8.add(e);
+            alarms[8].add(e);
             break;
         case Event.EV_ALARM9:
-            if (alarm9 == null)
-                alarm9 = new LinkedList<Event>();
-            alarm9.add(e);
+            alarms[9].add(e);
             break;
         case Event.EV_ALARM10:
-            if (alarm10 == null)
-                alarm10 = new LinkedList<Event>();
-            alarm10.add(e);
+            alarms[10].add(e);
             break;
         case Event.EV_ALARM11:
-            if (alarm11 == null)
-                alarm11 = new LinkedList<Event>();
-            alarm11.add(e);
+            alarms[11].add(e);
             break;
         }
     }
@@ -556,18 +532,8 @@ public class EventManager {
     // Draw events are handled differently;
     // alarm
     public boolean hasAlarmEvents;
-    public LinkedList<Event> alarm0;
-    public LinkedList<Event> alarm1;
-    public LinkedList<Event> alarm2;
-    public LinkedList<Event> alarm3;
-    public LinkedList<Event> alarm4;
-    public LinkedList<Event> alarm5;
-    public LinkedList<Event> alarm6;
-    public LinkedList<Event> alarm7;
-    public LinkedList<Event> alarm8;
-    public LinkedList<Event> alarm9;
-    public LinkedList<Event> alarm10;
-    public LinkedList<Event> alarm11;
+    @SuppressWarnings("unchecked")
+    public LinkedList<Event>[] alarms = new LinkedList[12];
     // step
     public boolean hasStepNormalEvents;
     public LinkedList<Event> stepNormal; // step middle

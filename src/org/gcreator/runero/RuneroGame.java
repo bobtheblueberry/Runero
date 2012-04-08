@@ -38,9 +38,9 @@ public class RuneroGame {
     public static RoomInstance room;
     public static RuneroDisplay display;
     public static TextureLoader tex;
-    public EventManager eventManager;
+    public EventManager em;
 
-    public File GameFolder = new File("/home/serge/Develop/ENIGMA/enigma-dev/RuneroGame");
+    public File GameFolder = new File("/home/serge/Develop/Runero/RuneroGame");
 
     public int[] roomOrder;
     public ArrayList<GameRoom> rooms;
@@ -84,7 +84,7 @@ public class RuneroGame {
     public RuneroGame() {
         super();
         RuneroGame.game = this;
-        eventManager = new EventManager();
+        em = new EventManager();
         globalVars = new ReferenceTable<VariableVal>();
         globalDotVars = new ReferenceTable<VariableVal>();
         tex = new TextureLoader();
@@ -99,7 +99,7 @@ public class RuneroGame {
             System.exit(1);
         }
         // Go to the first room
-        room = new RoomInstance(this, rooms.get(0));
+        room = new RoomInstance(this, rooms.get(2));
         GraphicsLibrary.gfx.setTitle(room.caption);
         room.init(true);
     }

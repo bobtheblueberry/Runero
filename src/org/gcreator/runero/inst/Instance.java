@@ -20,78 +20,81 @@ import org.newdawn.slick.opengl.Texture;
 
 public class Instance implements Comparable<Instance> {
 
-    public int alarm[] = new int[12];
-    public double depth;
+    public int                         alarm[]           = new int[12];
+    public double                      depth;
 
-    private double direction, speed; // use motion_set
-    private double hspeed, vspeed; // use setSpeed, setVSpeed, setHSpeed
+    private double                     direction, speed;               // use motion_set
+    private double                     hspeed, vspeed;                 // use setSpeed, setVSpeed, setHSpeed
 
-    public double friction;
-    public double gravity;
-    public double gravity_direction = 270;
-    public int mask_index = -1;
+    public double                      friction;
+    public double                      gravity;
+    public double                      gravity_direction = 270;
+    public int                         mask_index        = -1;
 
-    public double image_alpha;
-    public double image_angle;
-    public Color image_blend;
-    public double image_index;
-    public double image_single; // Deprecated
-    public double image_speed = 1.0;
-    public double image_xscale = 1.0;
-    public double image_yscale = 1.0;
-    public double sprite_index;
+    public double                      image_alpha;
+    public double                      image_angle;
+    public Color                       image_blend;
+    public double                      image_index;
+    public double                      image_single;                   // Deprecated
+    public double                      image_speed       = 1.0;
+    public double                      image_xscale      = 1.0;
+    public double                      image_yscale      = 1.0;
+    public double                      sprite_index;
 
-    public double timeline_index;
-    public double timeline_position;
-    public double timeline_speed;
+    public double                      timeline_index;
+    public double                      timeline_position;
+    public double                      timeline_speed;
 
-    public double path_endaction;
-    public double path_index = -1;
-    public double path_orientation;
-    public double path_position;
-    public double path_positionprevious;
-    public double path_scale;
-    public double path_speed;
-    public boolean persistent;
-    public boolean solid;
-    public boolean visible;
-    public double x, y;
-    public double xstart, ystart;
-    public double xprevious, yprevious;
-    public int image_number = 0; // * cannot be set manually
-    public int id;
+    public double                      path_endaction;
+    public double                      path_index        = -1;
+    public double                      path_orientation;
+    public double                      path_position;
+    public double                      path_positionprevious;
+    public double                      path_scale;
+    public double                      path_speed;
+    public boolean                     persistent;
+    public boolean                     solid;
+    public boolean                     visible;
+    public double                      x, y;
+    public double                      xstart, ystart;
+    public double                      xprevious, yprevious;
+    public int                         image_number      = 0;          // * cannot be set manually
+    public int                         id;
 
-    public int parentId; // not accessed directly in GML, must use GML function
+    public int                         parentId;                       // not accessed directly in GML, must use GML
+                                                                        // function
     /**
      * When an instance is marked as dead then it does nothing and waits to be destroyed
      */
-    public boolean isDead;
+    public boolean                     isDead;
 
-    public GameObject obj;
+    public GameObject                  obj;
     public ReferenceTable<VariableVal> variables;
 
-    public Instance(double x, double y, int id, GameObject obj) {
-        this.id = id;
-        this.obj = obj;
-        this.x = x;
-        this.y = y;
-        this.xstart = x;
-        this.ystart = y;
-        // Object variables
-        this.sprite_index = obj.spriteId;
-        this.solid = obj.solid;
-        this.visible = obj.visible;
-        this.depth = obj.depth;
-        this.persistent = obj.persistent; // TODO: Persistence for objects
-        this.parentId = obj.parentId;
-        this.mask_index = obj.maskId;
-        this.variables = new ReferenceTable<VariableVal>();
-        updateImageNumber();
-    }
+    public Instance(double x, double y, int id, GameObject obj)
+        {
+            this.id = id;
+            this.obj = obj;
+            this.x = x;
+            this.y = y;
+            this.xstart = x;
+            this.ystart = y;
+            // Object variables
+            this.sprite_index = obj.spriteId;
+            this.solid = obj.solid;
+            this.visible = obj.visible;
+            this.depth = obj.depth;
+            this.persistent = obj.persistent; // TODO: Persistence for objects
+            this.parentId = obj.parentId;
+            this.mask_index = obj.maskId;
+            this.variables = new ReferenceTable<VariableVal>();
+            updateImageNumber();
+        }
 
-    public Instance(GameRoom.StaticInstance i) {
-        this(i.x, i.y, i.id, RuneroGame.game.getObject(i.objectId));
-    }
+    public Instance(GameRoom.StaticInstance i)
+        {
+            this(i.x, i.y, i.id, RuneroGame.game.getObject(i.objectId));
+        }
 
     public void updateImageNumber() {
         GameSprite s = RuneroGame.game.getSprite((int) Math.round(sprite_index));
@@ -256,11 +259,13 @@ public class Instance implements Comparable<Instance> {
             Runner.Error("Cannot set built-in object variable '" + name + " to <String>");
             return;
         }
-        if (v.isArray) {
-            variables.put(GmlParser.getArrayName(v, this, other), new VariableVal(value));
+        if (builtin)
             return;
-        } else
+        if (v.isArray)
+            variables.put(GmlParser.getArrayName(v, this, other), new VariableVal(value));
+        else
             variables.put(name, new VariableVal(value));
+
     }
 
     public VariableVal getVariable(Variable v, Instance other) {
@@ -275,10 +280,11 @@ public class Instance implements Comparable<Instance> {
         } else if (val != null) {
             return val;
         }
-        if (v.isArray) {
+        if (v.isArray)
             return variables.get(GmlParser.getArrayName(v, this, other));
-        } else
+        else
             return variables.get(name);
+
     }
 
     private VariableVal getVar(String name) {
@@ -543,7 +549,8 @@ public class Instance implements Comparable<Instance> {
 
     @Override
     public int compareTo(Instance o) {
-        return Double.compare(depth, o.depth);
+        // Do it backwards (highest to lowest)
+        return Double.compare(o.depth, depth);
     }
 
     public String toString() {

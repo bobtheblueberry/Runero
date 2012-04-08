@@ -26,6 +26,7 @@ public class ObjectGroup implements Comparable<ObjectGroup> {
     
     @Override
     public int compareTo(ObjectGroup o) {
-        return Integer.compare(obj.depth, o.obj.depth);
+        // Do it backwards (highest to lowest)
+        return Integer.compare(o.obj.depth, obj.depth);
     }
 }

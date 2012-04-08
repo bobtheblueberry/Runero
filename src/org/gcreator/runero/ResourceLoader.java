@@ -60,7 +60,7 @@ public class ResourceLoader {
         loadBackgrounds();
         System.out.println("Loaded background data");
         loadObjects();
-        if (game.eventManager.hasCollisionEvents) Collections.sort(game.eventManager.collision);
+        if (game.em.hasCollisionEvents) Collections.sort(game.em.collision);
         System.out.println("Loaded object data");
         loadSprites();
         System.out.println("Loaded sprite data");
@@ -257,7 +257,7 @@ public class ResourceLoader {
                 indentEvent(ev);
                 e.addEvent(ev);
             }
-            game.eventManager.addObject(o);
+            game.em.addObject(o);
             r.close();
             game.objects.add(o);
         }

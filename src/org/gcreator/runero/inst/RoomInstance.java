@@ -2,9 +2,9 @@ package org.gcreator.runero.inst;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.collision.RuneroCollision;
@@ -19,7 +19,6 @@ import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameRoom.StaticInstance;
 import org.gcreator.runero.res.GameSprite;
-import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.opengl.Texture;
 
 public class RoomInstance {
@@ -52,11 +51,11 @@ public class RoomInstance {
         loadInstances();
         // TODO: Object creation code
         // Create Events
-        if (game.eventManager.hasCreateEvents)
-            EventExecutor.executeEvent(game.eventManager.create, this);
+        if (game.em.hasCreateEvents)
+            EventExecutor.executeEvent(game.em.create, this);
 
-        if (gameStart && game.eventManager.otherGameStart != null)
-            EventExecutor.executeEvent(game.eventManager.otherGameStart, this);
+        if (gameStart && game.em.otherGameStart != null)
+            EventExecutor.executeEvent(game.em.otherGameStart, this);
 
         if (room.creation_code != null) {
             // TODO: GMLScript.executeCode(room.creation_code);
@@ -139,6 +138,7 @@ public class RoomInstance {
      * 
      */
     public void destoryInstance(Instance instance) {
+        System.out.println("Destroy " + instance);
         instance.isDead = true;
         // destroy event
         if (instance.obj.hasEvent(MainEvent.EV_DESTROY)) {
@@ -148,7 +148,7 @@ public class RoomInstance {
     }
 
     public void changeInstance(Instance instance, GameObject newobj, boolean performEvents) {
-
+        System.out.println("Change " + instance + " into " + newobj.getName());
         EventQueue.addChangeEvent(instance, instance.obj.getId());
         try {
             if (performEvents) {
@@ -186,57 +186,72 @@ public class RoomInstance {
         EventQueue.processChange(this);
         EventQueue.processDestroy(this);
         // begin step
-        if (game.eventManager.hasStepBeginEvents)
-            EventExecutor.executeEvent(game.eventManager.stepBegin, this);
+        if (game.em.hasStepBeginEvents)
+            EventExecutor.executeEvent(game.em.stepBegin, this);
 
-        // TODO: alarm events
+        if (game.em.hasAlarmEvents)
+            for (int a = 0; a < game.em.alarms.length; a++) {
+                LinkedList<Event> l = game.em.alarms[a];
+                for (Event e : l)
+                    for (ObjectGroup g : instanceGroups)
+                        if (g.obj.getId() == e.object.getId())
 
-        // keyboard TODO: these are all broken
-        if (game.eventManager.hasKeyboardEvents)
-            for (Event e : game.eventManager.keyboardEvents) {
-                int type = Event.getGmKeyName(e.type);
-                // if (Keyboard.isKeyDown(type)) {
-                // EventExecutor.executeEvent(e, this);
-                // System.out.println("Keyboard " + KeyEvent.getKeyText(type));
-                // }
+                            for (Instance i : g.instances) {
+                                if (i.alarm[a] <= 0)
+                                    continue;
+                                i.alarm[a]--;
+                                if (i.alarm[a] == 0)
+                                    i.performEvent(e);
+                            }
             }
 
-        // key press
-        if (game.eventManager.hasKeyPressEvents)
-            for (Event e : game.eventManager.keyPressEvents) {
-                int type = Event.getGmKeyName(e.type);
-                if (Keyboard.isKeyDown(type)) { // TODO: This behaves in the same way as keyDown...
-                    EventExecutor.executeEvent(e, this);
-                    System.out.println("Key press " + KeyEvent.getKeyText(type));
-                }
-            }
-        // key release
-        if (game.eventManager.hasKeyReleaseEvents)
-            for (Event e : game.eventManager.keyReleaseEvents) {
-                int type = Event.getGmKeyName(e.type);
-                // TODO: THIs
-                if (false) { // TODO: This behaves in the same way as keyDown...
-                    EventExecutor.executeEvent(e, this);
-                    System.out.println("Key press " + KeyEvent.getKeyText(type));
-                }
-            }
+        /*
+                // keyboard TODO: these are all broken
+                if (game.eventManager.hasKeyboardEvents)
+                    for (Event e : game.eventManager.keyboardEvents) {
+                        int type = Event.getGmKeyName(e.type);
+                        // if (Keyboard.isKeyDown(type)) {
+                        // EventExecutor.executeEvent(e, this);
+                        // System.out.println("Keyboard " + KeyEvent.getKeyText(type));
+                        // }
+                    }
 
+                // key press
+                if (game.eventManager.hasKeyPressEvents)
+                    for (Event e : game.eventManager.keyPressEvents) {
+                        int type = Event.getGmKeyName(e.type);
+                        if (Keyboard.isKeyDown(type)) { // TODO: This behaves in the same way as keyDown...
+                            EventExecutor.executeEvent(e, this);
+                            System.out.println("Key press " + KeyEvent.getKeyText(type));
+                        }
+                    }
+                // key release
+                if (game.eventManager.hasKeyReleaseEvents)
+                    for (Event e : game.eventManager.keyReleaseEvents) {
+                        int type = Event.getGmKeyName(e.type);
+                        // TODO: THIs
+                        if (false) { // TODO: This behaves in the same way as keyDown...
+                            EventExecutor.executeEvent(e, this);
+                            System.out.println("Key press " + KeyEvent.getKeyText(type));
+                        }
+                    }
+        */
         // millions of mouse and joystick events
 
         // normal step
-        if (game.eventManager.hasStepNormalEvents)
-            EventExecutor.executeEvent(game.eventManager.stepNormal, this);
+        if (game.em.hasStepNormalEvents)
+            EventExecutor.executeEvent(game.em.stepNormal, this);
 
         // Move objects
         for (ObjectGroup g : instanceGroups)
             for (Instance i : g.instances)
                 i.move();
 
-        if (game.eventManager.hasOtherEvents) {
+        if (game.em.hasOtherEvents) {
             // TODO: path end
             // outside room
-            if (game.eventManager.otherOutsideRoom != null)
-                for (Event e : game.eventManager.otherOutsideRoom)
+            if (game.em.otherOutsideRoom != null)
+                for (Event e : game.em.otherOutsideRoom)
                     for (ObjectGroup g : instanceGroups)
                         if (g.obj.getId() == e.object.getId())
                             for (Instance i : g.instances)
@@ -245,8 +260,8 @@ public class RoomInstance {
 
             // TODO: Intersect boundary
         }
-        if (game.eventManager.hasCollisionEvents)
-            for (CollisionEvent ce : game.eventManager.collision) {
+        if (game.em.hasCollisionEvents)
+            for (CollisionEvent ce : game.em.collision) {
                 // look for instances
                 ObjectGroup g = getObjectGroup2(ce.event.object.getId());
                 ObjectGroup g2 = getObjectGroup2(ce.otherId);
@@ -261,19 +276,19 @@ public class RoomInstance {
 
             }
 
-        if (game.eventManager.hasOtherEvents) {
+        if (game.em.hasOtherEvents) {
             // No more lives
-            if (game.eventManager.otherNoMoreLives != null && game.lives <= 0) {
-                EventExecutor.executeEvent(game.eventManager.otherNoMoreLives, this);
+            if (game.em.otherNoMoreLives != null && game.lives <= 0) {
+                EventExecutor.executeEvent(game.em.otherNoMoreLives, this);
             }
             // No more health
-            if (game.eventManager.otherNoMoreLives != null && game.health <= 0) {
-                EventExecutor.executeEvent(game.eventManager.otherNoMoreHealth, this);
+            if (game.em.otherNoMoreLives != null && game.health <= 0) {
+                EventExecutor.executeEvent(game.em.otherNoMoreHealth, this);
             }
         }
         // end step
-        if (game.eventManager.hasStepEndEvents)
-            EventExecutor.executeEvent(game.eventManager.stepEnd, this);
+        if (game.em.hasStepEndEvents)
+            EventExecutor.executeEvent(game.em.stepEnd, this);
 
         // draw
         // have to wait for someone else to call render...
@@ -297,19 +312,18 @@ public class RoomInstance {
         drawBackgrounds(g, false);
         // Draw instances
         for (ObjectGroup og : instanceGroups)
-            for (Instance i : og.instances) {
-                if (i.obj.hasEvent(MainEvent.EV_DRAW)) {
+            for (Instance i : og.instances)
+                if (i.obj.hasEvent(MainEvent.EV_DRAW))
                     i.performEvent(i.obj.getMainEvent(MainEvent.EV_DRAW).events.get(0));
-                } else
+                else
                     i.draw(g);
-            }
 
         // Draw Foregrounds
         drawBackgrounds(g, true);
 
         // Animation end
-        if (game.eventManager.otherAnimationEnd != null)
-            for (Event e : game.eventManager.otherAnimationEnd)
+        if (game.em.otherAnimationEnd != null)
+            for (Event e : game.em.otherAnimationEnd)
                 for (ObjectGroup gr : instanceGroups)
                     if (gr.obj.getId() == e.object.getId())
                         for (Instance i : gr.instances)
