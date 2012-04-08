@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.gcreator.runero.Runner;
+import org.gcreator.runero.gml.Constant;
 import org.gcreator.runero.gml.VariableManager;
 import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.gml.exec.Expression.Type;
+import org.gcreator.runero.gml.lib.FunctionManager;
 import org.gcreator.runero.inst.Instance;
 
 /**
@@ -17,11 +19,12 @@ import org.gcreator.runero.inst.Instance;
  */
 public class ExprArgument {
     public ArrayList<Expression> expressions;
-    public String debugVal = "";
+    public String                debugVal = "";
 
-    public ExprArgument() {
-        expressions = new ArrayList<Expression>();
-    }
+    public ExprArgument()
+        {
+            expressions = new ArrayList<Expression>();
+        }
 
     public void add(Expression e) {
         expressions.add(e);
@@ -50,8 +53,12 @@ public class ExprArgument {
                 }
                 exp.add(new Thing(v.getConstant()));
             } else if (e.type == Type.FUNCTION) {
-                // TODO: solve function
-                exp.add(new Thing(new Constant(0)));
+                Constant res = e.function.solve(instance, other);
+                if (res == null) {
+                    System.err.println("unimplemented/unknown function " + e.function.name);
+                    exp.add(new Thing(new Constant(0)));
+                }
+                exp.add(new Thing(res));
             } else if (e.type == Type.PARENTHESIS) {
                 exp.add(new Thing(e.parenthesis.solve()));
             } else if (e.type == Type.OPERATOR) {
@@ -150,14 +157,14 @@ public class ExprArgument {
             } else if (t.op == Operator.LESS_EQUAL) {
                 t = new Thing(getBool(p.c.dVal <= n.c.dVal));
             } else if (t.op == Operator.EQUALS) {
-            boolean strp = p.c.type == Constant.STRING;
-            boolean strn = n.c.type == Constant.STRING;
-            if (strp ^ strn)
-                t = new Thing(getBool(false));
-            else if (strp && strn)
-                t = new Thing(getBool(p.c.sVal.equals(n.c.sVal)));
-            else
-                t = new Thing(getBool(p.c.dVal == n.c.dVal));
+                boolean strp = p.c.type == Constant.STRING;
+                boolean strn = n.c.type == Constant.STRING;
+                if (strp ^ strn)
+                    t = new Thing(getBool(false));
+                else if (strp && strn)
+                    t = new Thing(getBool(p.c.sVal.equals(n.c.sVal)));
+                else
+                    t = new Thing(getBool(p.c.dVal == n.c.dVal));
             } else if (t.op == Operator.NOT_EQUAL) {
                 boolean strp = p.c.type == Constant.STRING;
                 boolean strn = n.c.type == Constant.STRING;
@@ -206,14 +213,16 @@ public class ExprArgument {
     static class Thing {
         boolean isOp;
 
-        public Thing(Constant c) {
-            this.c = c;
-        }
+        public Thing(Constant c)
+            {
+                this.c = c;
+            }
 
-        public Thing(Operator op) {
-            this.op = op;
-            isOp = true;
-        }
+        public Thing(Operator op)
+            {
+                this.op = op;
+                isOp = true;
+            }
 
         public String toString() {
             if (isOp)

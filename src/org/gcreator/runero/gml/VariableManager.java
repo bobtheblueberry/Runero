@@ -2,7 +2,6 @@ package org.gcreator.runero.gml;
 
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.Runner;
-import org.gcreator.runero.gml.exec.Constant;
 import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.gml.exec.VariableRef;
 import org.gcreator.runero.inst.Instance;

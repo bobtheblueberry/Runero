@@ -4,10 +4,10 @@ import static org.gcreator.runero.gml.lex.Token.*;
 
 import java.util.ArrayList;
 
+import org.gcreator.runero.gml.Constant;
 import org.gcreator.runero.gml.exec.ExprArgument;
 import org.gcreator.runero.gml.exec.Assignment;
 import org.gcreator.runero.gml.exec.Break;
-import org.gcreator.runero.gml.exec.Constant;
 import org.gcreator.runero.gml.exec.Continue;
 import org.gcreator.runero.gml.exec.Do;
 import org.gcreator.runero.gml.exec.Expression;

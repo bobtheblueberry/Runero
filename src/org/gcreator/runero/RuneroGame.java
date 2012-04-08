@@ -9,11 +9,10 @@ import org.gcreator.runero.event.EventManager;
 import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gfx.RuneroDisplay;
 import org.gcreator.runero.gfx.TextureLoader;
-import org.gcreator.runero.gml.GmlLibrary;
+import org.gcreator.runero.gml.Constant;
 import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReferenceTable;
 import org.gcreator.runero.gml.VariableVal;
-import org.gcreator.runero.gml.exec.Constant;
 import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.inst.RoomInstance;
@@ -37,7 +36,6 @@ public class RuneroGame {
 
     public static RuneroGame game;
     public static RoomInstance room;
-    public static GmlLibrary library;
     public static RuneroDisplay display;
     public static TextureLoader tex;
     public EventManager eventManager;
@@ -86,7 +84,6 @@ public class RuneroGame {
     public RuneroGame() {
         super();
         RuneroGame.game = this;
-        library = new GmlLibrary();
         eventManager = new EventManager();
         globalVars = new ReferenceTable<VariableVal>();
         globalDotVars = new ReferenceTable<VariableVal>();
@@ -310,12 +307,12 @@ public class RuneroGame {
         if (v.isArray)
             name = GmlParser.getArrayName(v, instance, other);
         if (name.equals("gamemaker_registered")) {
-            VariableVal.Real(1);
+            return VariableVal.ONE;
         }// else if (name.equals("argument_relative")) {
-         // VariableVal.Real(argument_relative);
+         // new VariableVal(argument_relative);
          // }
          // else if (name.equals("argument")) {
-         // VariableVal.Real(arguments);
+         // new VariableVal(arguments);
          // }
 
         // TODO: Fix arguments
@@ -354,49 +351,49 @@ public class RuneroGame {
         }
 
         else if (name.equals("instance_count")) {
-            return VariableVal.Real(room.getInstanceCount());
+            return new VariableVal(room.getInstanceCount());
         } else if (name.equals("instance_id")) {// TODO: this is an array
-            return VariableVal.Real(0);
+            return new VariableVal(0);
         } else if (name.equals("room_speed")) {
-            return VariableVal.Real(room_speed);
+            return new VariableVal(room_speed);
         } else if (name.equals("fps")) {
-            return VariableVal.Real(fps);
+            return new VariableVal(fps);
         } else if (name.equals("current_time")) {
-            return VariableVal.Real(System.currentTimeMillis() / 1000);
+            return new VariableVal(System.currentTimeMillis() / 1000);
         } else if (name.equals("current_year")) {
-            return VariableVal.Real(Calendar.getInstance().get(Calendar.YEAR));
+            return new VariableVal(Calendar.getInstance().get(Calendar.YEAR));
         } else if (name.equals("current_month")) {
-            return VariableVal.Real(Calendar.getInstance().get(Calendar.MONTH));
+            return new VariableVal(Calendar.getInstance().get(Calendar.MONTH));
         } else if (name.equals("current_day")) {
-            return VariableVal.Real(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+            return new VariableVal(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
         } else if (name.equals("current_weekday")) {
-            return VariableVal.Real(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+            return new VariableVal(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
         } else if (name.equals("current_hour")) {
-            return VariableVal.Real(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+            return new VariableVal(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
         } else if (name.equals("current_minute")) {
-            return VariableVal.Real(Calendar.getInstance().get(Calendar.MINUTE));
+            return new VariableVal(Calendar.getInstance().get(Calendar.MINUTE));
         } else if (name.equals("current_second")) {
-            return VariableVal.Real(Calendar.getInstance().get(Calendar.SECOND));
+            return new VariableVal(Calendar.getInstance().get(Calendar.SECOND));
         } else if (name.equals("room")) {
-            return VariableVal.Real(room_index);
+            return new VariableVal(room_index);
         } else if (name.equals("room_first")) {
-            return VariableVal.Real(roomOrder[0]);
+            return new VariableVal(roomOrder[0]);
         } else if (name.equals("room_last")) {
-            return VariableVal.Real(roomOrder[roomOrder.length - 1]);
+            return new VariableVal(roomOrder[roomOrder.length - 1]);
         } else if (name.equals("room_width")) {
-            return VariableVal.Real(room.width);
+            return new VariableVal(room.width);
         } else if (name.equals("room_height")) {
-            return VariableVal.Real(room.height);
+            return new VariableVal(room.height);
         } else if (name.equals("room_caption")) {
             return new VariableVal(room.caption);
         } else if (name.equals("room_persistent")) {
             return VariableVal.Bool(room.room.persistent);
         } else if (name.equals("score")) {
-            return VariableVal.Real(score);
+            return new VariableVal(score);
         } else if (name.equals("lives")) {
-            return VariableVal.Real(lives);
+            return new VariableVal(lives);
         } else if (name.equals("health")) {
-            return VariableVal.Real(health);
+            return new VariableVal(health);
         } else if (name.equals("show_score")) {
             return VariableVal.Bool(show_score);
         } else if (name.equals("show_lives")) {
@@ -414,29 +411,29 @@ public class RuneroGame {
         } else if (name.equals("error_last")) {
             return new VariableVal(Runner.error_last);
         } else if (name.equals("keyboard_key")) {
-            return VariableVal.Real('c');// TODO ...
+            return new VariableVal('c');// TODO ...
         } else if (name.equals("keyboard_lastkey")) {
-            return VariableVal.Real('c');
+            return new VariableVal('c');
         } else if (name.equals("keyboard_lastchar")) {
-            return VariableVal.Real('c');
+            return new VariableVal('c');
         } else if (name.equals("keyboard_string")) {
             return new VariableVal("keyboard_string");// TODO
         } else if (name.equals("mouse_x")) {
-            return VariableVal.Real(Mouse.getX());
+            return new VariableVal(Mouse.getX());
         } else if (name.equals("mouse_y")) {
-            return VariableVal.Real(Mouse.getY());
+            return new VariableVal(Mouse.getY());
         } else if (name.equals("mouse_button")) {
-            return VariableVal.Real(0);
+            return new VariableVal(0);
         } else if (name.equals("mouse_lastbutton")) {
-            return VariableVal.Real(0);
+            return new VariableVal(0);
         } else if (name.equals("cursor_sprite")) {
-            return VariableVal.Real(cursor_sprite);
+            return new VariableVal(cursor_sprite);
         } else if (name.equals("background_color")) {
-            return VariableVal.Real(room.background_color.getRGB());
+            return new VariableVal(room.background_color.getRGB());
         } else if (name.equals("background_showcolor")) {
             return VariableVal.Bool(room.draw_background_color);
         } else if (name.equals("game_id")) {
-            return VariableVal.Real(0);// TODO: Game id
+            return new VariableVal(0);// TODO: Game id
         } else if (name.equals("working_directory")) {
             return new VariableVal(System.getProperty("user.dir"));
         } else if (name.equals("temp_directory")) {
@@ -444,7 +441,7 @@ public class RuneroGame {
         } else if (name.equals("program_directory")) {
             return new VariableVal(System.getProperty("user.dir"));
         } else if (name.equals("secure_mode")) {
-            return VariableVal.Real(0); // ff that stuff
+            return new VariableVal(0); // ff that stuff
         }
 
         return null;

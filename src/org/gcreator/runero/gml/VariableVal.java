@@ -1,34 +1,29 @@
 package org.gcreator.runero.gml;
 
-import org.gcreator.runero.gml.exec.Constant;
-
 /**
  * Holds a String or a double
  * 
  * @author serge
  *
  */
-public class VariableVal extends ReturnValue {
+public class VariableVal {
 
-    public String val;
-    public boolean isString = true;
-    public boolean isReal = false;
-    public double realVal = 0;
-    public static final VariableVal ZERO = Real(0);
-    public static final VariableVal ONE = Real(1);
+    public String                   val;
+    public boolean                  isString = true;
+    public boolean                  isReal   = false;
+    public double                   realVal  = 0;
+    public static final VariableVal ZERO     = new VariableVal(0), FALSE = ZERO;
+    public static final VariableVal ONE      = new VariableVal(1), TRUE = ONE;
+    
 
     public boolean isTrue() {
         return !isString && realVal == 1;
     }
 
-    public VariableVal() {
-        super(Type.VARIABLE);
-    }
-
-    public VariableVal(String s) {
-        super(Type.VARIABLE);
-        this.val = s;
-    }
+    public VariableVal(String s)
+        {
+            this.val = s;
+        }
 
     public void set(Constant c) {
         this.isString = c.type == Constant.STRING;
@@ -37,23 +32,22 @@ public class VariableVal extends ReturnValue {
         this.realVal = (isReal) ? c.dVal : 0;
     }
 
-    public VariableVal(Constant value) {
-        super(Type.VARIABLE);
-        if (value.type == Constant.STRING) {
-            this.val = value.sVal;
-            isString = true;
-        } else {
-            this.realVal = value.dVal;
+    public VariableVal(Constant value)
+        {
+            if (value.type == Constant.STRING) {
+                this.val = value.sVal;
+                isString = true;
+            } else {
+                this.realVal = value.dVal;
+                isReal = true;
+            }
+        }
+
+    public VariableVal(double val)
+        {
+            realVal = val;
             isReal = true;
         }
-    }
-
-    public static VariableVal Real(double val) {
-        VariableVal v = new VariableVal();
-        v.realVal = val;
-        v.isReal = true;
-        return v;
-    }
 
     public static VariableVal Bool(boolean val) {
         return val ? ONE : ZERO;

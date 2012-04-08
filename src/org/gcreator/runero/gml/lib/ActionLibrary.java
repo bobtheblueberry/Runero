@@ -10,11 +10,10 @@ import javax.swing.JOptionPane;
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.event.Action;
 import org.gcreator.runero.gfx.GraphicsLibrary;
+import org.gcreator.runero.gml.Constant;
 import org.gcreator.runero.gml.GmlParser;
-import org.gcreator.runero.gml.ReturnValue;
 import org.gcreator.runero.gml.VariableManager;
 import org.gcreator.runero.gml.VariableVal;
-import org.gcreator.runero.gml.exec.Constant;
 import org.gcreator.runero.gml.exec.VariableRef;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameBackground;
@@ -175,8 +174,8 @@ public class ActionLibrary {
 
     private static GraphicsLibrary g                     = GraphicsLibrary.gfx;
 
-    public static ReturnValue executeAction(Action act, Instance instance) {
-        return executeAction(act, instance, null);
+    public static void executeAction(Action act, Instance instance) {
+        executeAction(act, instance, null);
     }
 
     /**
@@ -186,337 +185,389 @@ public class ActionLibrary {
      * @param act
      * @return
      */
-    public static ReturnValue executeAction(Action act, Instance instance, Instance other) {
+    public static void executeAction(Action act, Instance instance, Instance other) {
         if (act.lib.question) {
             System.err.println("Error! Game Engine used wrong function to execute action");
-            return ReturnValue.FAILURE;
+            return;
         }
         if (act.lib.execType == Action.EXEC_NONE) {
             if (act.lib.id != COMMENT) {
                 System.out.println("?? Nothing action != Comment ?? " + act.lib.name);
             }
-            return ReturnValue.SUCCESS;
+            return;
         }
 
         switch (act.lib.id) {
         // move
             case ACTION_MOVE:
                 action_move(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_MOTION:
                 set_motion(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case MOVE_POINT:
                 move_point(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_HSPEED:
                 set_hspeed(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_VSPEED:
                 set_vspeed(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_GRAVITY:
                 set_gravity(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case REVERSE_XDIR:
                 reverse_xdir(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case REVERSE_YDIR:
                 reverse_ydir(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_FRICTION:
                 set_friction(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case MOVE_TO:
                 move_to(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case MOVE_START:
                 move_start(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case MOVE_RANDOM:
                 move_random(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SNAP:
                 snap(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case WRAP:
                 wrap(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case MOVE_CONTACT:
                 // TODO: This, and collision system
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case BOUNCE:
                 // TODO: This, and collision system
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PATH:
                 // TODO: Paths
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PATH_END:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PATH_POSITION:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PATH_SPEED:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case STEP_LINEAR:
                 // TODO: Stepping
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case STEP_POTENTIAL:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
                 // main1
             case CREATE_OBJECT:
                 create_object(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case CREATE_OBJECT_MOTION:
                 create_object_motion(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case CREATE_OBJECT_RANDOM:
                 create_object_random(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case CHANGE_OBJECT:
                 change_object(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case KILL_OBJECT:
                 kill_object(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case KILL_POSITION: // TODO: Implement this!
                 kill_position(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_SPRITE:
                 set_sprite(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case TRANSFORM_SPRITE:
                 transform_sprite(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case COLOR_SPRITE:
                 color_sprite(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_SPRITE_OLD: // Deprecated
                 set_sprite_old(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case BEGIN_SOUND:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case END_SOUND:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PREVIOUS_ROOM:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case NEXT_ROOM:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case CURRENT_ROOM:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case ANOTHER_ROOM:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
                 // main2
             case SET_ALARM:
                 set_alarm(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SLEEP:
                 sleep(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_TIMELINE:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case POSITION_TIMELINE:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case MESSAGE:
                 show_message(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SHOW_INFO:
                 show_info(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SHOW_VIDEO:
                 show_video(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
+            case SPLASH_TEXT:
+                splash_text(act, instance, other);
+                return;
+            case SPLASH_IMAGE:
+                splash_image(act, instance, other);
+                return;
+            case SPLASH_WEB:
+                splash_web(act, instance, other);
+                return;
+            case SPLASH_VIDEO:
+                splash_video(act, instance, other);
+                return;
+            case SPLASH_SETTINGS:
+                splash_settings(act, instance, other);
+                return;
             case RESTART_GAME:
                 restart_game(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case END_GAME:
                 end_game(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SAVE_GAME:
                 save_game(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case LOAD_GAME:
                 load_game(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case REPLACE_SPRITE:
                 replace_sprite(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case REPLACE_SOUND:
                 replace_sound(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case REPLACE_BACKGROUND:
                 replace_background(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
                 // control
             case INHERITED:
                 // This is actually handled by the action executor class.
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case CODE:
                 // TODO: This
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case EXECUTE_SCRIPT:
                 // TODO: this
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case VARIABLE:
                 variable(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_VARIABLE:
                 draw_variable(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
                 // score
             case SET_SCORE:
                 set_score(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_SCORE:
                 draw_score(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case HIGHSCORE_SHOW:
                 highscore_show(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case HIGHSCORE_CLEAR:
                 highscore_clear(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_LIFE:
                 set_life(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_LIFE:
                 draw_life(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_LIFE_IMAGES:
                 draw_life_images(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_HEALTH:
                 set_health(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_HEALTH:
                 draw_health(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_CAPTION:
                 set_caption(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
                 // extra i.e. never going to be implemented
             case PART_SYST_CREATE:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_SYST_DESTROY:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_SYST_CLEAR:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_TYPE_CREATE_OLD:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_TYPE_CREATE:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_TYPE_COLOR:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_TYPE_LIFE:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_TYPE_SPEED:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_TYPE_GRAVITY:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_TYPE_SECONDARY:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_EMIT_CREATE:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_EMIT_DESTROY:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_EMIT_BURST:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case PART_EMIT_STREAM:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case CD_PLAY:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case CD_STOP:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case CD_PAUSE:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case CD_RESUME:
 
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case SET_MOUSE:
                 // TODO: set mouse
-                return ReturnValue.FAILURE;
+                // TODO: THIS
+                return;
             case OPEN_WEBPAGE:
                 open_webpage(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
                 // draw
             case DRAW_SPRITE:
                 draw_sprite(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_BACKGROUND:
                 draw_background(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_TEXT:
                 draw_text(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_TEXT_SCALED:
                 draw_text_scaled(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_RECTANGLE:
                 draw_rectangle(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_GRADIENT_HOR:
                 draw_gradient_hor(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_GRADIENT_VERT:
                 draw_gradient_vert(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_ELLIPSE:
                 draw_ellipse(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_ELLIPSE_GRADIENT:
                 draw_ellipse_gradient(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_LINE:
                 draw_line(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case DRAW_ARROW:
                 draw_arrow(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_COLOR:
                 set_color(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case SET_FONT:
                 set_font(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case FULLSCREEN:
                 fullscreen(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case TAKE_SNAPSHOT:
                 take_snapshot(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
             case EFFECT:
                 effect(act, instance, other);
-                return ReturnValue.SUCCESS;
+                return;
         }
-        return ReturnValue.FAILURE;
     }
 
     public static boolean executeQuestion(Action act, Instance instance, Instance other) {
@@ -602,21 +653,21 @@ public class ActionLibrary {
 
     private static boolean if_life(Action act, Instance instance, Instance other) {
         // value, operation {equal to|smaller than|larger than}
-        VariableVal lives = VariableVal.Real(RuneroGame.game.lives);
+        VariableVal lives = new VariableVal(RuneroGame.game.lives);
         VariableVal val = GmlParser.solve(act.arguments.get(0).exprVal, instance, other);
         int op = act.arguments.get(1).menuVal;
         return compare(lives, val, op);
     }
 
     private static boolean if_health(Action act, Instance instance, Instance other) {
-        VariableVal health = VariableVal.Real(RuneroGame.game.health);
+        VariableVal health = new VariableVal(RuneroGame.game.health);
         VariableVal val = GmlParser.solve(act.arguments.get(0).exprVal, instance, other);
         int op = act.arguments.get(1).menuVal;
         return compare(health, val, op);
     }
 
     private static boolean if_score(Action act, Instance instance, Instance other) {
-        VariableVal score = VariableVal.Real(RuneroGame.game.score);
+        VariableVal score = new VariableVal(RuneroGame.game.score);
         VariableVal val = GmlParser.solve(act.arguments.get(0).exprVal, instance, other);
         int op = act.arguments.get(1).menuVal;
         return compare(score, val, op);

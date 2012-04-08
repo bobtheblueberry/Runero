@@ -22,6 +22,7 @@ import org.gcreator.runero.gml.CodeManager;
 import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReferenceTable;
 import org.gcreator.runero.gml.VariableVal;
+import org.gcreator.runero.gml.lib.FunctionManager;
 import org.gcreator.runero.res.Code;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
@@ -51,6 +52,9 @@ public class ResourceLoader {
         }
 
     public void loadResources() throws IOException {
+        FunctionManager.load();
+        System.out.println("Loaded function IDs");
+        
         loadRooms();
         System.out.println("Loaded room data");
         loadBackgrounds();
@@ -78,6 +82,7 @@ public class ResourceLoader {
         addResourceConstants(game.rooms);
 
         System.out.println("Loaded Constants");
+        
 
         // DEBUG TREE
         /*
@@ -126,7 +131,7 @@ public class ResourceLoader {
     private void addResourceConstants(ArrayList<? extends GameResource> res) {
         if (res == null) return;
         for (GameResource r : res)
-            game.constants.put(r.getName(), VariableVal.Real(r.getId()));
+            game.constants.put(r.getName(), new VariableVal(r.getId()));
     }
 
     private void loadConstants() throws IOException {
@@ -144,7 +149,7 @@ public class ResourceLoader {
             } else {
                 n = Double.parseDouble(vals[1]);
             }
-            game.constants.put(vals[0], VariableVal.Real(n));
+            game.constants.put(vals[0], new VariableVal(n));
         }
         r.close();
     }

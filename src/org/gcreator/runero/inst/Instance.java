@@ -7,11 +7,11 @@ import org.gcreator.runero.Runner;
 import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.gfx.GraphicsLibrary;
+import org.gcreator.runero.gml.Constant;
 import org.gcreator.runero.gml.GmlInterpreter;
 import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReferenceTable;
 import org.gcreator.runero.gml.VariableVal;
-import org.gcreator.runero.gml.exec.Constant;
 import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
@@ -283,123 +283,123 @@ public class Instance implements Comparable<Instance> {
 
     private VariableVal getVar(String name) {
         if (name.equals("x")) {
-            return VariableVal.Real(x);
+            return new VariableVal(x);
         } else if (name.equals("y")) {
-            return VariableVal.Real(y);
+            return new VariableVal(y);
         } else if (name.equals("xprevious")) {
-            return VariableVal.Real(xprevious);
+            return new VariableVal(xprevious);
         } else if (name.equals("yprevious")) {
-            return VariableVal.Real(yprevious);
+            return new VariableVal(yprevious);
         } else if (name.equals("xstart")) {
-            return VariableVal.Real(xstart);
+            return new VariableVal(xstart);
         } else if (name.equals("ystart")) {
-            return VariableVal.Real(ystart);
+            return new VariableVal(ystart);
         } else if (name.equals("hspeed")) {
-            return VariableVal.Real(hspeed);
+            return new VariableVal(hspeed);
         } else if (name.equals("vspeed")) {
-            return VariableVal.Real(vspeed);
+            return new VariableVal(vspeed);
         } else if (name.equals("direction")) {
-            return VariableVal.Real(direction);
+            return new VariableVal(direction);
         } else if (name.equals("speed")) {
-            return VariableVal.Real(speed);
+            return new VariableVal(speed);
         } else if (name.equals("friction")) {
-            return VariableVal.Real(friction);
+            return new VariableVal(friction);
         } else if (name.equals("gravity")) {
-            return VariableVal.Real(gravity);
+            return new VariableVal(gravity);
         } else if (name.equals("gravity_direction")) {
-            return VariableVal.Real(gravity_direction);
+            return new VariableVal(gravity_direction);
         } else if (name.equals("object_index")) {
-            return VariableVal.Real(obj.getId());
+            return new VariableVal(obj.getId());
         } else if (name.equals("id")) {
-            return VariableVal.Real(id);
+            return new VariableVal(id);
         } else if (name.equals("solid")) {
             return VariableVal.Bool(solid);
         } else if (name.equals("persistent")) {
             return VariableVal.Bool(persistent);
         } else if (name.equals("mask_index")) {
-            return VariableVal.Real(mask_index);
+            return new VariableVal(mask_index);
         } else if (name.equals("timeline_index")) {
-            return VariableVal.Real(timeline_index);
+            return new VariableVal(timeline_index);
         } else if (name.equals("timeline_position")) {
-            return VariableVal.Real(timeline_position);
+            return new VariableVal(timeline_position);
         } else if (name.equals("timeline_speed")) {
-            return VariableVal.Real(timeline_speed);
+            return new VariableVal(timeline_speed);
         } else if (name.equals("visible")) {
             return VariableVal.Bool(visible);
         } else if (name.equals("sprite_index")) {
-            return VariableVal.Real(sprite_index);
+            return new VariableVal(sprite_index);
         } else if (name.equals("sprite_width")) {
             GameSprite s = getSprite();
             if (s == null)
                 return VariableVal.ZERO;
-            return VariableVal.Real(s.width);
+            return new VariableVal(s.width);
         } else if (name.equals("sprite_height")) {
             GameSprite s = getSprite();
             if (s == null)
                 return VariableVal.ZERO;
-            return VariableVal.Real(s.height);
+            return new VariableVal(s.height);
         } else if (name.equals("sprite_xoffset")) {
             GameSprite s = getSprite();
             if (s == null)
                 return VariableVal.ZERO;
-            return VariableVal.Real(s.x);
+            return new VariableVal(s.x);
         } else if (name.equals("sprite_yoffset")) {
             GameSprite s = getSprite();
             if (s == null)
                 return VariableVal.ZERO;
-            return VariableVal.Real(s.y);
+            return new VariableVal(s.y);
         } else if (name.equals("image_number")) {
-            return VariableVal.Real(image_number);
+            return new VariableVal(image_number);
         } else if (name.equals("image_index")) {
-            return VariableVal.Real(image_index);
+            return new VariableVal(image_index);
         } else if (name.equals("image_speed")) {
-            return VariableVal.Real(image_speed);
+            return new VariableVal(image_speed);
         } else if (name.equals("depth")) {
-            return VariableVal.Real(depth);
+            return new VariableVal(depth);
         } else if (name.equals("image_xscale")) {
-            return VariableVal.Real(image_xscale);
+            return new VariableVal(image_xscale);
         } else if (name.equals("image_yscale")) {
-            return VariableVal.Real(image_yscale);
+            return new VariableVal(image_yscale);
         } else if (name.equals("image_angle")) {
-            return VariableVal.Real(image_angle);
+            return new VariableVal(image_angle);
         } else if (name.equals("image_alpha")) {
-            return VariableVal.Real(image_alpha);
+            return new VariableVal(image_alpha);
         } else if (name.equals("image_blend")) {
-            return VariableVal.Real((image_blend == null) ? 0 : image_blend.getRGB());
+            return new VariableVal((image_blend == null) ? 0 : image_blend.getRGB());
         } else if (name.equals("bbox_left")) {
             GameSprite s = getSprite();
             if (s == null)
                 return VariableVal.ZERO;
-            return VariableVal.Real(s.left);
+            return new VariableVal(s.left);
         } else if (name.equals("bbox_right")) {
             GameSprite s = getSprite();
             if (s == null)
                 return VariableVal.ZERO;
-            return VariableVal.Real(s.right);
+            return new VariableVal(s.right);
         } else if (name.equals("bbox_top")) {
             GameSprite s = getSprite();
             if (s == null)
                 return VariableVal.ZERO;
-            return VariableVal.Real(s.top);
+            return new VariableVal(s.top);
         } else if (name.equals("bbox_bottom")) {
             GameSprite s = getSprite();
             if (s == null)
                 return VariableVal.ZERO;
-            return VariableVal.Real(s.bottom);
+            return new VariableVal(s.bottom);
         } else if (name.equals("path_index")) {
-            return VariableVal.Real(path_index);
+            return new VariableVal(path_index);
         } else if (name.equals("path_position")) {
-            return VariableVal.Real(path_position);
+            return new VariableVal(path_position);
         } else if (name.equals("path_positionprevious")) {
-            return VariableVal.Real(path_positionprevious);
+            return new VariableVal(path_positionprevious);
         } else if (name.equals("path_speed")) {
-            return VariableVal.Real(path_speed);
+            return new VariableVal(path_speed);
         } else if (name.equals("path_scale")) {
-            return VariableVal.Real(path_scale);
+            return new VariableVal(path_scale);
         } else if (name.equals("path_orientation")) {
-            return VariableVal.Real(path_orientation);
+            return new VariableVal(path_orientation);
         } else if (name.equals("path_endaction")) {
-            return VariableVal.Real(path_endaction);
+            return new VariableVal(path_endaction);
         }
         return null;
     }

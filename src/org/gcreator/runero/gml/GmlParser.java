@@ -2,7 +2,6 @@ package org.gcreator.runero.gml;
 
 import java.awt.Color;
 
-import org.gcreator.runero.gml.exec.Constant;
 import org.gcreator.runero.gml.exec.ExprArgument;
 import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.inst.Instance;
@@ -49,7 +48,7 @@ public class GmlParser {
 
     public static VariableVal solve(ExprArgument a, Instance instance, Instance other) {
         Constant c = a.solve(instance, other);
-        VariableVal v = (c.type == Constant.NUMBER) ? VariableVal.Real(c.dVal) : new VariableVal(c.sVal);
+        VariableVal v = (c.type == Constant.NUMBER) ? new VariableVal(c.dVal) : new VariableVal(c.sVal);
         return v;
     }
 
