@@ -72,6 +72,7 @@ public class RuneroGame {
     public String caption_health; // The caption used for the health.
     public int room_index; // the current room index; 'room' in GML
     public int cursor_sprite;
+
     public String keyboard_string = "";
     public int mouse_button;
     public int mouse_lastbutton;
@@ -81,15 +82,16 @@ public class RuneroGame {
 
     public int fps = 100002;
 
-    public RuneroGame() {
-        super();
-        RuneroGame.game = this;
-        em = new EventManager();
-        globalVars = new ReferenceTable<VariableVal>();
-        globalDotVars = new ReferenceTable<VariableVal>();
-        tex = new TextureLoader();
-        gameStart();
-    }
+    public RuneroGame()
+        {
+            super();
+            RuneroGame.game = this;
+            em = new EventManager();
+            globalVars = new ReferenceTable<VariableVal>();
+            globalDotVars = new ReferenceTable<VariableVal>();
+            tex = new TextureLoader();
+            gameStart();
+        }
 
     public void loadGame() {
 
@@ -196,9 +198,11 @@ public class RuneroGame {
      * @param val
      * @return whether not the variable was set
      */
-    public boolean setVariable(Variable v, Constant val) {
+    public boolean setVariable(Variable v, Constant val, Instance instance, Instance other) {
         String name = v.name;
-
+        int i = 0;
+        if (v.isArray)
+            i = (int) v.arrayIndex.solve(instance, other).dVal;
         // TODO: argument[] argument0...15
         if (name.equals("caption")) {
             room.caption = val.sVal;
@@ -280,25 +284,54 @@ public class RuneroGame {
         } else if (name.equals("background_showcolor")) {
             room.draw_background_color = val.dVal > 0.5;
             return true;
+        } else if (name.equals("background_visible")) {
+            room.backgrounds[i].visible = val.dVal > 0.5;
+            return true;
+        } else if (name.equals("background_foreground")) {
+            room.backgrounds[i].foreground = val.dVal > 0.5;
+            return true;
+        } else if (name.equals("background_index")) {
+            room.backgrounds[i].backgroundId = (int) val.dVal;
+            return true;
+        } else if (name.equals("background_x")) {
+            room.backgrounds[i].x = (int) val.dVal;
+            return true;
+        } else if (name.equals("background_y")) {
+            room.backgrounds[i].y = (int) val.dVal;
+            return true;
+        } else if (name.equals("background_width")) {
+            // ERROR! cannot set
+            System.err.println("Cannot set background width!");
+            return true;
+        } else if (name.equals("background_height")) {
+            System.err.println("Cannot set background height!");
+            return true;
+        } else if (name.equals("background_htiled")) {
+            room.backgrounds[i].tileHoriz = val.dVal > 0.5;
+            return true;
+        } else if (name.equals("background_vtiled")) {
+            room.backgrounds[i].tileVert = val.dVal > 0.5;
+            return true;
+        } else if (name.equals("background_xscale")) {
+            room.backgrounds[i].xscale = val.dVal;
+            return true;
+        } else if (name.equals("background_yscale")) {
+            room.backgrounds[i].yscale = val.dVal;
+            return true;
+        } else if (name.equals("background_hspeed")) {
+            room.backgrounds[i].hSpeed = val.dVal;
+            return true;
+        } else if (name.equals("background_vspeed")) {
+            room.backgrounds[i].vSpeed = val.dVal;
+            return true;
+        } else if (name.equals("background_blend")) {
+            room.backgrounds[i].blend = new Color((int) val.dVal);
+            return true;
+        } else if (name.equals("background_alpha")) {
+            room.backgrounds[i].alpha = val.dVal;
+            return true;
         }
-
-        /*TODO:
-         * background_visible[0..7] 
-        background_foreground[0..7] 
-        background_index[0..7] 
-        background_x[0..7] 
-        background_y[0...7] 
-        background_width[0...7]* 
-        background_height[0...7]* 
-        background_htiled[0..7] 
-        background_vtiled[0..7] 
-        background_xscale[0..7] 
-        background_yscale[0..7] 
-        background_hspeed[0..7] 
-        background_vspeed[0..7] 
-        background_blend[0..7] 
-        background_alpha[0..7] 
-         * */
+        //TODO: views, tiles
         return false;
     }
 

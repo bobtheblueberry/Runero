@@ -31,7 +31,7 @@ public class Instance implements Comparable<Instance> {
     public double                      gravity_direction = 270;
     public int                         mask_index        = -1;
 
-    public double                      image_alpha;
+    public double                      image_alpha       = 1.0;
     public double                      image_angle;
     public Color                       image_blend;
     public double                      image_index;
@@ -118,7 +118,7 @@ public class Instance implements Comparable<Instance> {
         return (int) Math.round(image_index);
     }
 
-    public void setVar(Variable v, Constant value, Instance other) {
+    public void setVariable(Variable v, Constant value, Instance other) {
         // TODO: Pre-runtime checking...
         String name = v.name;
         if (name.equals("path_index")) {
@@ -515,12 +515,11 @@ public class Instance implements Comparable<Instance> {
         }
         s.load(); // load sub image files
         Texture img = s.getSubImage((int) Math.round(image_index));
-        // TODO: angle, scale, color blend
         if (img == null) {
             System.out.println("Null image for sprite " + s.getName() + " index " + image_index);
             return;
         }
-        g.drawTexture(img, x - s.x, y - s.y);
+        g.drawTexture(img, x - s.x, y - s.y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
     }
 
     public double getSpeed() {

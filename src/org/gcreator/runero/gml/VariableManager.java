@@ -60,21 +60,68 @@ public class VariableManager {
                 return;
             }
             // try to set it as a game var
-            if (RuneroGame.game.setVariable(v, val))
+            if (RuneroGame.game.setVariable(v, val, instance, other))
                 return;
             // guess we'll set it for the instance..
-            instance.setVar(v, val, other);
+            instance.setVariable(v, val, other);
         } else {
-            System.out.println("TODO: Set variable ");
-            // TODO: THIS
+
+            VariableVal first = findVariable(r, instance, other, true);
+            int ref = (int) first.realVal;
+            v = r.ref.get(r.ref.size() - 2);
+            String name = v.name;
+            if (v.isArray)
+                name = GmlParser.getArrayName(v, instance, other);
+            else if (v.isExpression) {
+                Runner.Error("What r u doin???");
+                return;
+            }
+            if (ref == -1 || ref == -7) {// self, local
+               instance.setVariable(v, val, other);
+            } else if (ref == -2) { // other
+                other.setVariable(v, val, other);
+            } else if (ref == -3) { // all
+                for (ObjectGroup o : RuneroGame.room.instanceGroups)
+                    for (Instance i : o.instances)
+                        i.setVariable(v, val, other);
+            } else if (ref == -4) {// noone
+                // noo
+            } else if (ref == -5) {// global
+                RuneroGame.game.globalDotVars.put(name, new VariableVal(val));
+            } else if (ref > 100000) {
+                Instance i = RuneroGame.room.getInstance(ref);
+                if (i == null) {
+                    Runner.Error("Unknown instance with ID " + ref);
+                    return;
+                }
+                i.setVariable(v, val, other);
+            } else {
+                // look for object
+                GameObject g = RuneroGame.game.getObject(ref);
+                if (g == null) {
+                    Runner.Error("Unknown object ID " + ref);
+                    return;
+                }
+                ObjectGroup o = RuneroGame.room.getObjectGroup2(ref);
+                if (o == null || o.instances.isEmpty()) {
+                    Runner.Error("No instance of " + g.getName() + " in room");
+                    return;
+                }
+                for (Instance i : o.instances)
+                    i.setVariable(v, val, other);
+            }
         }
 
     }
 
     public static VariableVal findVariable(VariableRef r, Instance instance, Instance other) {
+        return findVariable(r, instance, other, false);
+    }
+
+    public static VariableVal findVariable(VariableRef r, Instance instance, Instance other, boolean notlast) {
         Variable v = r.ref.get(0);
         VariableVal val = getVariable(v, instance, other);
-        
+
         if (r.ref.size() == 1) {
             if (v.isExpression) {
                 Runner.Error("Invalid variable reference");
@@ -85,7 +132,10 @@ public class VariableManager {
         // else
         int prev = (int) val.realVal;
         VariableVal value = null;
-        for (int i = 1; i < r.ref.size(); i++) {
+        int len = r.ref.size();
+        if (notlast)
+            len--;
+        for (int i = 1; i < len; i++) {
             value = getVar(prev, r.ref.get(i), instance, other);
             prev = (int) value.realVal;
         }

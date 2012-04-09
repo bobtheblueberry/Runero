@@ -19,10 +19,11 @@ import org.newdawn.slick.opengl.Texture;
 public class GraphicsLibrary {
 
     private TrueTypeFont font;
-    public int fontAlign; // Font alignment, 0,1,2 (left,center,right), respectively
+    public int           fontAlign; // Font alignment, 0,1,2 (left,center,right), respectively
 
-    private GraphicsLibrary() {
-    }
+    private GraphicsLibrary()
+        {
+        }
 
     public void init() {
         font = new TrueTypeFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12), true);
@@ -33,9 +34,13 @@ public class GraphicsLibrary {
     public void setTitle(String s) {
         Display.setTitle(s);
     }
-    
+
     public void setColor(Color c) {
         glColor4d(c.getRed() / 255.0, c.getGreen() / 255.0, c.getBlue() / 255.0, c.getAlpha() / 255.0);
+    }
+
+    public void setColor(Color c, double alpha) {
+        glColor4d(c.getRed() / 255.0, c.getGreen() / 255.0, c.getBlue() / 255.0, alpha);
     }
 
     public void setClearColor(Color c) {
@@ -218,8 +223,31 @@ public class GraphicsLibrary {
             drawTexture(bi, x, y, w, h);
     }
 
+    /**
+     * Draw Texture
+     * 
+     * @param x x-coord
+     * @param y y-coord
+     */
+    public void drawTexture(Texture t, double x, double y) {
+        drawTexture(t, x, y, t.getImageWidth(), t.getImageHeight());
+    }
+
     public void drawTexture(Texture t, double x, double y, double width, double height) {
-        glColor4d(1, 1, 1, 1);
+        drawTexture(t, x, y, width, height, 1, 1, 0, null, 1.0);
+    }
+
+    public void drawTexture(Texture t, double x, double y, double xscale, double yscale, double angle, Color blend, double alpha) {
+        drawTexture(t, x, y, t.getImageWidth(), t.getImageHeight(), 1, 1, 0, blend, alpha);
+    }
+
+    public void drawTexture(Texture t, double x, double y, double width, double height, double xscale, double yscale,
+            double angle, Color blend, double alpha) {
+        if (blend == null)
+            glColor4d(1, 1, 1, alpha);
+        else
+            setColor(blend, alpha);
+
         // store the current model matrix
         glPushMatrix();
         // bind to the appropriate texture for this sprite
@@ -227,7 +255,7 @@ public class GraphicsLibrary {
 
         // translate to the right location and prepare to draw
         glTranslated(x, y, 0);
-
+        glRotated(angle, xscale, yscale, 0);
         // draw a quad textured to match the sprite
         glBegin(GL_QUADS);
         {
@@ -267,19 +295,9 @@ public class GraphicsLibrary {
         RuneroGame.room.render(this);
     }
 
-    /**
-     * Draw Texture
-     * 
-     * @param x x-coord
-     * @param y y-coord
-     */
-    public void drawTexture(Texture t, double x, double y) {
-        drawTexture(t, x, y, t.getImageWidth(), t.getImageHeight());
-    }
-
     public void setFont(GameFont f) {
-       //TODO: fonts are broken
-       // font = f.load();
+        // TODO: fonts are broken
+        // font = f.load();
     }
 
     public void drawString(String text, float x, float y) {
@@ -287,15 +305,15 @@ public class GraphicsLibrary {
     }
 
     public void drawString(float x, float y, String text) {
-       // font.drawString(x, y, text, 1, 1, fontAlign);
+        // font.drawString(x, y, text, 1, 1, fontAlign);
     }
 
     public void drawString(float x, float y, String text, float xscale, float yscale, float angle) {
-     //   font.drawString(x, y, text, 1, 1, xscale, yscale, angle, fontAlign);
+        // font.drawString(x, y, text, 1, 1, xscale, yscale, angle, fontAlign);
     }
 
     public void drawString(double x, double y, String text, double xscale, double yscale, double angle) {
-        //font.drawString((float) x, (float) y, text, 1, 1, (float) xscale, (float) yscale, (float) angle, fontAlign);
+        // font.drawString((float) x, (float) y, text, 1, 1, (float) xscale, (float) yscale, (float) angle, fontAlign);
     }
 
     public void saveScreenshot(File file) {

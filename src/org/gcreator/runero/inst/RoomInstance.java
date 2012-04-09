@@ -17,8 +17,12 @@ import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
+import org.gcreator.runero.res.GameRoom.Background;
 import org.gcreator.runero.res.GameRoom.StaticInstance;
+import org.gcreator.runero.res.GameRoom.Tile;
+import org.gcreator.runero.res.GameRoom.View;
 import org.gcreator.runero.res.GameSprite;
+import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.opengl.Texture;
 
 public class RoomInstance {
@@ -35,6 +39,9 @@ public class RoomInstance {
 
     private int                   instance_count;
     private static int            instance_nextid = 100000;
+    public Background[]           backgrounds;
+    public View[]                 views;
+    public Tile[]                 tiles;
 
     public RoomInstance(RuneroGame game, GameRoom room)
         {
@@ -45,6 +52,9 @@ public class RoomInstance {
             this.background_color = room.background_color;
             this.draw_background_color = room.draw_background_color;
             this.caption = room.caption;
+            backgrounds = new Background[room.backgrounds.length];
+            for (int i = 0; i < backgrounds.length; i++)
+                backgrounds[i] = room.backgrounds[i].copy();
         }
 
     public void init(boolean gameStart) {
@@ -205,37 +215,42 @@ public class RoomInstance {
                             }
             }
 
-        /*
-                // keyboard TODO: these are all broken
-                if (game.eventManager.hasKeyboardEvents)
-                    for (Event e : game.eventManager.keyboardEvents) {
-                        int type = Event.getGmKeyName(e.type);
-                        // if (Keyboard.isKeyDown(type)) {
-                        // EventExecutor.executeEvent(e, this);
-                        // System.out.println("Keyboard " + KeyEvent.getKeyText(type));
-                        // }
-                    }
+        while (Keyboard.next()) {
+            game.keyboard_string += Keyboard.getEventCharacter();
+            game.keyboard_lastchar = String.valueOf(Keyboard.getEventCharacter());
 
-                // key press
-                if (game.eventManager.hasKeyPressEvents)
-                    for (Event e : game.eventManager.keyPressEvents) {
-                        int type = Event.getGmKeyName(e.type);
-                        if (Keyboard.isKeyDown(type)) { // TODO: This behaves in the same way as keyDown...
-                            EventExecutor.executeEvent(e, this);
-                            System.out.println("Key press " + KeyEvent.getKeyText(type));
-                        }
+            // keyboard TODO: these are all broken
+            if (game.em.hasKeyboardEvents)
+                for (Event e : game.em.keyboardEvents) {
+                    int type = e.type;
+                    // if (Keyboard.isKeyDown(type)) {
+                    // EventExecutor.executeEvent(e, this);
+                    // System.out.println("Keyboard " + KeyEvent.getKeyText(type));
+                    // }
+                }
+
+            // key press
+            if (game.em.hasKeyPressEvents)
+                for (Event e : game.em.keyPressEvents) {
+                    int type = e.type;
+                    if (Keyboard.isKeyDown(type)) {
+                        EventExecutor.executeEvent(e, this);
                     }
-                // key release
-                if (game.eventManager.hasKeyReleaseEvents)
-                    for (Event e : game.eventManager.keyReleaseEvents) {
-                        int type = Event.getGmKeyName(e.type);
-                        // TODO: THIs
-                        if (false) { // TODO: This behaves in the same way as keyDown...
-                            EventExecutor.executeEvent(e, this);
-                            System.out.println("Key press " + KeyEvent.getKeyText(type));
-                        }
+                }
+            // key release
+            if (game.em.hasKeyReleaseEvents)
+                for (Event e : game.em.keyReleaseEvents) {
+                    int type = e.type;
+                    // TODO: THI
+                    if (false) {
+                        // TODO: This behaves in the same way as keyDown
+                        EventExecutor.executeEvent(e, this);
                     }
-        */
+                }
+            if (Keyboard.isKeyDown(Keyboard.KEY_SPACE))
+                System.out.println("SPACE!");
+        }
+
         // millions of mouse and joystick events
 
         // normal step
