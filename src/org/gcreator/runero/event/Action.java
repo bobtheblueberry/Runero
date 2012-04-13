@@ -2,7 +2,7 @@ package org.gcreator.runero.event;
 
 import java.util.ArrayList;
 
-import org.lateralgm.resources.library.RLibAction;
+import org.lateralgm.resources.library.gc.LibAction;
 
 public class Action {
 
@@ -26,13 +26,13 @@ public class Action {
     public boolean not = false;
     public int appliesTo;
 
-    public final RLibAction lib;
+    public final LibAction lib;
     public ArrayList<Argument> arguments;
     public BlockAction ifAction; // used for Question actions
     public BlockAction elseAction;
     public BlockAction repeatAction; // used for Repeat actions
 
-    public Action(RLibAction lib) {
+    public Action(LibAction lib) {
         this.lib = lib;
         arguments = new ArrayList<Argument>();
     }

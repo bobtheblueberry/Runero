@@ -1,10 +1,12 @@
 package org.gcreator.runero.gml.lib;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.gcreator.runero.gml.Constant;
-import org.lateralgm.file.StreamDecoder;
+import org.lateralgm.file.gc.StreamDecoder;
 
 public class FunctionManager {
 
@@ -16,7 +18,13 @@ public class FunctionManager {
 
     public static void load() {
         try {
-            StreamDecoder in = new StreamDecoder(new FileInputStream("fnames"));
+            InputStream s;
+            try {
+                s = new FileInputStream("fnames");
+            } catch (FileNotFoundException exc) {
+                s = FunctionManager.class.getResourceAsStream("/fnames");
+            }
+            StreamDecoder in = new StreamDecoder(s);
             int num = in.read4();
             ids = new String[num];
             System.out.println("Functions: " + num);
@@ -31,13 +39,13 @@ public class FunctionManager {
     }
 
     public static int getId(String name) {
-        for (int i = 0; i < ids.length; i++) 
+        for (int i = 0; i < ids.length; i++)
             if (ids[i].equals(name))
                 return i;
-            
+
         return -1;
     }
-    
+
     public static Constant getFunction(int id, Constant... args) {
 
         Constant arg0 = null, arg1 = null, arg2 = null, arg3 = null, arg4 = null, arg5 = null;

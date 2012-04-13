@@ -40,8 +40,6 @@ public class RuneroGame {
     public static TextureLoader tex;
     public EventManager em;
 
-    public File GameFolder = new File("/home/serge/Develop/Runero/RuneroGame");
-
     public int[] roomOrder;
     public ArrayList<GameRoom> rooms;
     public ArrayList<GameBackground> backgrounds;
@@ -101,7 +99,7 @@ public class RuneroGame {
             System.exit(1);
         }
         // Go to the first room
-        room = new RoomInstance(this, rooms.get(2));
+        room = new RoomInstance(this, rooms.get(0));
         GraphicsLibrary.gfx.setTitle(room.caption);
         room.init(true);
     }

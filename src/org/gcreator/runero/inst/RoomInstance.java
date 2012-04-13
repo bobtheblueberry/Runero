@@ -202,6 +202,8 @@ public class RoomInstance {
         if (game.em.hasAlarmEvents)
             for (int a = 0; a < game.em.alarms.length; a++) {
                 LinkedList<Event> l = game.em.alarms[a];
+                if (l == null)
+                    continue;
                 for (Event e : l)
                     for (ObjectGroup g : instanceGroups)
                         if (g.obj.getId() == e.object.getId())

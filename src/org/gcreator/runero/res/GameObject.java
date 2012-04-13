@@ -51,6 +51,11 @@ public class GameObject extends GameResource implements Comparable<GameObject> {
 
     @Override
     public int compareTo(GameObject o) {
-        return Integer.compare(depth, o.depth);
+        return compare(depth, o.depth);
+    }
+    
+    // Java 1.7 from Integer
+    public static int compare(int x, int y) {
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 }

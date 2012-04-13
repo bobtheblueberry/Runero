@@ -464,39 +464,63 @@ public class EventManager {
     private void addAlarmEvent(Event e) {
         switch (e.type) {
         case Event.EV_ALARM0:
+            if (alarms[0] == null)
+                alarms[0] = new LinkedList<Event>();
             alarms[0].add(e);
             break;
         case Event.EV_ALARM1:
+            if (alarms[1] == null)
+                alarms[1] = new LinkedList<Event>();
             alarms[1].add(e);
             break;
         case Event.EV_ALARM2:
+            if (alarms[2] == null)
+                alarms[2] = new LinkedList<Event>();
             alarms[2].add(e);
             break;
         case Event.EV_ALARM3:
+            if (alarms[3] == null)
+                alarms[3] = new LinkedList<Event>();
             alarms[3].add(e);
             break;
         case Event.EV_ALARM4:
+            if (alarms[4] == null)
+                alarms[4] = new LinkedList<Event>();
             alarms[4].add(e);
             break;
         case Event.EV_ALARM5:
+            if (alarms[5] == null)
+                alarms[5] = new LinkedList<Event>();
             alarms[5].add(e);
             break;
         case Event.EV_ALARM6:
+            if (alarms[6] == null)
+                alarms[6] = new LinkedList<Event>();
             alarms[6].add(e);
             break;
         case Event.EV_ALARM7:
+            if (alarms[7] == null)
+                alarms[7] = new LinkedList<Event>();
             alarms[7].add(e);
             break;
         case Event.EV_ALARM8:
+            if (alarms[8] == null)
+                alarms[8] = new LinkedList<Event>();
             alarms[8].add(e);
             break;
         case Event.EV_ALARM9:
+            if (alarms[9] == null)
+                alarms[9] = new LinkedList<Event>();
             alarms[9].add(e);
             break;
         case Event.EV_ALARM10:
+            if (alarms[10] == null)
+                alarms[10] = new LinkedList<Event>();
             alarms[10].add(e);
             break;
         case Event.EV_ALARM11:
+            if (alarms[11] == null)
+                alarms[11] = new LinkedList<Event>();
             alarms[11].add(e);
             break;
         }

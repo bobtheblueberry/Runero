@@ -4,10 +4,12 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,33 +36,38 @@ import org.gcreator.runero.res.GameRoom.Tile;
 import org.gcreator.runero.res.GameSprite;
 import org.gcreator.runero.res.GameSprite.BBMode;
 import org.gcreator.runero.res.GameSprite.MaskShape;
-import org.lateralgm.file.StreamDecoder;
-import org.lateralgm.resources.library.RLibAction;
-import org.lateralgm.resources.library.RLibManager;
-import org.lateralgm.resources.library.RLibAction.LibArgument;
+import org.lateralgm.file.gc.StreamDecoder;
+import org.lateralgm.resources.library.gc.LibAction;
+import org.lateralgm.resources.library.gc.LibAction.LibArgument;
+import org.lateralgm.resources.library.gc.LibManager;
 
 public class ResourceLoader {
 
-    RuneroGame              game;
+    RuneroGame game;
     LinkedList<Preloadable> preloadables;
 
     public ResourceLoader(RuneroGame game)
         {
             this.game = game;
             preloadables = new LinkedList<Preloadable>();
-            actionFolder = new File(game.GameFolder, "actions/");
+            actionFolder = new File(Runner.GameFolder, "actions/");
         }
 
     public void loadResources() throws IOException {
         FunctionManager.load();
         System.out.println("Loaded function IDs");
-        
+
+        if (!LibManager.autoLoad())
+            throw new IOException("Failed to load Libraries");
+        System.out.println("Loaded Libraries");
+
         loadRooms();
         System.out.println("Loaded room data");
         loadBackgrounds();
         System.out.println("Loaded background data");
         loadObjects();
-        if (game.em.hasCollisionEvents) Collections.sort(game.em.collision);
+        if (game.em.hasCollisionEvents)
+            Collections.sort(game.em.collision);
         System.out.println("Loaded object data");
         loadSprites();
         System.out.println("Loaded sprite data");
@@ -82,7 +89,6 @@ public class ResourceLoader {
         addResourceConstants(game.rooms);
 
         System.out.println("Loaded Constants");
-        
 
         // DEBUG TREE
         /*
@@ -129,7 +135,8 @@ public class ResourceLoader {
     }
 
     private void addResourceConstants(ArrayList<? extends GameResource> res) {
-        if (res == null) return;
+        if (res == null)
+            return;
         for (GameResource r : res)
             game.constants.put(r.getName(), new VariableVal(r.getId()));
     }
@@ -137,9 +144,19 @@ public class ResourceLoader {
     private void loadConstants() throws IOException {
         // Load constants
         game.constants = new ReferenceTable<VariableVal>();
-        File f = new File("constants");
+        String path = "constants";
+        InputStream s;
+        try {
+            s = new FileInputStream(path);
+        } catch (FileNotFoundException exc) {
+            s = FunctionManager.class.getResourceAsStream("/" + path);
+        }
 
-        BufferedReader r = new BufferedReader(new FileReader(f));
+        if (s == null) {
+            System.err.println("Cannot find constants file");
+            throw new IOException("Where are constants?");
+        }
+        BufferedReader r = new BufferedReader(new ISReader(s));
         String line;
         while ((line = r.readLine()) != null) {
             String[] vals = line.split("\\s+", 2);
@@ -155,7 +172,7 @@ public class ResourceLoader {
     }
 
     private void loadFonts() throws IOException {
-        File fntDir = new File(game.GameFolder, "fonts/");
+        File fntDir = new File(Runner.GameFolder, "fonts/");
         File[] files = fntDir.listFiles(new FileFilter(".dat"));
         game.fonts = new ArrayList<GameFont>(files.length);
         for (File f : files) {
@@ -176,7 +193,7 @@ public class ResourceLoader {
     }
 
     private void loadSprites() throws IOException {
-        File sprDir = new File(game.GameFolder, "sprites/");
+        File sprDir = new File(Runner.GameFolder, "sprites/");
         File[] files = sprDir.listFiles(new FileFilter(".dat"));
         game.sprites = new ArrayList<GameSprite>(files.length);
         for (File f : files) {
@@ -225,7 +242,7 @@ public class ResourceLoader {
     }
 
     private void loadObjects() throws IOException {
-        File objDir = new File(game.GameFolder, "objects/");
+        File objDir = new File(Runner.GameFolder, "objects/");
         File[] files = objDir.listFiles(new FileFilter(".dat"));
         game.objects = new ArrayList<GameObject>(files.length);
         for (File f : files) {
@@ -267,7 +284,7 @@ public class ResourceLoader {
         // First thing is to load rooms
         ArrayList<Integer> rooms = new ArrayList<Integer>();
         ArrayList<String> roomNames = new ArrayList<String>();
-        File roomDir = new File(game.GameFolder, "rooms/");
+        File roomDir = new File(Runner.GameFolder, "rooms/");
         File roomData = new File(roomDir, "rooms.lst");
 
         BufferedReader r = new BufferedReader(new FileReader(roomData));
@@ -392,7 +409,7 @@ public class ResourceLoader {
     }
 
     private void loadBackgrounds() throws IOException {
-        File bgDir = new File(game.GameFolder, "backgrounds/");
+        File bgDir = new File(Runner.GameFolder, "backgrounds/");
         File[] bgFiles = bgDir.listFiles(new FileFilter(".dat"));
         game.backgrounds = new ArrayList<GameBackground>(bgFiles.length);
         for (File f : bgFiles) {
@@ -428,7 +445,7 @@ public class ResourceLoader {
     }
 
     private void loadGameInfo() throws IOException {
-        File settingsFile = new File(game.GameFolder, "Game Information.dat");
+        File settingsFile = new File(Runner.GameFolder, "Game Information.dat");
         GameInformation g = new GameInformation();
         BufferedReader r = new BufferedReader(new FileReader(settingsFile));
         g.backgroundColor = new java.awt.Color(Integer.parseInt(r.readLine()));
@@ -444,7 +461,7 @@ public class ResourceLoader {
         g.pauseGame = Boolean.parseBoolean(r.readLine());
         r.close();
 
-        File infoFile = new File(game.GameFolder, "Game Information.rtf");
+        File infoFile = new File(Runner.GameFolder, "Game Information.rtf");
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(infoFile));
         byte data[] = new byte[read4(in)];
         in.read(data);
@@ -461,7 +478,7 @@ public class ResourceLoader {
 
         int parentId = in.read4();
         int id = in.read4();
-        RLibAction a = RLibManager.getLibAction(parentId, id);
+        LibAction a = LibManager.getLibAction(parentId, id);
         // Done of Lib stuff
         // Load Action
         Action act = new Action(a);
@@ -475,7 +492,8 @@ public class ResourceLoader {
                 arg.val = "Resource; ID: " + arg.resVal;
             } else if (type == 1) {
                 arg.val = in.readStr();
-            } else if (type == 2) arg.code = new Code(in.readStr());
+            } else if (type == 2)
+                arg.code = new Code(in.readStr());
             act.arguments.add(arg);
         }
         act.appliesTo = in.read4();
@@ -486,7 +504,7 @@ public class ResourceLoader {
         return act;
     }
 
-    private void lexAction(Action a, RLibAction r) {
+    private void lexAction(Action a, LibAction r) {
         int start = 0;
         if (a.lib.actionKind == Action.ACT_VARIABLE) {
             start = 1;
@@ -511,7 +529,8 @@ public class ResourceLoader {
             } else if (la.kind == Argument.ARG_BOTH) {
                 for (int j = 0; j < arg.val.length(); j++) {
                     char c = arg.val.charAt(j);
-                    if (c == ' ') continue;
+                    if (c == ' ')
+                        continue;
                     else if (c == '\'' || c == '"') {
                         arg.bothIsExpr = true;
                         expr = true;
@@ -584,14 +603,19 @@ public class ResourceLoader {
             qa.actionEnd = index + 1;
             if (next.lib.question) {
                 questionIndent(e, index + 1, next);
-                if (next.elseAction != null) qa.end = qa.actionEnd = next.elseAction.actionEnd;
-                else qa.end = qa.actionEnd = next.ifAction.actionEnd;
+                if (next.elseAction != null)
+                    qa.end = qa.actionEnd = next.elseAction.actionEnd;
+                else
+                    qa.end = qa.actionEnd = next.ifAction.actionEnd;
 
-                if (next.ifAction.isBlock) qa.end++;
+                if (next.ifAction.isBlock)
+                    qa.end++;
             } else if (next.lib.actionKind == Action.ACT_REPEAT) {
                 next.repeatAction = actionIndent(e, index + 1);
-                if (next.repeatAction.isBlock) qa.end = qa.actionEnd = next.repeatAction.actionEnd + 1;
-                else qa.end = qa.actionEnd = next.repeatAction.actionEnd;
+                if (next.repeatAction.isBlock)
+                    qa.end = qa.actionEnd = next.repeatAction.actionEnd + 1;
+                else
+                    qa.end = qa.actionEnd = next.repeatAction.actionEnd;
             }
             return qa;
         }
@@ -609,7 +633,7 @@ public class ResourceLoader {
             }
             if (a.lib.actionKind == Action.ACT_END) {
                 if (i == index + 2)
-                // empty block
+                    // empty block
                     qa.isFake = true;
 
                 qa.end = i - 1;
@@ -633,5 +657,31 @@ public class ResourceLoader {
         public boolean accept(File dir, String name) {
             return name.endsWith(ext);
         }
+    }
+
+    static class ISReader extends Reader {
+
+        InputStream s;
+
+        public ISReader(InputStream s)
+            {
+                this.s = s;
+            }
+
+        @Override
+        public int read(char[] cbuf, int off, int len) throws IOException {
+            byte[] buffer = new byte[cbuf.length];
+            int r = s.read(buffer, off, len);
+            int i = 0;
+            for (byte b : buffer)
+                cbuf[i++] = (char) b;
+            return r;
+        }
+
+        @Override
+        public void close() throws IOException {
+            s.close();
+        }
+
     }
 }
