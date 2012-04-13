@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="/home/serge/Develop/Runero/plugins/shared/Runero.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/Runero/runero.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="true"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" mainClassHandleIdentifier="=Runero/src&lt;org.gcreator.runero{Main.java[Main" manifestLocation="/Runero/manifest.mf" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <file path="/Runero/fnames"/>
+        <file path="/Runero/constants"/>
+        <javaElement handleIdentifier="=Runero/src"/>
+    </selectedElements>
+</jardesc>

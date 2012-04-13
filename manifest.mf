@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: org.gcreator.runero.Main
+Class-Path: lwjgl.jar lwjgl_util.jar slick-util.jar
