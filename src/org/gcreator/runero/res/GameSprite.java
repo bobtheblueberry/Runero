@@ -9,33 +9,29 @@ import org.gcreator.runero.RuneroGame;
 import org.newdawn.slick.opengl.Texture;
 
 public class GameSprite extends GameResource implements Preloadable {
-    public enum BBMode {
-        AUTO, FULL, MANUAL
-    }
 
     public enum MaskShape {
-        PRECISE, RECTANGLE, DISK, DIAMOND
+        PRECISE, RECTANGLE, DISK, DIAMOND, POLYGON
     }
 
     public MaskShape shape;
-    public BBMode bbMode;
     public boolean transparent;
-    // GM8; Ignored - int alpha;
-    // GM8; Ignored - boolean mask;
+    public int alpha_tolerance;// GM8; Ignored
+    public boolean mask;// GM8; Ignored
     public boolean smooth;
     public boolean preload;
     public int x, y;
-    public BBMode mode;
     public int left, right, top, bottom;
     public int width, height;
     public ArrayList<SubImage> subImages;
     private boolean loaded = false;
     private Rectangle bounds;
 
-    public GameSprite(String name) {
-        super(name);
-        subImages = new ArrayList<GameSprite.SubImage>();
-    }
+    public GameSprite(String name)
+        {
+            super(name);
+            subImages = new ArrayList<GameSprite.SubImage>();
+        }
 
     public Rectangle getBounds() {
         if (bounds == null)
@@ -67,16 +63,31 @@ public class GameSprite extends GameResource implements Preloadable {
     public class SubImage {
         File file;
         Texture image;
+        public Mask mask;
 
-        public SubImage(File f) {
-            this.file = f;
-        }
+        public SubImage(File f)
+            {
+                this.file = f;
+            }
 
         protected Texture load() {
             if (image != null)
                 return image;
 
             return image = RuneroGame.tex.getTexture(file);
+        }
+    }
+
+    public class Mask {
+        public boolean map[][];
+
+        public Mask()
+            {
+                map = new boolean[width][height];
+            }
+
+        public GameSprite getSprite() {
+            return GameSprite.this;
         }
     }
 }

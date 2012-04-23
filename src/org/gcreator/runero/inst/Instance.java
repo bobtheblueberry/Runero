@@ -16,6 +16,7 @@ import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameSprite;
+import org.gcreator.runero.res.GameSprite.SubImage;
 import org.newdawn.slick.opengl.Texture;
 
 public class Instance implements Comparable<Instance> {
@@ -435,6 +436,16 @@ public class Instance implements Comparable<Instance> {
         if (sprite_index < 0)
             return null;
         return RuneroGame.game.getSprite((int) Math.round(sprite_index));
+    }
+    
+    public SubImage getSubImage() {
+        GameSprite s = RuneroGame.game.getSprite((int) sprite_index);
+        if (s == null) 
+            return null;
+        int subs = s.subImages.size();
+        if (subs == 0) 
+            return null;
+        return s.subImages.get(((int) Math.round(image_index)) % s.subImages.size());
     }
 
     public GameSprite getMask() {

@@ -1,7 +1,6 @@
 package org.gcreator.runero;
 
 import java.awt.Color;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 

@@ -34,7 +34,7 @@ import org.gcreator.runero.res.GameResource;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameRoom.Tile;
 import org.gcreator.runero.res.GameSprite;
-import org.gcreator.runero.res.GameSprite.BBMode;
+import org.gcreator.runero.res.GameSprite.Mask;
 import org.gcreator.runero.res.GameSprite.MaskShape;
 import org.lateralgm.file.gc.StreamDecoder;
 import org.lateralgm.resources.library.gc.LibAction;
@@ -197,48 +197,82 @@ public class ResourceLoader {
         File[] files = sprDir.listFiles(new FileFilter(".dat"));
         game.sprites = new ArrayList<GameSprite>(files.length);
         for (File f : files) {
-            BufferedReader r = new BufferedReader(new FileReader(f));
-            GameSprite s = new GameSprite(r.readLine());
-            s.setId(Integer.parseInt(r.readLine()));
-            s.width = Integer.parseInt(r.readLine());
-            s.height = Integer.parseInt(r.readLine());
-            s.transparent = Boolean.parseBoolean(r.readLine());
-            String shape = r.readLine();
-            if (shape.equalsIgnoreCase("RECTANGLE")) {
-                s.shape = MaskShape.RECTANGLE;
-            } else if (shape.equalsIgnoreCase("PRECISE")) {
-                s.shape = MaskShape.PRECISE;
-            } else if (shape.equalsIgnoreCase("DIAMOND")) {
-                s.shape = MaskShape.DIAMOND;
-            } else {
-                s.shape = MaskShape.DISK;
-            }
-            r.readLine(); // alpha - GM8; Ignored
-            r.readLine(); // mask - GM8; Ignored
-            s.smooth = Boolean.parseBoolean(r.readLine());
-            s.preload = Boolean.parseBoolean(r.readLine());
-            s.x = Integer.parseInt(r.readLine());
-            s.y = Integer.parseInt(r.readLine());
-            String mode = r.readLine();
-            if (mode.equalsIgnoreCase("AUTO")) {
-                s.mode = BBMode.AUTO;
-            } else if (mode.equalsIgnoreCase("FULL")) {
-                s.mode = BBMode.FULL;
-            } else {
-                s.mode = BBMode.MANUAL;
-            }
-            s.left = Integer.parseInt(r.readLine());
-            s.right = Integer.parseInt(r.readLine());
-            s.top = Integer.parseInt(r.readLine());
-            s.bottom = Integer.parseInt(r.readLine());
-            String[] subimgs = r.readLine().split(",");
-            for (String sub : subimgs) {
-                File sf = new File(sprDir, sub);
+            StreamDecoder in = new StreamDecoder(f);
+
+            GameSprite s = new GameSprite(in.readStr());
+            s.setId(in.read4());
+            s.width = in.read4();
+            s.height = in.read4();
+            int subimgs = in.read4();
+            for (int i = 0; i < subimgs; i++) {
+                File sf = new File(sprDir, in.readStr());
                 s.subImages.add(s.new SubImage(sf));
             }
-            r.close();
+            s.transparent = in.readBool();
+            int shape = in.read();
+            if (shape == 0)
+                s.shape = MaskShape.RECTANGLE;
+            else if (shape == 1)
+                s.shape = MaskShape.PRECISE;
+            else if (shape == 2)
+                s.shape = MaskShape.DISK;
+            else if (shape == 3)
+                s.shape = MaskShape.DIAMOND;
+            else if (shape == 4)
+                s.shape = MaskShape.POLYGON;
+            s.alpha_tolerance = in.read4();
+            s.mask = in.readBool();
+            s.smooth = in.readBool();
+            s.preload = in.readBool();
+            s.x = in.read4();
+            s.y = in.read4();
+            s.left = in.read4();
+            s.right = in.read4();
+            s.top = in.read4();
+            s.bottom = in.read4();
+            loadMask(s, in);
+
+            in.close();
             game.sprites.add(s);
         }
+    }
+
+    private void loadMask(GameSprite s, StreamDecoder in) throws IOException {
+        int len = in.read4();
+        if (len <= 0)
+            return;
+
+        int numbers = s.width * s.height;
+        for (int i = 0; i < s.subImages.size(); i++) {
+            x = y = 0;
+            Mask mask = s.new Mask();
+            s.subImages.get(i).mask = mask;
+            // Load Collision mask
+            for (int c = 0; c < len; c++) {
+                char d = (char) in.read();
+                int k = 0;
+                for (int j = 7; j >= 0; j--) {
+                    if (c + k >= numbers) {
+                        break;
+                    }
+                    boolean r = ((d >>> j) & 1) == 1;
+                    add(r, mask, s.width, s.height);
+                    k++;
+                }
+            }
+
+        }
+    }
+
+    int x, y;
+
+    private void add(boolean b, Mask m, int width, int height) {
+        m.map[x][y] = b;
+        if (x + 1 >= width) {
+            x = 0;
+            y++;
+        } else
+            x++;
     }
 
     private void loadObjects() throws IOException {

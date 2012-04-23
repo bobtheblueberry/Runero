@@ -287,6 +287,7 @@ public class RoomInstance {
                 for (Instance i : g.instances)
                     for (Instance i2 : g2.instances)
                         if (i != i2 && RuneroCollision.checkCollision(i, i2, false)) {
+                    //TODO: FIx collision
                             ce.collide(i, i2);
                             System.out.println("collision with " + i + " and " + i2);
                         }
