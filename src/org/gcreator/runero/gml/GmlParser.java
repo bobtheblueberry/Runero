@@ -35,12 +35,12 @@ public class GmlParser {
                 System.err.println("Error reading argument: " + a.debugVal);
                 return 0;
             }
-            if (c.type == Constant.STRING) {
+            if (c.isString) {
                 System.err.println("WARNING: String value for non-string expression");
             }
             return c.dVal;
         } catch (Exception exc) {
-            System.err.println("Error parsing argument: " + a.expressions.size() + "; " + a.debugVal);
+            System.err.println(instance.obj.getName() + ": Error parsing argument: " + a.expressions.size() + "; " + a.debugVal);
             exc.printStackTrace();
         }
         return 0;
@@ -48,7 +48,7 @@ public class GmlParser {
 
     public static VariableVal solve(ExprArgument a, Instance instance, Instance other) {
         Constant c = a.solve(instance, other);
-        VariableVal v = (c.type == Constant.NUMBER) ? new VariableVal(c.dVal) : new VariableVal(c.sVal);
+        VariableVal v = (c.isReal) ? new VariableVal(c.dVal) : new VariableVal(c.sVal);
         return v;
     }
 
@@ -57,7 +57,7 @@ public class GmlParser {
         if (!v.isArray)
             return v.name;
         Constant c = v.arrayIndex.solve(instance, other);
-        if (c.type != Constant.NUMBER) {
+        if (c.isString) {
             System.err.println("Error: Array Index <String>");
             return null;
         }

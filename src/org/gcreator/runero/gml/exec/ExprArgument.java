@@ -49,7 +49,7 @@ public class ExprArgument {
             } else if (e.type == Type.FUNCTION) {
                 Constant res = e.function.solve(instance, other);
                 if (res == null) {
-                    System.err.println("unimplemented/unknown function " + e.function.name);
+                    System.err.println("unimplemented/unknown function: " + e.function.name);
                     exp.add(new Thing(new Constant(0)));
                 } else
                     exp.add(new Thing(res));
@@ -132,9 +132,9 @@ public class ExprArgument {
                 t = new Thing(new Constant(p.c.dVal % n.c.dVal));
             } else if (t.op == Operator.PLUS) {
                 // Game Maker bitches if you try to do number + string but we don't need to
-                if (p.c.type == Constant.STRING || n.c.type == Constant.STRING) {
-                    String s = "" + ((p.c.type == Constant.STRING) ? p.c.sVal : p.c.dVal)
-                            + ((n.c.type == Constant.STRING) ? n.c.sVal : n.c.dVal);
+                if (p.c.isString || n.c.isString) {
+                    String s = "" + ((p.c.isString) ? p.c.sVal : p.c.dVal)
+                            + ((n.c.isString) ? n.c.sVal : n.c.dVal);
                     t = new Thing(new Constant(s));
                 } else
                     t = new Thing(new Constant(p.c.dVal + n.c.dVal));
@@ -153,8 +153,8 @@ public class ExprArgument {
             } else if (t.op == Operator.LESS_EQUAL) {
                 t = new Thing(getBool(p.c.dVal <= n.c.dVal));
             } else if (t.op == Operator.EQUALS) {
-                boolean strp = p.c.type == Constant.STRING;
-                boolean strn = n.c.type == Constant.STRING;
+                boolean strp = p.c.isString;
+                boolean strn = n.c.isString;
                 if (strp ^ strn)
                     t = new Thing(getBool(false));
                 else if (strp && strn)
@@ -162,8 +162,8 @@ public class ExprArgument {
                 else
                     t = new Thing(getBool(p.c.dVal == n.c.dVal));
             } else if (t.op == Operator.NOT_EQUAL) {
-                boolean strp = p.c.type == Constant.STRING;
-                boolean strn = n.c.type == Constant.STRING;
+                boolean strp = p.c.isString;
+                boolean strn = n.c.isString;
                 if (strp ^ strn)
                     t = new Thing(getBool(true));
                 else if (strp && strn)

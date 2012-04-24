@@ -48,14 +48,10 @@ lengthdir_x(len,dir)
 lengthdir_y(len,dir)
 */
 
-public class MathLibrary {
+public abstract class MathLibrary {
 
     protected static long   seed   = 0;
     protected static Random random = new Random(seed);
-
-    private MathLibrary()
-        {
-        }
 
     protected static double[] getReals(Constant... vars) {
         double[] ds = new double[vars.length];

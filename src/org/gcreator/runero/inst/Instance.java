@@ -152,7 +152,7 @@ public class Instance implements Comparable<Instance> {
         if (name.equals("alarm")) {
             if (v.isArray) {
                 Constant c = v.arrayIndex.solve(this, other);
-                if (c.type != Constant.NUMBER) {
+                if (c.isString) {
                     Runner.Error("Invalid alarm index <String>");
                     return;
                 }
@@ -256,7 +256,7 @@ public class Instance implements Comparable<Instance> {
             builtin = true;
             image_single = value.dVal;
         }
-        if (builtin && value.type != Constant.NUMBER) {
+        if (builtin && value.isString) {
             Runner.Error("Cannot set built-in object variable '" + name + " to <String>");
             return;
         }

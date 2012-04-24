@@ -165,32 +165,17 @@ public class FunctionManager {
             case 45: // lengthdir_y(len,dir)
                 return new Constant(MathLibrary.lendir_y(arg0.dVal, arg1.dVal));
             case 46: // real(str)
-
+                return new Constant(StringLibrary.real(arg0.sVal));
             case 47: // string(val)
-
-                // TODO: This function
-
-                return null; // string
+                return new Constant(StringLibrary.string(arg0));
             case 48: // string_format(val,total,dec)
-
-                // TODO: This function
-
-                return null; // string_format
+                return new Constant(StringLibrary.string_format(arg0.dVal, (int)arg1.dVal, (int)arg2.dVal));
             case 49: // chr(val)
-
-                // TODO: This function
-
-                return null; // chr
+                return new Constant(StringLibrary.chr((int)arg0.dVal));
             case 50: // ansi_char(val)
-
-                // TODO: This function
-
-                return null; // ansi_char
+                return new Constant(StringLibrary.ansi_char((int)arg0.dVal));
             case 51: // ord(char)
-
-                // TODO: This function
-
-                return null; // ord
+                return new Constant(StringLibrary.ord(arg0.sVal));
             case 52: // string_length(str)
 
                 // TODO: This function
@@ -5327,5 +5312,16 @@ public class FunctionManager {
         for (Constant c : args)
             d[i++] = c.dVal;
         return d;
+    }
+    
+    
+    // TODO: this function
+    private static  void checkString(Constant c) {
+        
+    }
+    
+ // TODO: this function
+    private  static void checkReal(Constant c) {
+        
     }
 }

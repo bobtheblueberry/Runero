@@ -27,21 +27,21 @@ import org.newdawn.slick.opengl.Texture;
 
 public class RoomInstance {
 
-    public GameRoom               room;
+    public GameRoom room;
     public ArrayList<ObjectGroup> instanceGroups;
-    public RuneroGame             game;
+    public RuneroGame game;
 
-    public int                    width;
-    public int                    height;
-    public Color                  background_color;
-    public boolean                draw_background_color;
-    public String                 caption;
+    public int width;
+    public int height;
+    public Color background_color;
+    public boolean draw_background_color;
+    public String caption;
 
-    private int                   instance_count;
-    private static int            instance_nextid = 100000;
-    public Background[]           backgrounds;
-    public View[]                 views;
-    public Tile[]                 tiles;
+    private int instance_count;
+    private static int instance_nextid = 100000;
+    public Background[] backgrounds;
+    public View[] views;
+    public Tile[] tiles;
 
     public RoomInstance(RuneroGame game, GameRoom room)
         {
@@ -217,22 +217,22 @@ public class RoomInstance {
                             }
             }
 
+        // if key is down
+        if (game.em.hasKeyboardEvents)
+            for (Event e : game.em.keyboardEvents) {
+                int type = e.type;
+                if (Keyboard.isKeyDown(type)) {
+                    EventExecutor.executeEvent(e, this);
+                    System.out.println("Keyboard " + type);
+                }
+            }
+
         while (Keyboard.next()) {
             game.keyboard_string += Keyboard.getEventCharacter();
             game.keyboard_lastchar = String.valueOf(Keyboard.getEventCharacter());
 
-            // keyboard TODO: these are all broken
-            if (game.em.hasKeyboardEvents)
-                for (Event e : game.em.keyboardEvents) {
-                    int type = e.type;
-                    // if (Keyboard.isKeyDown(type)) {
-                    // EventExecutor.executeEvent(e, this);
-                    // System.out.println("Keyboard " + KeyEvent.getKeyText(type));
-                    // }
-                }
-
             // key press
-            if (game.em.hasKeyPressEvents)
+            if (game.em.hasKeyPressEvents && Keyboard.getEventKeyState())
                 for (Event e : game.em.keyPressEvents) {
                     int type = e.type;
                     if (Keyboard.isKeyDown(type)) {
@@ -240,7 +240,7 @@ public class RoomInstance {
                     }
                 }
             // key release
-            if (game.em.hasKeyReleaseEvents)
+            if (game.em.hasKeyReleaseEvents && !Keyboard.getEventKeyState())
                 for (Event e : game.em.keyReleaseEvents) {
                     int type = e.type;
                     // TODO: THI
@@ -249,9 +249,9 @@ public class RoomInstance {
                         EventExecutor.executeEvent(e, this);
                     }
                 }
-            if (Keyboard.isKeyDown(Keyboard.KEY_SPACE))
-                System.out.println("SPACE!");
         }
+        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE))
+            System.out.println("SPACE!");
 
         // millions of mouse and joystick events
 
@@ -287,9 +287,9 @@ public class RoomInstance {
                 for (Instance i : g.instances)
                     for (Instance i2 : g2.instances)
                         if (i != i2 && RuneroCollision.checkCollision(i, i2, false)) {
-                    //TODO: FIx collision
+                            // TODO: FIx collision
                             ce.collide(i, i2);
-                            System.out.println("collision with " + i + " and " + i2);
+                            // System.out.println("collision with " + i + " and " + i2);
                         }
 
             }

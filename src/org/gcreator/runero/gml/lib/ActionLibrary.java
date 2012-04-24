@@ -763,7 +763,7 @@ public class ActionLibrary {
 
     private static boolean if_expression(Action act, Instance instance, Instance other) {
         Constant val = act.arguments.get(0).exprVal.solve(instance, other);
-        if (val.type == Constant.STRING)
+        if (val.isString)
             return false;
         return val.dVal > 0.5;// JUST LIKE GAME MAKER DOES!
     }

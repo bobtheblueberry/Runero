@@ -24,12 +24,12 @@ public class VariableManager {
             Runner.Error("no such variable " + r);
         }
         if (v.isString) {
-            if (val.type == Constant.STRING)
+            if (val.isString)
                 v.val += val.sVal;
             else
                 v.val += val.dVal; // GM would bitch, but oh well
         } else {
-            if (val.type == Constant.NUMBER)
+            if (val.isReal)
                 v.realVal += val.dVal;
             else
                 Runner.Error("Error! cannot set number variable relative to a string!");
@@ -65,19 +65,25 @@ public class VariableManager {
             // guess we'll set it for the instance..
             instance.setVariable(v, val, other);
         } else {
-
             VariableVal first = findVariable(r, instance, other, true);
+            if (first == null) {
+                System.err.println("Cannot locate reference path for " + r);
+            } else if (first.isString) {
+                // WTF
+            }
             int ref = (int) first.realVal;
             v = r.ref.get(r.ref.size() - 2);
-            String name = v.name;
-            if (v.isArray)
-                name = GmlParser.getArrayName(v, instance, other);
-            else if (v.isExpression) {
+
+            Variable lastvar = r.ref.get(r.ref.size() - 1);
+            String var = lastvar.name;
+            if (lastvar.isArray)
+                var = GmlParser.getArrayName(lastvar, instance, other);
+            else if (lastvar.isExpression) {
                 Runner.Error("What r u doin???");
                 return;
             }
             if (ref == -1 || ref == -7) {// self, local
-               instance.setVariable(v, val, other);
+                instance.setVariable(v, val, other);
             } else if (ref == -2) { // other
                 other.setVariable(v, val, other);
             } else if (ref == -3) { // all
@@ -87,7 +93,7 @@ public class VariableManager {
             } else if (ref == -4) {// noone
                 // noo
             } else if (ref == -5) {// global
-                RuneroGame.game.globalDotVars.put(name, new VariableVal(val));
+                RuneroGame.game.globalDotVars.put(var, new VariableVal(val));
             } else if (ref > 100000) {
                 Instance i = RuneroGame.room.getInstance(ref);
                 if (i == null) {
@@ -122,7 +128,7 @@ public class VariableManager {
         Variable v = r.ref.get(0);
         VariableVal val = getVariable(v, instance, other);
 
-        if (r.ref.size() == 1) {
+        if (r.ref.size() == 1 || (r.ref.size() == 2 && notlast)) {
             if (v.isExpression) {
                 Runner.Error("Invalid variable reference");
                 return null;
@@ -137,7 +143,11 @@ public class VariableManager {
             len--;
         for (int i = 1; i < len; i++) {
             value = getVar(prev, r.ref.get(i), instance, other);
-            prev = (int) value.realVal;
+            if (value == null) {
+                System.err.println("Cannot find variable " + r);
+                return null;
+            } else
+                prev = (int) value.realVal;
         }
 
         return value;
@@ -199,20 +209,24 @@ public class VariableManager {
         else if (v.isExpression) {
             return new VariableVal(v.expression.solve(instance, other));
         }
+
+        // Look in constants
+        val = RuneroGame.game.constants.get(name);
+        if (val != null)
+            return val;
+
+        // Look in global vars
+        val = RuneroGame.game.globalVars.get(name);
+
+        if (val != null)
+            return val;
+
         // Look in built-in variables
 
         val = RuneroGame.game.getVariable(v, instance, other);
         if (val != null)
             return val;
 
-        // Look in constants
-        val = RuneroGame.game.constants.get(name);
-        if (val != null)
-            return val;
-        // Look in global vars
-        val = RuneroGame.game.globalVars.get(name);
-        if (val != null)
-            return val;
         // Look locally
         if (instance != null) {
             return instance.getVariable(v, other);

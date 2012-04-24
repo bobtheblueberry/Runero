@@ -2,8 +2,7 @@ package org.gcreator.runero.res;
 
 import java.awt.Font;
 
-import org.gcreator.runero.gfx.TrueTypeFont;
-
+import org.newdawn.slick.TrueTypeFont;
 public class GameFont extends GameResource {
 
     public String fontName;

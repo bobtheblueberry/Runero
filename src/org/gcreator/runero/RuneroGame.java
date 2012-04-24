@@ -98,7 +98,7 @@ public class RuneroGame {
             System.exit(1);
         }
         // Go to the first room
-        room = new RoomInstance(this, rooms.get(0));
+        room = new RoomInstance(this, rooms.get(1));
         GraphicsLibrary.gfx.setTitle(room.caption);
         room.init(true);
     }
@@ -334,6 +334,7 @@ public class RuneroGame {
 
     public VariableVal getVariable(Variable v, Instance instance, Instance other) {
         String name = v.name;
+        System.out.println("look for var " + name);
         if (v.isArray)
             name = GmlParser.getArrayName(v, instance, other);
         if (name.equals("gamemaker_registered")) {
@@ -473,7 +474,7 @@ public class RuneroGame {
         } else if (name.equals("secure_mode")) {
             return new VariableVal(0); // ff that stuff
         }
-
+        
         return null;
     }
 }

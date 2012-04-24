@@ -22,10 +22,13 @@ public class ReferenceTable<T> {
     }
 
     public T get(String name) {
+        if (name == null)
+            return null;
         char c = name.charAt(0);
         SubTable t = getTable(c);
-        if (t == null) 
+        if (t == null)  {
             return null;
+        }
         return t.values.get(name);
     }
 

@@ -28,7 +28,7 @@ public class Expression {
     }
     
     public Expression (Constant c) {
-        this.type = (c.type == Constant.NUMBER) ? Type.NUMBER : Type.STRING;
+        this.type = (c.isReal) ? Type.NUMBER : Type.STRING;
         constant = c;
     }
     

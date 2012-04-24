@@ -18,15 +18,16 @@ import org.newdawn.slick.opengl.Texture;
 
 public class GraphicsLibrary {
 
-    private TrueTypeFont font;
-    public int           fontAlign; // Font alignment, 0,1,2 (left,center,right), respectively
+    org.newdawn.slick.Color curColor = org.newdawn.slick.Color.white;
+    private org.newdawn.slick.TrueTypeFont font;
+    public int fontAlign; // Font alignment, 0,1,2 (left,center,right), respectively
 
     private GraphicsLibrary()
         {
         }
 
     public void init() {
-        font = new TrueTypeFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12), true);
+        font = new org.newdawn.slick.TrueTypeFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12), true);
     }
 
     public final static GraphicsLibrary gfx = new GraphicsLibrary();
@@ -36,6 +37,7 @@ public class GraphicsLibrary {
     }
 
     public void setColor(Color c) {
+        curColor = new org.newdawn.slick.Color(c.getRGB());
         glColor4d(c.getRed() / 255.0, c.getGreen() / 255.0, c.getBlue() / 255.0, c.getAlpha() / 255.0);
     }
 
@@ -237,7 +239,8 @@ public class GraphicsLibrary {
         drawTexture(t, x, y, width, height, 1, 1, 0, null, 1.0);
     }
 
-    public void drawTexture(Texture t, double x, double y, double xscale, double yscale, double angle, Color blend, double alpha) {
+    public void drawTexture(Texture t, double x, double y, double xscale, double yscale, double angle, Color blend,
+            double alpha) {
         drawTexture(t, x, y, t.getImageWidth(), t.getImageHeight(), 1, 1, 0, blend, alpha);
     }
 
@@ -296,24 +299,27 @@ public class GraphicsLibrary {
     }
 
     public void setFont(GameFont f) {
-        // TODO: fonts are broken
-        // font = f.load();
+        font = f.load();
     }
 
     public void drawString(String text, float x, float y) {
-        drawString(x, y, text);
+        font.drawString(x, y, text, curColor);
     }
 
     public void drawString(float x, float y, String text) {
         // font.drawString(x, y, text, 1, 1, fontAlign);
+        drawString(x, y, text);
     }
 
     public void drawString(float x, float y, String text, float xscale, float yscale, float angle) {
         // font.drawString(x, y, text, 1, 1, xscale, yscale, angle, fontAlign);
+        drawString(x, y, text);
     }
 
     public void drawString(double x, double y, String text, double xscale, double yscale, double angle) {
         // font.drawString((float) x, (float) y, text, 1, 1, (float) xscale, (float) yscale, (float) angle, fontAlign);
+
+        drawString((float) x, (float) y, text);
     }
 
     public void saveScreenshot(File file) {
