@@ -241,7 +241,6 @@ public class ResourceLoader {
         int len = in.read4();
         if (len <= 0)
             return;
-
         int numbers = s.width * s.height;
         for (int i = 0; i < s.subImages.size(); i++) {
             x = y = 0;
@@ -252,12 +251,11 @@ public class ResourceLoader {
                 char d = (char) in.read();
                 int k = 0;
                 for (int j = 7; j >= 0; j--) {
-                    if (c + k >= numbers) {
+                    if (c*8 + k++ >= numbers) {
                         break;
                     }
                     boolean r = ((d >>> j) & 1) == 1;
                     add(r, mask, s.width, s.height);
-                    k++;
                 }
             }
 

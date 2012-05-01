@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.gcreator.runero.Preloadable;
 import org.gcreator.runero.RuneroGame;
-import org.newdawn.slick.opengl.Texture;
+import org.gcreator.runero.gfx.Texture;
 
 public class GameBackground extends GameResource implements Preloadable {
     

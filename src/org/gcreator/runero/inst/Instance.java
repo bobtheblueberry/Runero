@@ -7,6 +7,7 @@ import org.gcreator.runero.Runner;
 import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.gfx.GraphicsLibrary;
+import org.gcreator.runero.gfx.Texture;
 import org.gcreator.runero.gml.Constant;
 import org.gcreator.runero.gml.GmlInterpreter;
 import org.gcreator.runero.gml.GmlParser;
@@ -17,59 +18,58 @@ import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameSprite;
 import org.gcreator.runero.res.GameSprite.SubImage;
-import org.newdawn.slick.opengl.Texture;
 
 public class Instance implements Comparable<Instance> {
 
-    public int                         alarm[]           = new int[12];
-    public double                      depth;
+    public int alarm[] = new int[12];
+    public double depth;
 
-    private double                     direction, speed;               // use motion_set
-    private double                     hspeed, vspeed;                 // use setSpeed, setVSpeed, setHSpeed
+    private double direction, speed;               // use motion_set
+    private double hspeed, vspeed;                 // use setSpeed, setVSpeed, setHSpeed
 
-    public double                      friction;
-    public double                      gravity;
-    public double                      gravity_direction = 270;
-    public int                         mask_index        = -1;
+    public double friction;
+    public double gravity;
+    public double gravity_direction = 270;
+    public int mask_index = -1;
 
-    public double                      image_alpha       = 1.0;
-    public double                      image_angle;
-    public Color                       image_blend;
-    public double                      image_index;
-    public double                      image_single;                   // Deprecated
-    public double                      image_speed       = 1.0;
-    public double                      image_xscale      = 1.0;
-    public double                      image_yscale      = 1.0;
-    public double                      sprite_index;
+    public double image_alpha = 1.0;
+    public double image_angle;
+    public Color image_blend;
+    public double image_index;
+    public double image_single;                   // Deprecated
+    public double image_speed = 1.0;
+    public double image_xscale = 1.0;
+    public double image_yscale = 1.0;
+    public double sprite_index;
 
-    public double                      timeline_index;
-    public double                      timeline_position;
-    public double                      timeline_speed;
+    public double timeline_index;
+    public double timeline_position;
+    public double timeline_speed;
 
-    public double                      path_endaction;
-    public double                      path_index        = -1;
-    public double                      path_orientation;
-    public double                      path_position;
-    public double                      path_positionprevious;
-    public double                      path_scale;
-    public double                      path_speed;
-    public boolean                     persistent;
-    public boolean                     solid;
-    public boolean                     visible;
-    public double                      x, y;
-    public double                      xstart, ystart;
-    public double                      xprevious, yprevious;
-    public int                         image_number      = 0;          // * cannot be set manually
-    public int                         id;
+    public double path_endaction;
+    public double path_index = -1;
+    public double path_orientation;
+    public double path_position;
+    public double path_positionprevious;
+    public double path_scale;
+    public double path_speed;
+    public boolean persistent;
+    public boolean solid;
+    public boolean visible;
+    public double x, y;
+    public double xstart, ystart;
+    public double xprevious, yprevious;
+    public int image_number = 0;          // * cannot be set manually
+    public int id;
 
-    public int                         parentId;                       // not accessed directly in GML, must use GML
-                                                                        // function
+    public int parentId;                       // not accessed directly in GML, must use GML
+                         // function
     /**
      * When an instance is marked as dead then it does nothing and waits to be destroyed
      */
-    public boolean                     isDead;
+    public boolean isDead;
 
-    public GameObject                  obj;
+    public GameObject obj;
     public ReferenceTable<VariableVal> variables;
 
     public Instance(double x, double y, int id, GameObject obj)
@@ -119,6 +119,177 @@ public class Instance implements Comparable<Instance> {
         return (int) Math.round(image_index);
     }
 
+    /**
+     * Performs event
+     * 
+     * @param index  main event index
+     */
+    public void performEvent(Event event) {
+        if (isDead)
+            return;
+        byte index = event.parent.mainEvent;
+        if (index == MainEvent.EV_DRAW) {
+            if (!visible)
+                return;
+        }
+        if (index == MainEvent.EV_COLLISION)
+            if (solid || event.collisionObject.solid) {
+                x = xprevious;
+                y = yprevious;
+            }
+        GmlInterpreter.performEvent(event, this);
+    }
+
+    public GameSprite getSprite() {
+        if (sprite_index < 0)
+            return null;
+        return RuneroGame.game.getSprite((int) Math.round(sprite_index));
+    }
+
+    public SubImage getSubImage() {
+        GameSprite s = RuneroGame.game.getSprite((int) sprite_index);
+        if (s == null)
+            return null;
+        int subs = s.subImages.size();
+        if (subs == 0)
+            return null;
+        return s.subImages.get(((int) Math.round(image_index)) % s.subImages.size());
+    }
+
+    public GameSprite getMask() {
+        if (mask_index < 0)
+            return null;
+        return RuneroGame.game.getSprite((int) Math.round(mask_index));
+    }
+
+    public void setDirection(double newDir) {
+        motion_set(newDir, speed);
+    }
+
+    public void setSpeed(double newSpeed) {
+        motion_set(direction, newSpeed);
+    }
+
+    public void setHspeed(double newHspeed) {
+        setSpeed(newHspeed, vspeed);
+    }
+
+    public void setVspeed(double newVspeed) {
+        setSpeed(hspeed, newVspeed);
+    }
+
+    public void setSpeed(double newHspeed, double newVspeed) {
+        hspeed = newHspeed;
+        vspeed = newVspeed;
+        double dir = Math.atan2(newVspeed, newHspeed);
+        this.direction = dir / Math.PI * 180;
+        // Pythagorean theorem
+        double h = Math.abs(newHspeed);
+        double v = Math.abs(newVspeed);
+        this.speed = Math.sqrt((v * v) + (h * h));
+    }
+
+    public void motion_set(double dir, double speed) {
+        this.direction = dir;
+        this.speed = speed;
+        double r = dir * Math.PI / 180;
+        double cos = Math.cos(r);
+        double sin = Math.sin(r);
+        hspeed = cos * speed;
+        vspeed = -sin * speed;
+    }
+
+    public void motion_add(double dir, double speed) {
+        motion_set(dir + this.direction, speed + this.speed);
+    }
+
+    protected void move() {
+        if (isDead)
+            return;
+        xprevious = x;
+        yprevious = y;
+        // Move with direction etc
+        x += hspeed;
+        y += vspeed;
+        image_index += image_speed;
+        if (sprite_index >= 0)
+            image_index %= image_number;
+    }
+
+    public void draw(GraphicsLibrary g) {
+        if (isDead)
+            return;
+        if (sprite_index < 0) {
+            return;
+        }
+        GameSprite s = RuneroGame.game.getSprite((int) sprite_index);
+        if (s == null) {
+            System.out.println("Unknown sprite " + sprite_index);
+            return;
+        }
+        int subs = s.subImages.size();
+        if (subs == 0) {
+            System.out.println("Sprite has no sub-images " + s.getName());
+            return;
+        }
+        
+
+  //      SubImage si = s.subImages.get((int) image_index);
+    //   g.setColor(Color.RED);
+        // if (s.shape == MaskShape.PRECISE)
+     /*   for (int i = 0; i < s.width; i++)
+            for (int j = 0; j < s.height; j++)
+
+                // if (si.mask.map[i][j])
+                {
+                g.drawLine((x - s.x),  (y - s.y), (x - s.x) + i, (y - s.y) + j); }
+*/
+        
+        s.load(); // load sub image files
+        Texture img = s.getTexture((int) Math.round(image_index));
+        if (img == null) {
+            System.out.println("Null image for sprite " + s.getName() + " index " + image_index);
+            return;
+        }
+       g.drawTexture(img, x - s.x, y - s.y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
+
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public double getDirection() {
+        return direction;
+    }
+
+    public double getHspeed() {
+        return hspeed;
+    }
+
+    public double getVspeed() {
+        return vspeed;
+    }
+
+    public boolean equals(Object o) {
+        if (o instanceof Instance) {
+            Instance i = (Instance) o;
+            return i.id == this.id;
+        }
+        return false;
+    }
+
+    @Override
+    public int compareTo(Instance o) {
+        // Do it backwards (highest to lowest)
+        return Double.compare(o.depth, depth);
+    }
+
+    public String toString() {
+        return obj.getName() + " at (" + x + "," + y + ")";
+    }
+
+    /* Variable Code */
     public void setVariable(Variable v, Constant value, Instance other) {
         // TODO: Pre-runtime checking...
         String name = v.name;
@@ -411,159 +582,4 @@ public class Instance implements Comparable<Instance> {
         return null;
     }
 
-    /**
-     * Performs event
-     * 
-     * @param index  main event index
-     */
-    public void performEvent(Event event) {
-        if (isDead)
-            return;
-        byte index = event.parent.mainEvent;
-        if (index == MainEvent.EV_DRAW) {
-            if (!visible)
-                return;
-        }
-        if (index == MainEvent.EV_COLLISION)
-            if (solid || event.collisionObject.solid) {
-                x = xprevious;
-                y = yprevious;
-            }
-        GmlInterpreter.performEvent(event, this);
-    }
-
-    public GameSprite getSprite() {
-        if (sprite_index < 0)
-            return null;
-        return RuneroGame.game.getSprite((int) Math.round(sprite_index));
-    }
-    
-    public SubImage getSubImage() {
-        GameSprite s = RuneroGame.game.getSprite((int) sprite_index);
-        if (s == null) 
-            return null;
-        int subs = s.subImages.size();
-        if (subs == 0) 
-            return null;
-        return s.subImages.get(((int) Math.round(image_index)) % s.subImages.size());
-    }
-
-    public GameSprite getMask() {
-        if (mask_index < 0)
-            return null;
-        return RuneroGame.game.getSprite((int) Math.round(mask_index));
-    }
-
-    public void setDirection(double newDir) {
-        motion_set(newDir, speed);
-    }
-
-    public void setSpeed(double newSpeed) {
-        motion_set(direction, newSpeed);
-    }
-
-    public void setHspeed(double newHspeed) {
-        setSpeed(newHspeed, vspeed);
-    }
-
-    public void setVspeed(double newVspeed) {
-        setSpeed(hspeed, newVspeed);
-    }
-
-    public void setSpeed(double newHspeed, double newVspeed) {
-        hspeed = newHspeed;
-        vspeed = newVspeed;
-        double dir = Math.atan2(newVspeed, newHspeed);
-        this.direction = dir / Math.PI * 180;
-        // Pythagorean theorem
-        double h = Math.abs(newHspeed);
-        double v = Math.abs(newVspeed);
-        this.speed = Math.sqrt((v * v) + (h * h));
-    }
-
-    public void motion_set(double dir, double speed) {
-        this.direction = dir;
-        this.speed = speed;
-        double r = dir * Math.PI / 180;
-        double cos = Math.cos(r);
-        double sin = Math.sin(r);
-        hspeed = cos * speed;
-        vspeed = -sin * speed;
-    }
-
-    public void motion_add(double dir, double speed) {
-        motion_set(dir + this.direction, speed + this.speed);
-    }
-
-    protected void move() {
-        if (isDead)
-            return;
-        xprevious = x;
-        yprevious = y;
-        // Move with direction etc
-        x += hspeed;
-        y += vspeed;
-        image_index += image_speed;
-        if (sprite_index >= 0)
-            image_index %= image_number;
-    }
-
-    public void draw(GraphicsLibrary g) {
-        if (isDead)
-            return;
-        if (sprite_index < 0) {
-            return;
-        }
-        GameSprite s = RuneroGame.game.getSprite((int) sprite_index);
-        if (s == null) {
-            System.out.println("Unknown sprite " + sprite_index);
-            return;
-        }
-        int subs = s.subImages.size();
-        if (subs == 0) {
-            System.out.println("Sprite has no sub-images " + s.getName());
-            return;
-        }
-        s.load(); // load sub image files
-        Texture img = s.getSubImage((int) Math.round(image_index));
-        if (img == null) {
-            System.out.println("Null image for sprite " + s.getName() + " index " + image_index);
-            return;
-        }
-        g.drawTexture(img, x - s.x, y - s.y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
-    }
-
-    public double getSpeed() {
-        return speed;
-    }
-
-    public double getDirection() {
-        return direction;
-    }
-
-    public double getHspeed() {
-        return hspeed;
-    }
-
-    public double getVspeed() {
-        return vspeed;
-    }
-
-    public boolean equals(Object o) {
-        if (o instanceof Instance) {
-            Instance i = (Instance) o;
-            return i.id == this.id;
-        }
-        return false;
-    }
-
-    @Override
-    public int compareTo(Instance o) {
-        // Do it backwards (highest to lowest)
-        return Double.compare(o.depth, depth);
-    }
-
-    public String toString() {
-        return obj.getName() + " at (" + x + "," + y + ")";
-    }
 }

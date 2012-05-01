@@ -14,12 +14,10 @@ import org.gcreator.runero.res.GameFont;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.Rectangle;
-import org.newdawn.slick.opengl.Texture;
 
 public class GraphicsLibrary {
 
-    org.newdawn.slick.Color curColor = org.newdawn.slick.Color.white;
-    private org.newdawn.slick.TrueTypeFont font;
+    private TrueTypeFont font;
     public int fontAlign; // Font alignment, 0,1,2 (left,center,right), respectively
 
     private GraphicsLibrary()
@@ -27,7 +25,7 @@ public class GraphicsLibrary {
         }
 
     public void init() {
-        font = new org.newdawn.slick.TrueTypeFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12), true);
+        font = new TrueTypeFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12), true);
     }
 
     public final static GraphicsLibrary gfx = new GraphicsLibrary();
@@ -37,7 +35,6 @@ public class GraphicsLibrary {
     }
 
     public void setColor(Color c) {
-        curColor = new org.newdawn.slick.Color(c.getRGB());
         glColor4d(c.getRed() / 255.0, c.getGreen() / 255.0, c.getBlue() / 255.0, c.getAlpha() / 255.0);
     }
 
@@ -128,12 +125,9 @@ public class GraphicsLibrary {
 
     public void drawLine(double x1, double y1, double x2, double y2) {
         glPushMatrix();
-        glBegin(GL_LINE_LOOP);
-        for (int i = 0; i < 10; i++) {
-            int v = i * 10;
-            glVertex2d(x1 + v, y1 + v);
-            glVertex2d(x2 + v, y2 + v);
-        }
+        glBegin(GL_LINES);
+        glVertex2d(x1, y1);
+        glVertex2d(x2, y2);
         glEnd();
         glPopMatrix();
     }
@@ -225,6 +219,12 @@ public class GraphicsLibrary {
             drawTexture(bi, x, y, w, h);
     }
 
+    public void drawPoint(double x, double y) {
+        glBegin(GL_POINTS);
+        glVertex2d(x, y);
+        glEnd();
+    }
+
     /**
      * Draw Texture
      * 
@@ -265,13 +265,13 @@ public class GraphicsLibrary {
             glTexCoord2d(0, 0);
             glVertex2d(0, 0);
 
-            glTexCoord2d(t.getWidth(), 0);
+            glTexCoord2d(t.getWidthRatio(), 0);
             glVertex2d(width, 0);
 
-            glTexCoord2d(t.getWidth(), t.getHeight());
+            glTexCoord2d(t.getWidthRatio(), t.getHeightRatio());
             glVertex2d(width, height);
 
-            glTexCoord2d(0, t.getHeight());
+            glTexCoord2d(0, t.getHeightRatio());
             glVertex2d(0, height);
 
         }
@@ -303,23 +303,19 @@ public class GraphicsLibrary {
     }
 
     public void drawString(String text, float x, float y) {
-        font.drawString(x, y, text, curColor);
+        font.drawString(x, y, text, 1, 1);
     }
 
     public void drawString(float x, float y, String text) {
-        // font.drawString(x, y, text, 1, 1, fontAlign);
-        drawString(x, y, text);
+        font.drawString(x, y, text, 1, 1, fontAlign);
     }
 
     public void drawString(float x, float y, String text, float xscale, float yscale, float angle) {
-        // font.drawString(x, y, text, 1, 1, xscale, yscale, angle, fontAlign);
-        drawString(x, y, text);
+        font.drawString(x, y, text, 1, 1, xscale, yscale, angle, fontAlign);
     }
 
     public void drawString(double x, double y, String text, double xscale, double yscale, double angle) {
-        // font.drawString((float) x, (float) y, text, 1, 1, (float) xscale, (float) yscale, (float) angle, fontAlign);
-
-        drawString((float) x, (float) y, text);
+        font.drawString((float) x, (float) y, text, 1, 1, (float) xscale, (float) yscale, (float) angle, fontAlign);
     }
 
     public void saveScreenshot(File file) {

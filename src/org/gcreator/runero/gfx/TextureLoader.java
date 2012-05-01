@@ -19,45 +19,105 @@
 
 package org.gcreator.runero.gfx;
 
-import java.awt.image.BufferedImage;
+import static org.lwjgl.opengl.GL11.*;
+
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.LinkedList;
+import java.util.zip.InflaterInputStream;
 
-import javax.imageio.ImageIO;
-
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.util.BufferedImageUtil;
+import org.lwjgl.BufferUtils;
 
 public class TextureLoader {
 
     public LinkedList<Texture> textures;
-    
-    public TextureLoader() {
-        textures = new LinkedList<Texture>();
+
+    public TextureLoader()
+        {
+            textures = new LinkedList<Texture>();
+        }
+
+    /** Scratch buffer for texture ID's */
+    private IntBuffer textureIDBuffer = BufferUtils.createIntBuffer(1);
+
+    private int createTextureID() {
+        glGenTextures(textureIDBuffer);
+        return textureIDBuffer.get(0);
     }
-    
+
     /**
-     * Load a texture
+     * Loads a texture
      *
      * @param resourceName The location of the resource to load
      * @return The loaded texture
      * @throws IOException Indicates a failure to access the resource
      */
     public Texture getTexture(File res) {
-        long start = System.currentTimeMillis();
         try {
-            BufferedImage i = ImageIO.read(res);
-            Texture t = BufferedImageUtil.getTexture(res.getName(), i);
-            textures.add(t);
+            long start = System.currentTimeMillis();
+            int target = GL_TEXTURE_2D;
+
+            InflaterInputStream in = new InflaterInputStream(new BufferedInputStream(new FileInputStream(res)));
+            int width = read4(in);
+            int height = read4(in);
+            int texWidth = read4(in);
+            int texHeight = read4(in);
+            byte[] data = new byte[texWidth * texHeight * 4];
+            int tmp = 0;
+            int inc = (texWidth-width)*4;
+            for (int j = 0; j < height; j++) {
+                for (int i = 0; i < width; i++) {
+                    for (int k = 0; k < 4; k++)
+                        data[tmp++] = (byte) in.read();
+                }
+                tmp += inc;
+            }
+            // create the texture ID for this texture
+            int textureID = createTextureID();
+            Texture texture = new Texture(target, textureID);
+
+            // bind this texture
+            glBindTexture(target, textureID);
+
+            texture.setWidth(width);
+            texture.setHeight(height);
+
+            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            ByteBuffer imageBuffer;
+
+            texture.setTextureHeight(texHeight);
+            texture.setTextureWidth(texWidth);
+
+            imageBuffer = ByteBuffer.allocateDirect(data.length);
+            imageBuffer.order(ByteOrder.nativeOrder());
+            imageBuffer.put(data, 0, data.length);
+            imageBuffer.flip();
+            // produce a texture from the byte buffer
+            glTexImage2D(target, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer);
             long time = System.currentTimeMillis() - start;
-            System.out.println("Loaded " + res + " in " + time + " ms");
-            return t;
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Loaded " + res.getName() + " in " + time + " ms");
+
+            return texture;
+        } catch (IOException exc) {
+            System.err.println("Cannot load texture " + res);
+            exc.printStackTrace();
         }
         return null;
-
     }
 
+    private static int read4(InputStream i) throws IOException {
+        int a = i.read();
+        int b = i.read();
+        int c = i.read();
+        int d = i.read();
+        return (a | (b << 8) | (c << 16) | (d << 24));
+    }
 }

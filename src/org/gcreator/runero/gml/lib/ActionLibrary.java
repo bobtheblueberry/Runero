@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.event.Action;
 import org.gcreator.runero.gfx.GraphicsLibrary;
+import org.gcreator.runero.gfx.Texture;
 import org.gcreator.runero.gml.Constant;
 import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.VariableManager;
@@ -40,7 +41,6 @@ import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameSprite;
 import org.lwjgl.input.Mouse;
-import org.newdawn.slick.opengl.Texture;
 
 /**
  * Implements all Game Maker library actions
@@ -1291,9 +1291,9 @@ public class ActionLibrary {
         if (s.subImages.size() == 0) {
             return;
         }
-        Texture lifeImg = s.getSubImage(0);
+        Texture lifeImg = s.getTexture(0);
         for (int i = 0; i < lives; i++) {
-            int off = lifeImg.getTextureWidth() * i;
+            int off = lifeImg.getImageWidth() * i;
             g.drawTexture(lifeImg, x + off, y);
         }
         // a nice thing would be to draw part of an image if lives is, say 1.5
@@ -1389,7 +1389,7 @@ public class ActionLibrary {
             x += instance.x;
             y += instance.y;
         }
-        Texture img = s.getSubImage(subImage % s.subImages.size());
+        Texture img = s.getTexture(subImage % s.subImages.size());
         g.drawTexture(img, x, y);
     }
 

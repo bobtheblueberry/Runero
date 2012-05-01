@@ -14,6 +14,7 @@ import org.gcreator.runero.event.EventExecutor;
 import org.gcreator.runero.event.EventQueue;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.gfx.GraphicsLibrary;
+import org.gcreator.runero.gfx.Texture;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
@@ -23,7 +24,6 @@ import org.gcreator.runero.res.GameRoom.Tile;
 import org.gcreator.runero.res.GameRoom.View;
 import org.gcreator.runero.res.GameSprite;
 import org.lwjgl.input.Keyboard;
-import org.newdawn.slick.opengl.Texture;
 
 public class RoomInstance {
 

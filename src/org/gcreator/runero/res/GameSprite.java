@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import org.gcreator.runero.Preloadable;
 import org.gcreator.runero.RuneroGame;
-import org.newdawn.slick.opengl.Texture;
+import org.gcreator.runero.gfx.Texture;
 
 public class GameSprite extends GameResource implements Preloadable {
 
@@ -39,7 +39,7 @@ public class GameSprite extends GameResource implements Preloadable {
         return bounds;
     }
 
-    public Texture getSubImage(int index) {
+    public Texture getTexture(int index) {
         int i = index % subImages.size();
         return subImages.get(i).load();
     }

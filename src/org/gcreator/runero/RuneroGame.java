@@ -334,7 +334,6 @@ public class RuneroGame {
 
     public VariableVal getVariable(Variable v, Instance instance, Instance other) {
         String name = v.name;
-        System.out.println("look for var " + name);
         if (v.isArray)
             name = GmlParser.getArrayName(v, instance, other);
         if (name.equals("gamemaker_registered")) {
