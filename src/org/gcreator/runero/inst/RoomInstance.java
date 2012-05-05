@@ -2,11 +2,13 @@ package org.gcreator.runero.inst;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 
 import org.gcreator.runero.RuneroGame;
+import org.gcreator.runero.Runner;
 import org.gcreator.runero.collision.RuneroCollision;
 import org.gcreator.runero.event.CollisionEvent;
 import org.gcreator.runero.event.Event;
@@ -220,39 +222,49 @@ public class RoomInstance {
         // if key is down
         if (game.em.hasKeyboardEvents)
             for (Event e : game.em.keyboardEvents) {
-                int type = e.type;
-                if (Keyboard.isKeyDown(type)) {
+                boolean fired = false;
+                for (int i : getCodes(e.type))
+                    if (i > 0 && Keyboard.isKeyDown(i)) {
+                        fired = true;
+                        break;
+                    }
+                if (fired)
                     EventExecutor.executeEvent(e, this);
-                    System.out.println("Keyboard " + type);
-                }
             }
 
         while (Keyboard.next()) {
+            System.out.println("Keyboard down " + Keyboard.getKeyName(Keyboard.getEventKey()) + " :"
+                    + Keyboard.getEventCharacter());
+            // TODO: Fix this
             game.keyboard_string += Keyboard.getEventCharacter();
             game.keyboard_lastchar = String.valueOf(Keyboard.getEventCharacter());
 
             // key press
             if (game.em.hasKeyPressEvents && Keyboard.getEventKeyState())
                 for (Event e : game.em.keyPressEvents) {
-                    int type = e.type;
-                    if (Keyboard.isKeyDown(type)) {
-                        EventExecutor.executeEvent(e, this);
-                    }
+                    boolean fired = false;
+                    int t = -1;
+                    for (int i : getCodes(e.type))
+                        if (i == Keyboard.getEventKey() && Keyboard.getEventKeyState()) {
+                            fired = true;
+                            t = i;
+                            break;
+                        }
                 }
+
             // key release
             if (game.em.hasKeyReleaseEvents && !Keyboard.getEventKeyState())
                 for (Event e : game.em.keyReleaseEvents) {
-                    int type = e.type;
-                    // TODO: THI
-                    if (false) {
-                        // TODO: This behaves in the same way as keyDown
+                    boolean fired = false;
+                    for (int i : getCodes(e.type))
+                        if (i == Keyboard.getEventKey() && !Keyboard.getEventKeyState()) {
+                            fired = true;
+                            break;
+                        }
+                    if (fired)
                         EventExecutor.executeEvent(e, this);
-                    }
                 }
         }
-        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE))
-            System.out.println("SPACE!");
-
         // millions of mouse and joystick events
 
         // normal step
@@ -387,5 +399,24 @@ public class RoomInstance {
         }
 
         return false;
+    }
+
+    private int[] getCodes(int awtKey) {
+        int type = Runner.getLWJGLKey(awtKey);
+        if (awtKey == KeyEvent.VK_ALT)
+            return new int[]
+                { Keyboard.KEY_RMENU, Keyboard.KEY_LMENU };
+        else if (awtKey == KeyEvent.VK_CONTROL)
+            return new int[]
+                { Keyboard.KEY_RCONTROL, Keyboard.KEY_LCONTROL };
+        else if (awtKey == KeyEvent.VK_SHIFT)
+            return new int[]
+                { Keyboard.KEY_RSHIFT, Keyboard.KEY_LSHIFT };
+        else if (awtKey == KeyEvent.VK_ENTER)
+            return new int[]
+                { Keyboard.KEY_RETURN, Keyboard.KEY_LEFT };
+
+        return new int[]
+            { type };
     }
 }
