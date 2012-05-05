@@ -417,22 +417,22 @@ public class ResourceLoader {
         File[] bgFiles = bgDir.listFiles(new FileFilter(".dat"));
         game.backgrounds = new ArrayList<GameBackground>(bgFiles.length);
         for (File f : bgFiles) {
-            BufferedReader r = new BufferedReader(new FileReader(f));
-            GameBackground b = new GameBackground(r.readLine());
-            b.setId(Integer.parseInt(r.readLine()));
-            b.transparent = Boolean.parseBoolean(r.readLine());
-            b.smoothEdges = Boolean.parseBoolean(r.readLine());
-            b.preload = Boolean.parseBoolean(r.readLine());
-            b.useAsTileset = Boolean.parseBoolean(r.readLine());
-            b.tileWidth = Integer.parseInt(r.readLine());
-            b.tileHeight = Integer.parseInt(r.readLine());
-            b.hOffset = Integer.parseInt(r.readLine());
-            b.vOffset = Integer.parseInt(r.readLine());
-            b.hSep = Integer.parseInt(r.readLine());
-            b.vSep = Integer.parseInt(r.readLine());
-            String bgImage = r.readLine();
+            StreamDecoder in = new StreamDecoder(f);
+            GameBackground b = new GameBackground(in.readStr());
+            b.setId(in.read4());
+            b.transparent = in.readBool();
+            b.smoothEdges = in.readBool();
+            b.preload = in.readBool();
+            b.useAsTileset = in.readBool();
+            b.tileWidth = in.read4();
+            b.tileHeight = in.read4();
+            b.hOffset = in.read4();
+            b.vOffset = in.read4();
+            b.hSep = in.read4();
+            b.vSep = in.read4();
+            String bgImage = in.readStr();
             b.imageFile = new File(bgDir, bgImage);
-            r.close();
+            in.close();
             game.backgrounds.add(b);
             if (b.preload) {
                 preloadables.add(b);
