@@ -1182,7 +1182,8 @@ public class ActionLibrary {
     }
 
     private static void execute_script(Action a, Instance instance, Instance other) {
-        // TODO: This
+        // script, arg0,arg1,arg2,arg3,arg4
+        
     }
 
     // GM8 Splash functions that SUCK

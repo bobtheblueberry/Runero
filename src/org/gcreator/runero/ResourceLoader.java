@@ -251,7 +251,7 @@ public class ResourceLoader {
                 char d = (char) in.read();
                 int k = 0;
                 for (int j = 7; j >= 0; j--) {
-                    if (c*8 + k++ >= numbers) {
+                    if (c * 8 + k++ >= numbers) {
                         break;
                     }
                     boolean r = ((d >>> j) & 1) == 1;
@@ -319,123 +319,97 @@ public class ResourceLoader {
         File roomDir = new File(Runner.GameFolder, "rooms/");
         File roomData = new File(roomDir, "rooms.lst");
 
-        BufferedReader r = new BufferedReader(new FileReader(roomData));
-        String line;
-        while ((line = r.readLine()) != null) {
-            String[] s = line.split(",");
-            // room_instruce,6
-            roomNames.add(s[0]);
-            rooms.add(Integer.parseInt(s[1]));
+        StreamDecoder in = new StreamDecoder(roomData);
+        int num = in.read4();
+        int[] ro = new int[num];
+        for (int i = 0; i < num; i++) {
+            int n;
+            rooms.add(n = in.read4());
+            roomNames.add(in.readStr());
+            ro[i] = n;
         }
-        r.close();
-        int[] ro = new int[rooms.size()];
-        for (int i = 0; i < rooms.size(); i++)
-            ro[i] = rooms.get(0);
         game.roomOrder = ro;
+        in.close();
 
-        game.rooms = new ArrayList<GameRoom>(game.roomOrder.length);
+        game.rooms = new ArrayList<GameRoom>(num);
         for (int i = 0; i < game.roomOrder.length; i++) {
-            boolean hasCCode;
             File rf = new File(roomDir, roomNames.get(i) + ".dat");
-            r = new BufferedReader(new FileReader(rf));
-            GameRoom room = new GameRoom(r.readLine());
-            room.setId(Integer.parseInt(r.readLine()));
-            room.caption = r.readLine();
-            room.setWidth(Integer.parseInt(r.readLine()));
-            room.setHeight(Integer.parseInt(r.readLine()));
-            room.speed = Integer.parseInt(r.readLine());
-            room.persistent = Boolean.parseBoolean(r.readLine());
-            room.background_color = new java.awt.Color(Integer.parseInt(r.readLine()));
-            room.draw_background_color = Boolean.parseBoolean(r.readLine());
-            hasCCode = Boolean.parseBoolean(r.readLine());
-            int bgs = Integer.parseInt(r.readLine());
+            in = new StreamDecoder(rf);
+            GameRoom room = new GameRoom(in.readStr());
+            room.setId(in.read4());
+            room.caption = in.readStr();
+            room.setWidth(in.read4());
+            room.setHeight(in.read4());
+            room.speed = in.read4();
+            room.persistent = in.readBool();
+            room.background_color = new java.awt.Color(in.read4());
+            room.draw_background_color = in.readBool();
+            room.creation_code = CodeRes.load(in.readStr());
+            int bgs = in.read4();
             room.backgrounds = new GameRoom.Background[bgs];
             for (int j = 0; j < bgs; j++) {
-                String bg = r.readLine();
-                String[] data = bg.split(",");
                 GameRoom.Background b = new GameRoom.Background();
-                b.visible = Boolean.parseBoolean(data[0]);
-                b.foreground = Boolean.parseBoolean(data[1]);
-                b.backgroundId = Integer.parseInt(data[2]);
-                b.x = Integer.parseInt(data[3]);
-                b.y = Integer.parseInt(data[4]);
-                b.tileHoriz = Boolean.parseBoolean(data[5]);
-                b.tileVert = Boolean.parseBoolean(data[6]);
-                b.hSpeed = Integer.parseInt(data[7]);
-                b.vSpeed = Integer.parseInt(data[8]);
-                b.stretch = Boolean.parseBoolean(data[9]);
+                b.visible = in.readBool();
+                b.foreground = in.readBool();
+                b.backgroundId = in.read4();
+                b.x = in.read4();
+                b.y = in.read4();
+                b.tileHoriz = in.readBool();
+                b.tileVert = in.readBool();
+                b.hSpeed = in.read4();
+                b.vSpeed = in.read4();
+                b.stretch = in.readBool();
                 room.backgrounds[j] = b;
             }
-            room.enable_views = Boolean.parseBoolean(r.readLine());
-            int views = Integer.parseInt(r.readLine());
+            room.enable_views = in.readBool();
+            int views = in.read4();
             room.views = new GameRoom.View[views];
             for (int j = 0; j < views; j++) {
-                String view = r.readLine();
-                String[] data = view.split(",");
                 GameRoom.View v = new GameRoom.View();
-                v.visible = Boolean.parseBoolean(data[0]);
-                v.viewX = Integer.parseInt(data[1]);
-                v.viewY = Integer.parseInt(data[2]);
-                v.viewW = Integer.parseInt(data[3]);
-                v.viewH = Integer.parseInt(data[4]);
-                v.portX = Integer.parseInt(data[5]);
-                v.portY = Integer.parseInt(data[6]);
-                v.portW = Integer.parseInt(data[7]);
-                v.portH = Integer.parseInt(data[8]);
-                v.borderH = Integer.parseInt(data[9]);
-                v.borderV = Integer.parseInt(data[10]);
-                v.speedH = Integer.parseInt(data[11]);
-                v.speedV = Integer.parseInt(data[12]);
-                v.objectId = Integer.parseInt(data[13]);
+                v.visible = in.readBool();
+                v.viewX = in.read4();
+                v.viewY = in.read4();
+                v.viewW = in.read4();
+                v.viewH = in.read4();
+                v.portX = in.read4();
+                v.portY = in.read4();
+                v.portW = in.read4();
+                v.portH = in.read4();
+                v.borderH = in.read4();
+                v.borderV = in.read4();
+                v.speedH = in.read4();
+                v.speedV = in.read4();
+                v.objectId = in.read4();
 
                 room.views[j] = v;
             }
-            int instances = Integer.parseInt(r.readLine());
+            int instances = in.read4();
             room.staticInstances = new ArrayList<GameRoom.StaticInstance>(instances);
             for (int j = 0; j < instances; j++) {
-                String ins = r.readLine();
-                String[] data = ins.split(",");
-                GameRoom.StaticInstance in = new GameRoom.StaticInstance();
-                in.x = Integer.parseInt(data[0]);
-                in.y = Integer.parseInt(data[1]);
-                in.objectId = Integer.parseInt(data[2]);
-                in.id = Integer.parseInt(data[3]);
-                String ccode_ref = data[4];
-                if (ccode_ref.startsWith("@")) {
-                    String file = "c_" + ccode_ref.substring(1) + ".gml";
-                    in.creationCode = CodeRes.load(roomDir, file);
-                } else {
-                    in.creationCode = null;
-                }
-                room.staticInstances.add(in);
+                GameRoom.StaticInstance inst = new GameRoom.StaticInstance();
+                inst.x = in.read4();
+                inst.y = in.read4();
+                inst.objectId = in.read4();
+                inst.id = in.read4();
+                inst.creationCode = CodeRes.load(in.readStr());
+                room.staticInstances.add(inst);
             }
-            int tiles = Integer.parseInt(r.readLine());
+            int tiles = in.read4();
             room.tiles = new GameRoom.Tile[tiles];
             for (int j = 0; j < tiles; j++) {
-                String tile = r.readLine();
-                String[] data = tile.split(",");
                 Tile t = new Tile();
-                t.roomX = Integer.parseInt(data[0]);
-                t.roomY = Integer.parseInt(data[1]);
-                t.bgX = Integer.parseInt(data[2]);
-                t.bgY = Integer.parseInt(data[3]);
-                t.width = Integer.parseInt(data[4]);
-                t.height = Integer.parseInt(data[5]);
-                t.depth = Integer.parseInt(data[6]);
-                t.backgroundId = Integer.parseInt(data[7]);
-                t.id = Integer.parseInt(data[8]);
+                t.roomX = in.read4();
+                t.roomY = in.read4();
+                t.bgX = in.read4();
+                t.bgY = in.read4();
+                t.width = in.read4();
+                t.height = in.read4();
+                t.depth = in.read4();
+                t.backgroundId = in.read4();
+                t.id = in.read4();
                 room.tiles[j] = t;
             }
-            if (r.readLine() != null) {
-                System.err.println("Error! Expected end of room file but there is still more data " + rf);
-            }
-            r.close();
-            // load creation code
-            if (hasCCode) {
-                room.creation_code = CodeRes.load(roomDir, room.getName() + "_ccode.gml");
-            } else {
-                room.creation_code = null;
-            }
+            in.close();
             game.rooms.add(room);
         }
     }
@@ -525,7 +499,7 @@ public class ResourceLoader {
             } else if (type == 1) {
                 arg.val = in.readStr();
             } else if (type == 2)
-                arg.code = new CodeRes(in.readStr());
+                arg.code = CodeRes.load(in.readStr());
             act.arguments.add(arg);
         }
         act.appliesTo = in.read4();
