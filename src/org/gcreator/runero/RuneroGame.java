@@ -98,7 +98,10 @@ public class RuneroGame {
             System.exit(1);
         }
         // Go to the first room
-        room = new RoomInstance(this, rooms.get(0));
+        int i = 0;
+        if (rooms.size() > 1)
+            i = 1; // DEBUG CODE
+        room = new RoomInstance(this, rooms.get(i));
         GraphicsLibrary.gfx.setTitle(room.caption);
         room.init(true);
     }

@@ -278,36 +278,34 @@ public class ResourceLoader {
         File[] files = objDir.listFiles(new FileFilter(".dat"));
         game.objects = new ArrayList<GameObject>(files.length);
         for (File f : files) {
-            BufferedReader r = new BufferedReader(new FileReader(f));
-            GameObject o = new GameObject(r.readLine());
-            o.setId(Integer.parseInt(r.readLine()));
-            o.spriteId = Integer.parseInt(r.readLine());
-            o.solid = Boolean.parseBoolean(r.readLine());
-            o.visible = Boolean.parseBoolean(r.readLine());
-            o.depth = Integer.parseInt(r.readLine());
-            o.persistent = Boolean.parseBoolean(r.readLine());
-            o.parentId = Integer.parseInt(r.readLine());
-            o.maskId = Integer.parseInt(r.readLine());
-            String line;
-            while ((line = r.readLine()) != null) {
-                String[] evt = line.split(",");
-                byte a = Byte.parseByte(evt[0]);
-                byte b = Byte.parseByte(evt[1]);
-                MainEvent e = o.getMainEvent(a);
-                Event ev = new Event(e, b);
-                ev.object = o;
-                String[] actions = r.readLine().split(",");
-                for (String ac : actions) {
-                    if (ac.startsWith("#")) {
-                        Action act = loadAction(ac.substring(1));
-                        ev.addAction(act);
-                    }
+            StreamDecoder in = new StreamDecoder(f);
+            GameObject o = new GameObject(in.readStr());
+            o.setId(in.read4());
+            o.spriteId = in.read4();
+            o.solid = in.readBool();
+            o.visible = in.readBool();
+            o.persistent = in.readBool();
+            o.depth = in.read4();
+            o.parentId = in.read4();
+            o.maskId = in.read4();
+
+            int numMainEvents = in.read4();
+            for (int i = 0; i < numMainEvents; i++) {
+                int events = in.read4();
+                for (int j = 0; j < events; j++) {
+                    MainEvent e = o.getMainEvent((byte) in.read());
+                    Event ev = new Event(e, in.read4());
+                    ev.object = o;
+                    int actn = in.read4();
+                    for (int a = 0; a < actn; a++)
+                        ev.addAction(loadAction(in));
+                    indentEvent(ev);
+                    e.addEvent(ev);
                 }
-                indentEvent(ev);
-                e.addEvent(ev);
             }
+
             game.em.addObject(o);
-            r.close();
+            in.close();
             game.objects.add(o);
         }
     }
@@ -478,9 +476,7 @@ public class ResourceLoader {
 
     File actionFolder;
 
-    private Action loadAction(String file) throws IOException {
-        File f = new File(actionFolder, "a_" + file + ".dat");
-        StreamDecoder in = new StreamDecoder(f);
+    private Action loadAction(StreamDecoder in) throws IOException {
 
         int parentId = in.read4();
         int id = in.read4();
@@ -505,7 +501,6 @@ public class ResourceLoader {
         act.appliesTo = in.read4();
         act.relative = in.readBool();
         act.not = in.readBool();
-        in.close();
         lexAction(act, a);
         return act;
     }
