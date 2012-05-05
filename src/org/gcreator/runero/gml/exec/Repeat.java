@@ -8,8 +8,9 @@ public class Repeat implements Statement {
 
     @Override
     public void execute(Context context) {
-        // TODO Auto-generated method stub
-
+        int c = (int)condition.solve(context.instance, context.other).dVal;
+        for (int i = 0; i < c; i++)
+            context.execute(exec);
     }
 
 }

@@ -25,7 +25,7 @@ import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReferenceTable;
 import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.gml.lib.FunctionManager;
-import org.gcreator.runero.res.Code;
+import org.gcreator.runero.res.CodeRes;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameInformation;
@@ -403,7 +403,7 @@ public class ResourceLoader {
                 String ccode_ref = data[4];
                 if (ccode_ref.startsWith("@")) {
                     String file = "c_" + ccode_ref.substring(1) + ".gml";
-                    in.creationCode = Code.load(roomDir, file);
+                    in.creationCode = CodeRes.load(roomDir, file);
                 } else {
                     in.creationCode = null;
                 }
@@ -432,7 +432,7 @@ public class ResourceLoader {
             r.close();
             // load creation code
             if (hasCCode) {
-                room.creation_code = Code.load(roomDir, room.getName() + "_ccode.gml");
+                room.creation_code = CodeRes.load(roomDir, room.getName() + "_ccode.gml");
             } else {
                 room.creation_code = null;
             }
@@ -525,7 +525,7 @@ public class ResourceLoader {
             } else if (type == 1) {
                 arg.val = in.readStr();
             } else if (type == 2)
-                arg.code = new Code(in.readStr());
+                arg.code = new CodeRes(in.readStr());
             act.arguments.add(arg);
         }
         act.appliesTo = in.read4();

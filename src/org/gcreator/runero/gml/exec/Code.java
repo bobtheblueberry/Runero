@@ -21,7 +21,7 @@ public class Code {
         for (Statement s : code) {
             if (!c.isGood())
                 return;
-            s.execute(c);
+            s.execute(c); //TODO: scope
         }
     }
     

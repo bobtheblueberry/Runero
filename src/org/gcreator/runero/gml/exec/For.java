@@ -11,8 +11,11 @@ public class For implements Statement {
     
     @Override
     public void execute(Context context) {
-        // TODO Auto-generated method stub
-
+        initial.execute(context);
+        while (condition.solve(context.instance, context.other).dVal > 0.5) {
+            context.execute(code);
+            increcement.execute(context);
+        }
     }
 
 }

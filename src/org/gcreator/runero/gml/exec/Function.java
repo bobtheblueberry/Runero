@@ -20,8 +20,7 @@ public class Function implements Statement {
 
     @Override
     public void execute(Context context) {
-        // TODO Auto-generated method stub
-
+        solve(context.instance, context.other);
     }
     
     public Constant solve(Instance instance, Instance other) {

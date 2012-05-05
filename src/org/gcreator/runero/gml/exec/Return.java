@@ -3,11 +3,10 @@ package org.gcreator.runero.gml.exec;
 public class Return implements Statement {
 
     public ExprArgument value;
-    
+
     @Override
     public void execute(Context context) {
-        // TODO Auto-generated method stub
-
+        context.returnStatement(value.solve(context.instance, context.other));
     }
 
 }

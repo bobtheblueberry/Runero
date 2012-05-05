@@ -13,7 +13,7 @@ package org.gcreator.runero.event;
 import java.awt.Color;
 
 import org.gcreator.runero.gml.exec.VariableRef;
-import org.gcreator.runero.res.Code;
+import org.gcreator.runero.res.CodeRes;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameObject;
@@ -47,7 +47,7 @@ public class Argument {
 
     public final int kind;
     public String val;
-    public Code code;
+    public CodeRes code;
     
     // Values parsed from the string
     public boolean boolVal;

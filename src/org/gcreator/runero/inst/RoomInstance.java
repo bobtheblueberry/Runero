@@ -250,6 +250,8 @@ public class RoomInstance {
                             t = i;
                             break;
                         }
+                    if (fired)
+                        EventExecutor.executeEvent(e, this);
                 }
 
             // key release

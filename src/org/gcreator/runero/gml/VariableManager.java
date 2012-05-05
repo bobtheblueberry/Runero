@@ -2,6 +2,7 @@ package org.gcreator.runero.gml;
 
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.Runner;
+import org.gcreator.runero.gml.exec.Scope;
 import org.gcreator.runero.gml.exec.Variable;
 import org.gcreator.runero.gml.exec.VariableRef;
 import org.gcreator.runero.inst.Instance;
@@ -15,11 +16,16 @@ public class VariableManager {
         }
 
     public static void setVariable(VariableRef r, Constant val, boolean relative, Instance instance, Instance other) {
+        setVariable(r, val, relative, instance, other, null);
+    }
+
+    public static void setVariable(VariableRef r, Constant val, boolean relative, Instance instance, Instance other,
+            Scope scope) {
         if (!relative) {
-            setVariable(r, val, instance, other);
+            setVariable(r, val, instance, other, scope);
             return;
         }
-        VariableVal v = findVariable(r, instance, other);
+        VariableVal v = findVariable(r, instance, other, scope);
         if (v == null) {
             Runner.Error("no such variable " + r);
         }
@@ -37,6 +43,10 @@ public class VariableManager {
     }
 
     public static void setVariable(VariableRef r, Constant val, Instance instance, Instance other) {
+        setVariable(r, val, instance, other, null);
+    }
+
+    public static void setVariable(VariableRef r, Constant val, Instance instance, Instance other, Scope scope) {
         Variable v = r.ref.get(0);
         if (r.ref.size() == 1) {
             String name = v.name;
@@ -65,7 +75,7 @@ public class VariableManager {
             // guess we'll set it for the instance..
             instance.setVariable(v, val, other);
         } else {
-            VariableVal first = findVariable(r, instance, other, true);
+            VariableVal first = findVariable(r, instance, other, null, true);
             if (first == null) {
                 System.err.println("Cannot locate reference path for " + r);
             } else if (first.isString) {
@@ -120,13 +130,18 @@ public class VariableManager {
 
     }
 
-    public static VariableVal findVariable(VariableRef r, Instance instance, Instance other) {
-        return findVariable(r, instance, other, false);
+    public static VariableVal findVariable(VariableRef r, Instance instance, Instance other, Scope scope) {
+        return findVariable(r, instance, other, scope, false);
     }
 
-    public static VariableVal findVariable(VariableRef r, Instance instance, Instance other, boolean notlast) {
+    public static VariableVal findVariable(VariableRef r, Instance instance, Instance other) {
+        return findVariable(r, instance, other, null, false);
+    }
+
+    private static VariableVal findVariable(VariableRef r, Instance instance, Instance other, Scope scope,
+            boolean notlast) {
         Variable v = r.ref.get(0);
-        VariableVal val = getVariable(v, instance, other);
+        VariableVal val = getVariable(v, instance, other, scope);
 
         if (r.ref.size() == 1 || (r.ref.size() == 2 && notlast)) {
             if (v.isExpression) {
@@ -201,7 +216,7 @@ public class VariableManager {
         }
     }
 
-    private static VariableVal getVariable(Variable v, Instance instance, Instance other) {
+    private static VariableVal getVariable(Variable v, Instance instance, Instance other, Scope scope) {
         VariableVal val;
         String name = v.name;
         if (v.isArray)
@@ -210,6 +225,11 @@ public class VariableManager {
             return new VariableVal(v.expression.solve(instance, other));
         }
 
+        if (scope != null) {
+            val = scope.vars.get(name);
+            if (val != null)
+                return val;
+        }
         // Look in constants
         val = RuneroGame.game.constants.get(name);
         if (val != null)

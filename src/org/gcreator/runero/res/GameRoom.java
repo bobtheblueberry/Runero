@@ -28,7 +28,7 @@ public class GameRoom extends GameResource {
     public int                       speed;
     public boolean                   persistent;
     public boolean                   draw_background_color;
-    public Code                      creation_code;
+    public CodeRes                      creation_code;
     public boolean                   enable_views;
     public Background[]              backgrounds;
     public View[]                    views;
@@ -117,7 +117,7 @@ public class GameRoom extends GameResource {
         public int  y;
         public int  objectId;
         public int  id;
-        public Code creationCode;
+        public CodeRes creationCode;
     }
 
     public static class Tile {

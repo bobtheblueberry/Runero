@@ -2,6 +2,8 @@ package org.gcreator.runero.gml.exec;
 
 import java.util.ArrayList;
 
+import org.gcreator.runero.gml.Constant;
+
 public class If implements Statement {
 
     public ExprArgument condition;
@@ -12,8 +14,12 @@ public class If implements Statement {
     
     @Override
     public void execute(Context context) {
-        // TODO Auto-generated method stub
-        
+        Constant c = condition.solve(context.instance, context.other);
+        if (c.dVal > 0.5)
+            context.execute(exec);
+        else if (hasElse)
+            context.execute(elseExec);
+            
     }
 
 }
