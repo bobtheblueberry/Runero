@@ -1,16 +1,13 @@
 package org.gcreator.runero;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -176,18 +173,18 @@ public class ResourceLoader {
         File[] files = fntDir.listFiles(new FileFilter(".dat"));
         game.fonts = new ArrayList<GameFont>(files.length);
         for (File f : files) {
-            BufferedReader r = new BufferedReader(new FileReader(f));
-            GameFont fnt = new GameFont(r.readLine());
-            fnt.setId(Integer.parseInt(r.readLine()));
-            fnt.fontName = r.readLine();
-            fnt.size = Integer.parseInt(r.readLine());
-            fnt.bold = Boolean.parseBoolean(r.readLine());
-            fnt.italic = Boolean.parseBoolean(r.readLine());
-            fnt.antialias = Integer.parseInt(r.readLine());
-            fnt.charset = Integer.parseInt(r.readLine());
-            fnt.rangeMin = Integer.parseInt(r.readLine());
-            fnt.rangeMax = Integer.parseInt(r.readLine());
-            r.close();
+            StreamDecoder in = new StreamDecoder(f);
+            GameFont fnt = new GameFont(in.readStr());
+            fnt.setId(in.read4());
+            fnt.fontName = in.readStr();
+            fnt.size = in.read4();
+            fnt.bold = in.readBool();
+            fnt.italic = in.readBool();
+            fnt.antialias = in.read4();
+            fnt.charset = in.read4();
+            fnt.rangeMin = in.read4();
+            fnt.rangeMax = in.read4();
+            in.close();
             game.fonts.add(fnt);
         }
     }
@@ -440,36 +437,22 @@ public class ResourceLoader {
         }
     }
 
-    private int read4(InputStream s) throws IOException {
-        int a = s.read();
-        int b = s.read();
-        int c = s.read();
-        int d = s.read();
-        return (a | (b << 8) | (c << 16) | (d << 24));
-    }
-
     private void loadGameInfo() throws IOException {
-        File settingsFile = new File(Runner.GameFolder, "Game Information.dat");
+        File f = new File(Runner.GameFolder, "Game Information.dat");
+        StreamDecoder in = new StreamDecoder(f);
         GameInformation g = new GameInformation();
-        BufferedReader r = new BufferedReader(new FileReader(settingsFile));
-        g.backgroundColor = new java.awt.Color(Integer.parseInt(r.readLine()));
-        g.caption = r.readLine();
-        g.left = Integer.parseInt(r.readLine());
-        g.top = Integer.parseInt(r.readLine());
-        g.width = Integer.parseInt(r.readLine());
-        g.height = Integer.parseInt(r.readLine());
-        g.mimicGameWindow = Boolean.parseBoolean(r.readLine());
-        g.showBorder = Boolean.parseBoolean(r.readLine());
-        g.allowResize = Boolean.parseBoolean(r.readLine());
-        g.stayOnTop = Boolean.parseBoolean(r.readLine());
-        g.pauseGame = Boolean.parseBoolean(r.readLine());
-        r.close();
-
-        File infoFile = new File(Runner.GameFolder, "Game Information.rtf");
-        BufferedInputStream in = new BufferedInputStream(new FileInputStream(infoFile));
-        byte data[] = new byte[read4(in)];
-        in.read(data);
-        g.text = new String(data, Charset.forName("ISO-8859-1"));
+        g.text = in.readStr();
+        g.backgroundColor = new java.awt.Color(in.read4());
+        g.caption = in.readStr();
+        g.left = in.read4();
+        g.top = in.read4();
+        g.width = in.read4();
+        g.height = in.read4();
+        g.mimicGameWindow = in.readBool();
+        g.showBorder = in.readBool();
+        g.allowResize = in.readBool();
+        g.stayOnTop = in.readBool();
+        g.pauseGame = in.readBool();
         in.close();
         RuneroGame.game.gameInfo = g;
     }
