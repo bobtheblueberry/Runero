@@ -68,11 +68,12 @@ public class StreamDecoder extends InputStream
 	public int read() throws IOException
 		{
 		int t = in.read();
+		/*
 		if (t == -1)
 			{
 			String error = "StreamDecoder.UNEXPECTED_EOF"; //$NON-NLS-1$
 			throw new IOException(error);
-			}
+			}*/
 		pos++;
 		return t;
 		}

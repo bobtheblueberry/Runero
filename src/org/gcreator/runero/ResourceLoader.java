@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -27,12 +26,16 @@ import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameInformation;
 import org.gcreator.runero.res.GameObject;
+import org.gcreator.runero.res.GamePath;
 import org.gcreator.runero.res.GameResource;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameRoom.Tile;
+import org.gcreator.runero.res.GameScript;
+import org.gcreator.runero.res.GameSound;
 import org.gcreator.runero.res.GameSprite;
 import org.gcreator.runero.res.GameSprite.Mask;
 import org.gcreator.runero.res.GameSprite.MaskShape;
+import org.gcreator.runero.res.GameTimeline;
 import org.lateralgm.file.gc.StreamDecoder;
 import org.lateralgm.resources.library.gc.LibAction;
 import org.lateralgm.resources.library.gc.LibAction.LibArgument;
@@ -42,37 +45,76 @@ public class ResourceLoader {
 
     RuneroGame game;
     LinkedList<Preloadable> preloadables;
+    File roomDir;
+    File fontDir;
+    File sprDir;
+    File scrDir;
+    File objDir;
+    File sndDir;
+    File bgDir;
+    File pathDir;
+    File tlDir;
+    int rooms, fonts, sprites, scripts, objects, backgrounds, paths, timelines, sounds;
+    
+    private static final byte SPRITE = 1;
+    private static final byte BACKGROUND = 2;
+    private static final byte SOUND = 3;
+    private static final byte PATH = 4;
+    private static final byte SCRIPT = 5;
+    private static final byte FONT = 6;
+    private static final byte TIMELINE = 7;
+    private static final byte OBJECT = 8;
+    private static final byte ROOM = 9;
+    private static final byte GAME_INFO = 10;
+    private static final byte SETTINGS = 11;
 
     public ResourceLoader(RuneroGame game)
         {
             this.game = game;
             preloadables = new LinkedList<Preloadable>();
             actionFolder = new File(Runner.GameFolder, "actions/");
+            roomDir = new File(Runner.GameFolder, "rooms/");
+            fontDir = new File(Runner.GameFolder, "fonts/");
+            sprDir = new File(Runner.GameFolder, "sprites/");
+            scrDir = new File(Runner.GameFolder, "scripts/");
+            objDir = new File(Runner.GameFolder, "objects/");
+            sndDir = new File(Runner.GameFolder, "sounds/");
+            bgDir = new File(Runner.GameFolder, "backgrounds/");
+            pathDir = new File(Runner.GameFolder, "paths/");
+            tlDir = new File(Runner.GameFolder, "timelines/");
         }
 
     public void loadResources() throws IOException {
         FunctionManager.load();
-        System.out.println("Loaded function IDs");
-
         if (!LibManager.autoLoad())
             throw new IOException("Failed to load Libraries");
-        System.out.println("Loaded Libraries");
 
-        loadRooms();
-        System.out.println("Loaded room data");
-        loadBackgrounds();
-        System.out.println("Loaded background data");
-        loadObjects();
-        if (game.em.hasCollisionEvents)
-            Collections.sort(game.em.collision);
-        System.out.println("Loaded object data");
-        loadSprites();
-        System.out.println("Loaded sprite data");
-        loadFonts();
-        System.out.println("Loaded font data");
+        File res = new File(Runner.GameFolder, "resources.dat");
+        StreamDecoder in = new StreamDecoder(res);
+        sprites = in.read4();
+        backgrounds = in.read4();
+        sounds = in.read4();
+        paths = in.read4();
+        scripts = in.read4();
+        fonts = in.read4();
+        timelines = in.read4();
+        objects = in.read4();
+        rooms = in.read4();
+        game.sprites = new ArrayList<GameSprite>(sprites);
+        game.backgrounds = new ArrayList<GameBackground>(backgrounds);
+        game.fonts = new ArrayList<GameFont>(fonts);
+        game.rooms = new ArrayList<GameRoom>(rooms);
+        game.objects = new ArrayList<GameObject>(objects);
+        game.sounds = new ArrayList<GameSound>(sounds);
+        game.scripts = new ArrayList<GameScript>(scripts);
+        game.timelines = new ArrayList<GameTimeline>(timelines);
+        game.paths = new ArrayList<GamePath>(paths);
 
-        loadGameInfo();
-        System.out.println("Loaded Game info");
+        int b;
+        while ((b = in.read()) != -1) {
+            loadRes(b, in.readStr());
+        }
+
         loadConstants();
         // Resource name Constants
         addResourceConstants(game.sprites);
@@ -85,7 +127,8 @@ public class ResourceLoader {
         addResourceConstants(game.objects);
         addResourceConstants(game.rooms);
 
-        System.out.println("Loaded Constants");
+        if (game.em.hasCollisionEvents)
+            Collections.sort(game.em.collision);
 
         // DEBUG TREE
         /*
@@ -131,6 +174,44 @@ public class ResourceLoader {
         */
     }
 
+    private void loadRes(int val, String name) throws IOException {
+        switch (val) {
+            case SPRITE:
+                loadSprite(name);
+                break;
+            case BACKGROUND:
+                loadBackground(name);
+                break;
+            case SOUND:
+                // loadSound(name);
+                break;
+            case PATH:
+                // loadPath(name);
+                break;
+            case SCRIPT:
+                // loadScript(name);
+                break;
+            case FONT:
+                loadFont(name);
+                break;
+            case TIMELINE:
+                // loadTimeline(name);
+                break;
+            case OBJECT:
+                loadObject(name);
+                break;
+            case ROOM:
+                loadRoom(name);
+                break;
+            case GAME_INFO:
+                loadGameInfo(name);
+                break;
+            case SETTINGS:
+                // loadSettings(name);
+                break;
+        }
+    }
+
     private void addResourceConstants(ArrayList<? extends GameResource> res) {
         if (res == null)
             return;
@@ -168,70 +249,62 @@ public class ResourceLoader {
         r.close();
     }
 
-    private void loadFonts() throws IOException {
-        File fntDir = new File(Runner.GameFolder, "fonts/");
-        File[] files = fntDir.listFiles(new FileFilter(".dat"));
-        game.fonts = new ArrayList<GameFont>(files.length);
-        for (File f : files) {
-            StreamDecoder in = new StreamDecoder(f);
-            GameFont fnt = new GameFont(in.readStr());
-            fnt.setId(in.read4());
-            fnt.fontName = in.readStr();
-            fnt.size = in.read4();
-            fnt.bold = in.readBool();
-            fnt.italic = in.readBool();
-            fnt.antialias = in.read4();
-            fnt.charset = in.read4();
-            fnt.rangeMin = in.read4();
-            fnt.rangeMax = in.read4();
-            in.close();
-            game.fonts.add(fnt);
-        }
+    private void loadFont(String name) throws IOException {
+        File f = new File(fontDir, name);
+        StreamDecoder in = new StreamDecoder(f);
+        GameFont fnt = new GameFont(in.readStr());
+        fnt.setId(in.read4());
+        fnt.fontName = in.readStr();
+        fnt.size = in.read4();
+        fnt.bold = in.readBool();
+        fnt.italic = in.readBool();
+        fnt.antialias = in.read4();
+        fnt.charset = in.read4();
+        fnt.rangeMin = in.read4();
+        fnt.rangeMax = in.read4();
+        in.close();
+        game.fonts.add(fnt);
     }
 
-    private void loadSprites() throws IOException {
-        File sprDir = new File(Runner.GameFolder, "sprites/");
-        File[] files = sprDir.listFiles(new FileFilter(".dat"));
-        game.sprites = new ArrayList<GameSprite>(files.length);
-        for (File f : files) {
-            StreamDecoder in = new StreamDecoder(f);
+    private void loadSprite(String name) throws IOException {
+        File f = new File(sprDir, name);
+        StreamDecoder in = new StreamDecoder(f);
 
-            GameSprite s = new GameSprite(in.readStr());
-            s.setId(in.read4());
-            s.width = in.read4();
-            s.height = in.read4();
-            int subimgs = in.read4();
-            for (int i = 0; i < subimgs; i++) {
-                File sf = new File(sprDir, in.readStr());
-                s.subImages.add(s.new SubImage(sf));
-            }
-            s.transparent = in.readBool();
-            int shape = in.read();
-            if (shape == 0)
-                s.shape = MaskShape.RECTANGLE;
-            else if (shape == 1)
-                s.shape = MaskShape.PRECISE;
-            else if (shape == 2)
-                s.shape = MaskShape.DISK;
-            else if (shape == 3)
-                s.shape = MaskShape.DIAMOND;
-            else if (shape == 4)
-                s.shape = MaskShape.POLYGON;
-            s.alpha_tolerance = in.read4();
-            s.mask = in.readBool();
-            s.smooth = in.readBool();
-            s.preload = in.readBool();
-            s.x = in.read4();
-            s.y = in.read4();
-            s.left = in.read4();
-            s.right = in.read4();
-            s.top = in.read4();
-            s.bottom = in.read4();
-            loadMask(s, in);
-
-            in.close();
-            game.sprites.add(s);
+        GameSprite s = new GameSprite(in.readStr());
+        s.setId(in.read4());
+        s.width = in.read4();
+        s.height = in.read4();
+        int subimgs = in.read4();
+        for (int i = 0; i < subimgs; i++) {
+            File sf = new File(sprDir, in.readStr());
+            s.subImages.add(s.new SubImage(sf));
         }
+        s.transparent = in.readBool();
+        int shape = in.read();
+        if (shape == 0)
+            s.shape = MaskShape.RECTANGLE;
+        else if (shape == 1)
+            s.shape = MaskShape.PRECISE;
+        else if (shape == 2)
+            s.shape = MaskShape.DISK;
+        else if (shape == 3)
+            s.shape = MaskShape.DIAMOND;
+        else if (shape == 4)
+            s.shape = MaskShape.POLYGON;
+        s.alpha_tolerance = in.read4();
+        s.mask = in.readBool();
+        s.smooth = in.readBool();
+        s.preload = in.readBool();
+        s.x = in.read4();
+        s.y = in.read4();
+        s.left = in.read4();
+        s.right = in.read4();
+        s.top = in.read4();
+        s.bottom = in.read4();
+        loadMask(s, in);
+
+        in.close();
+        game.sprites.add(s);
     }
 
     private void loadMask(GameSprite s, StreamDecoder in) throws IOException {
@@ -270,175 +343,147 @@ public class ResourceLoader {
             x++;
     }
 
-    private void loadObjects() throws IOException {
-        File objDir = new File(Runner.GameFolder, "objects/");
-        File[] files = objDir.listFiles(new FileFilter(".dat"));
-        game.objects = new ArrayList<GameObject>(files.length);
-        for (File f : files) {
-            StreamDecoder in = new StreamDecoder(f);
-            GameObject o = new GameObject(in.readStr());
-            o.setId(in.read4());
-            o.spriteId = in.read4();
-            o.solid = in.readBool();
-            o.visible = in.readBool();
-            o.persistent = in.readBool();
-            o.depth = in.read4();
-            o.parentId = in.read4();
-            o.maskId = in.read4();
+    private void loadObject(String name) throws IOException {
+        File f = new File(objDir, name);
+        StreamDecoder in = new StreamDecoder(f);
+        GameObject o = new GameObject(in.readStr());
+        o.setId(in.read4());
+        o.spriteId = in.read4();
+        o.solid = in.readBool();
+        o.visible = in.readBool();
+        o.persistent = in.readBool();
+        o.depth = in.read4();
+        o.parentId = in.read4();
+        o.maskId = in.read4();
 
-            int numMainEvents = in.read4();
-            for (int i = 0; i < numMainEvents; i++) {
-                int events = in.read4();
-                for (int j = 0; j < events; j++) {
-                    MainEvent e = o.getMainEvent((byte) in.read());
-                    Event ev = new Event(e, in.read4());
-                    ev.object = o;
-                    int actn = in.read4();
-                    for (int a = 0; a < actn; a++)
-                        ev.addAction(loadAction(in));
-                    indentEvent(ev);
-                    e.addEvent(ev);
-                }
+        int numMainEvents = in.read4();
+        for (int i = 0; i < numMainEvents; i++) {
+            int events = in.read4();
+            for (int j = 0; j < events; j++) {
+                MainEvent e = o.getMainEvent((byte) in.read());
+                Event ev = new Event(e, in.read4());
+                ev.object = o;
+                int actn = in.read4();
+                for (int a = 0; a < actn; a++)
+                    ev.addAction(loadAction(in));
+                indentEvent(ev);
+                e.addEvent(ev);
             }
-
-            game.em.addObject(o);
-            in.close();
-            game.objects.add(o);
         }
-    }
 
-    private void loadRooms() throws IOException {
-        // First thing is to load rooms
-        ArrayList<Integer> rooms = new ArrayList<Integer>();
-        ArrayList<String> roomNames = new ArrayList<String>();
-        File roomDir = new File(Runner.GameFolder, "rooms/");
-        File roomData = new File(roomDir, "rooms.lst");
-
-        StreamDecoder in = new StreamDecoder(roomData);
-        int num = in.read4();
-        int[] ro = new int[num];
-        for (int i = 0; i < num; i++) {
-            int n;
-            rooms.add(n = in.read4());
-            roomNames.add(in.readStr());
-            ro[i] = n;
-        }
-        game.roomOrder = ro;
+        game.em.addObject(o);
         in.close();
+        game.objects.add(o);
+    }
 
-        game.rooms = new ArrayList<GameRoom>(num);
-        for (int i = 0; i < game.roomOrder.length; i++) {
-            File rf = new File(roomDir, roomNames.get(i) + ".dat");
-            in = new StreamDecoder(rf);
-            GameRoom room = new GameRoom(in.readStr());
-            room.setId(in.read4());
-            room.caption = in.readStr();
-            room.setWidth(in.read4());
-            room.setHeight(in.read4());
-            room.speed = in.read4();
-            room.persistent = in.readBool();
-            room.background_color = new java.awt.Color(in.read4());
-            room.draw_background_color = in.readBool();
-            room.creation_code = CodeRes.load(in.readStr());
-            int bgs = in.read4();
-            room.backgrounds = new GameRoom.Background[bgs];
-            for (int j = 0; j < bgs; j++) {
-                GameRoom.Background b = new GameRoom.Background();
-                b.visible = in.readBool();
-                b.foreground = in.readBool();
-                b.backgroundId = in.read4();
-                b.x = in.read4();
-                b.y = in.read4();
-                b.tileHoriz = in.readBool();
-                b.tileVert = in.readBool();
-                b.hSpeed = in.read4();
-                b.vSpeed = in.read4();
-                b.stretch = in.readBool();
-                room.backgrounds[j] = b;
-            }
-            room.enable_views = in.readBool();
-            int views = in.read4();
-            room.views = new GameRoom.View[views];
-            for (int j = 0; j < views; j++) {
-                GameRoom.View v = new GameRoom.View();
-                v.visible = in.readBool();
-                v.viewX = in.read4();
-                v.viewY = in.read4();
-                v.viewW = in.read4();
-                v.viewH = in.read4();
-                v.portX = in.read4();
-                v.portY = in.read4();
-                v.portW = in.read4();
-                v.portH = in.read4();
-                v.borderH = in.read4();
-                v.borderV = in.read4();
-                v.speedH = in.read4();
-                v.speedV = in.read4();
-                v.objectId = in.read4();
+    private void loadRoom(String name) throws IOException {
+        // First thing is to load rooms
+        File rf = new File(roomDir, name);
+        StreamDecoder in = new StreamDecoder(rf);
+        GameRoom room = new GameRoom(in.readStr());
+        room.setId(in.read4());
+        room.caption = in.readStr();
+        room.setWidth(in.read4());
+        room.setHeight(in.read4());
+        room.speed = in.read4();
+        room.persistent = in.readBool();
+        room.background_color = new java.awt.Color(in.read4());
+        room.draw_background_color = in.readBool();
+        room.creation_code = CodeRes.load(in.readStr());
+        int bgs = in.read4();
+        room.backgrounds = new GameRoom.Background[bgs];
+        for (int j = 0; j < bgs; j++) {
+            GameRoom.Background b = new GameRoom.Background();
+            b.visible = in.readBool();
+            b.foreground = in.readBool();
+            b.backgroundId = in.read4();
+            b.x = in.read4();
+            b.y = in.read4();
+            b.tileHoriz = in.readBool();
+            b.tileVert = in.readBool();
+            b.hSpeed = in.read4();
+            b.vSpeed = in.read4();
+            b.stretch = in.readBool();
+            room.backgrounds[j] = b;
+        }
+        room.enable_views = in.readBool();
+        int views = in.read4();
+        room.views = new GameRoom.View[views];
+        for (int j = 0; j < views; j++) {
+            GameRoom.View v = new GameRoom.View();
+            v.visible = in.readBool();
+            v.viewX = in.read4();
+            v.viewY = in.read4();
+            v.viewW = in.read4();
+            v.viewH = in.read4();
+            v.portX = in.read4();
+            v.portY = in.read4();
+            v.portW = in.read4();
+            v.portH = in.read4();
+            v.borderH = in.read4();
+            v.borderV = in.read4();
+            v.speedH = in.read4();
+            v.speedV = in.read4();
+            v.objectId = in.read4();
 
-                room.views[j] = v;
-            }
-            int instances = in.read4();
-            room.staticInstances = new ArrayList<GameRoom.StaticInstance>(instances);
-            for (int j = 0; j < instances; j++) {
-                GameRoom.StaticInstance inst = new GameRoom.StaticInstance();
-                inst.x = in.read4();
-                inst.y = in.read4();
-                inst.objectId = in.read4();
-                inst.id = in.read4();
-                inst.creationCode = CodeRes.load(in.readStr());
-                room.staticInstances.add(inst);
-            }
-            int tiles = in.read4();
-            room.tiles = new GameRoom.Tile[tiles];
-            for (int j = 0; j < tiles; j++) {
-                Tile t = new Tile();
-                t.roomX = in.read4();
-                t.roomY = in.read4();
-                t.bgX = in.read4();
-                t.bgY = in.read4();
-                t.width = in.read4();
-                t.height = in.read4();
-                t.depth = in.read4();
-                t.backgroundId = in.read4();
-                t.id = in.read4();
-                room.tiles[j] = t;
-            }
-            in.close();
-            game.rooms.add(room);
+            room.views[j] = v;
+        }
+        int instances = in.read4();
+        room.staticInstances = new ArrayList<GameRoom.StaticInstance>(instances);
+        for (int j = 0; j < instances; j++) {
+            GameRoom.StaticInstance inst = new GameRoom.StaticInstance();
+            inst.x = in.read4();
+            inst.y = in.read4();
+            inst.objectId = in.read4();
+            inst.id = in.read4();
+            inst.creationCode = CodeRes.load(in.readStr());
+            room.staticInstances.add(inst);
+        }
+        int tiles = in.read4();
+        room.tiles = new GameRoom.Tile[tiles];
+        for (int j = 0; j < tiles; j++) {
+            Tile t = new Tile();
+            t.roomX = in.read4();
+            t.roomY = in.read4();
+            t.bgX = in.read4();
+            t.bgY = in.read4();
+            t.width = in.read4();
+            t.height = in.read4();
+            t.depth = in.read4();
+            t.backgroundId = in.read4();
+            t.id = in.read4();
+            room.tiles[j] = t;
+        }
+        in.close();
+        game.rooms.add(room);
+    }
+
+    private void loadBackground(String name) throws IOException {
+        File f = new File(bgDir, name);
+        StreamDecoder in = new StreamDecoder(f);
+        GameBackground b = new GameBackground(in.readStr());
+        b.setId(in.read4());
+        b.transparent = in.readBool();
+        b.smoothEdges = in.readBool();
+        b.preload = in.readBool();
+        b.useAsTileset = in.readBool();
+        b.tileWidth = in.read4();
+        b.tileHeight = in.read4();
+        b.hOffset = in.read4();
+        b.vOffset = in.read4();
+        b.hSep = in.read4();
+        b.vSep = in.read4();
+        String bgImage = in.readStr();
+        b.imageFile = new File(bgDir, bgImage);
+        in.close();
+        game.backgrounds.add(b);
+        if (b.preload) {
+            preloadables.add(b);
         }
     }
 
-    private void loadBackgrounds() throws IOException {
-        File bgDir = new File(Runner.GameFolder, "backgrounds/");
-        File[] bgFiles = bgDir.listFiles(new FileFilter(".dat"));
-        game.backgrounds = new ArrayList<GameBackground>(bgFiles.length);
-        for (File f : bgFiles) {
-            StreamDecoder in = new StreamDecoder(f);
-            GameBackground b = new GameBackground(in.readStr());
-            b.setId(in.read4());
-            b.transparent = in.readBool();
-            b.smoothEdges = in.readBool();
-            b.preload = in.readBool();
-            b.useAsTileset = in.readBool();
-            b.tileWidth = in.read4();
-            b.tileHeight = in.read4();
-            b.hOffset = in.read4();
-            b.vOffset = in.read4();
-            b.hSep = in.read4();
-            b.vSep = in.read4();
-            String bgImage = in.readStr();
-            b.imageFile = new File(bgDir, bgImage);
-            in.close();
-            game.backgrounds.add(b);
-            if (b.preload) {
-                preloadables.add(b);
-            }
-        }
-    }
-
-    private void loadGameInfo() throws IOException {
-        File f = new File(Runner.GameFolder, "Game Information.dat");
+    private void loadGameInfo(String name) throws IOException {
+        File f = new File(Runner.GameFolder, name);
         StreamDecoder in = new StreamDecoder(f);
         GameInformation g = new GameInformation();
         g.text = in.readStr();
@@ -627,20 +672,6 @@ public class ResourceLoader {
             }
         }
         return qa;
-    }
-
-    private static class FileFilter implements FilenameFilter {
-        String ext;
-
-        public FileFilter(String ext)
-            {
-                this.ext = ext;
-            }
-
-        @Override
-        public boolean accept(File dir, String name) {
-            return name.endsWith(ext);
-        }
     }
 
     static class ISReader extends Reader {

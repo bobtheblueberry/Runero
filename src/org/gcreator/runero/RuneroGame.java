@@ -39,7 +39,6 @@ public class RuneroGame {
     public static TextureLoader tex;
     public EventManager em;
 
-    public int[] roomOrder;
     public ArrayList<GameRoom> rooms;
     public ArrayList<GameBackground> backgrounds;
     public ArrayList<GameObject> objects;
@@ -98,10 +97,7 @@ public class RuneroGame {
             System.exit(1);
         }
         // Go to the first room
-        int i = 0;
-        if (rooms.size() > 1)
-            i = 1; // DEBUG CODE
-        room = new RoomInstance(this, rooms.get(i));
+        room = new RoomInstance(this, rooms.get(0));
         GraphicsLibrary.gfx.setTitle(room.caption);
         room.init(true);
     }
@@ -410,9 +406,9 @@ public class RuneroGame {
         } else if (name.equals("room")) {
             return new VariableVal(room_index);
         } else if (name.equals("room_first")) {
-            return new VariableVal(roomOrder[0]);
+            return new VariableVal(rooms.get(0).getId());
         } else if (name.equals("room_last")) {
-            return new VariableVal(roomOrder[roomOrder.length - 1]);
+            return new VariableVal(rooms.get(rooms.size()-1).getId());
         } else if (name.equals("room_width")) {
             return new VariableVal(room.width);
         } else if (name.equals("room_height")) {

@@ -136,9 +136,6 @@ public final class LibManager {
     }
 
     public static void loadLibMap(Map<String, InputStream> libs, File path) {
-        ArrayList<String> exceptions = new ArrayList<String>();
-        if (libs.size() > 0)
-            System.out.println("Loading lib files in " + path.getPath());
         StringBuilder buffer = new StringBuilder();
 
         for (Map.Entry<String, InputStream> ent : libs.entrySet()) {
@@ -148,17 +145,13 @@ public final class LibManager {
 
                 // print out filename
                 if (buffer.length() + fn.length() > 60) {
-                    System.out.println(buffer);
                     buffer.delete(0, buffer.length() - 1);
                 }
                 buffer.append(fn).append(' ');
             } catch (LibFormatException ex) {
-                exceptions.add(fn + ": " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
-        System.out.println(buffer);
-        for (String s : exceptions)
-            System.out.println(s);
     }
 
     /**

@@ -233,21 +233,19 @@ public class RoomInstance {
             }
 
         while (Keyboard.next()) {
-            System.out.println("Keyboard down " + Keyboard.getKeyName(Keyboard.getEventKey()) + " :"
-                    + Keyboard.getEventCharacter());
-            // TODO: Fix this
-            game.keyboard_string += Keyboard.getEventCharacter();
-            game.keyboard_lastchar = String.valueOf(Keyboard.getEventCharacter());
+            char c = Keyboard.getEventCharacter();
+            if (c > 0) {
+                game.keyboard_string += c;
+                game.keyboard_lastchar = String.valueOf(c);
+            }
 
             // key press
             if (game.em.hasKeyPressEvents && Keyboard.getEventKeyState())
                 for (Event e : game.em.keyPressEvents) {
                     boolean fired = false;
-                    int t = -1;
                     for (int i : getCodes(e.type))
                         if (i == Keyboard.getEventKey() && Keyboard.getEventKeyState()) {
                             fired = true;
-                            t = i;
                             break;
                         }
                     if (fired)
@@ -303,7 +301,6 @@ public class RoomInstance {
                         if (i != i2 && RuneroCollision.checkCollision(i, i2, false)) {
                             // TODO: FIx collision
                             ce.collide(i, i2);
-                            // System.out.println("collision with " + i + " and " + i2);
                         }
 
             }
