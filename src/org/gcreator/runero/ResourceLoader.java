@@ -89,6 +89,9 @@ public class ResourceLoader {
             throw new IOException("Failed to load Libraries");
 
         File res = new File(Runner.GameFolder, "resources.dat");
+        if (!res.exists()) 
+            throw new IOException("No resource data file! Did you export ?");
+        
         StreamDecoder in = new StreamDecoder(res);
         sprites = in.read4();
         backgrounds = in.read4();

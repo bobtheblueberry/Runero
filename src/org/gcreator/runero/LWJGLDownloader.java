@@ -12,7 +12,7 @@ public class LWJGLDownloader {
 
     static File folder;
     static String[] jars = new String[]
-        { "lwjgl.jar", "slick-util.jar", "lwjgl_util.jar" };
+        { "lwjgl.jar", "lwjgl_util.jar" };
     static String[] linux = new String[]
         { "libjinput-linux.so", "libjinput-linux64.so", "liblwjgl.so", "liblwjgl64.so", "libopenal.so",
                 "libopenal64.so" };

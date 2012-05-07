@@ -40,7 +40,6 @@ public class Runner {
 
     public Runner(File folder)
         {
-
             // Load LWJGL
             try {
                 new LWJGLDownloader().checkLWJGL();
@@ -60,11 +59,11 @@ public class Runner {
             } catch (IOException e) {
                 System.err.println("ERROR LOADING GAME!");
                 e.printStackTrace();
+                return;
             }
             game.loadGame();
             RuneroGame.display = new RuneroDisplay();
             RuneroGame.display.start(game);
-            System.exit(0);
             // Java Usually crashes here
         }
 }
