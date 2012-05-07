@@ -8,6 +8,7 @@ public abstract class RoomLibrary {
     // TODO: Room persistence
     // TODO: Room transitions
     // TODO: Object persistence
+    // TODO: Room End events
 
     public static void room_goto_next(int transition) {
         RuneroGame.room = new RoomInstance(RuneroGame.game, RuneroGame.game.getRoom(RuneroGame.game.room_index++));

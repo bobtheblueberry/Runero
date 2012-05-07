@@ -2,13 +2,11 @@ package org.gcreator.runero.inst;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 
 import org.gcreator.runero.RuneroGame;
-import org.gcreator.runero.Runner;
 import org.gcreator.runero.collision.RuneroCollision;
 import org.gcreator.runero.event.CollisionEvent;
 import org.gcreator.runero.event.Event;
@@ -17,6 +15,7 @@ import org.gcreator.runero.event.EventQueue;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gfx.Texture;
+import org.gcreator.runero.gml.lib.KeyboardLibrary;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GameRoom;
@@ -61,7 +60,7 @@ public class RoomInstance {
 
     public void init(boolean gameStart) {
         loadInstances();
-        // TODO: Object creation code
+        
         // Create Events
         if (game.em.hasCreateEvents)
             EventExecutor.executeEvent(game.em.create, this);
@@ -70,7 +69,7 @@ public class RoomInstance {
             EventExecutor.executeEvent(game.em.otherGameStart, this);
 
         if (room.creation_code != null) {
-            // TODO: GMLScript.executeCode(room.creation_code);
+            room.creation_code.getCode().execute(null, null);
         }
 
         System.out.println("New room " + room.getName() + "(" + width + "," + height + ")");
@@ -115,7 +114,7 @@ public class RoomInstance {
             Instance i = new Instance(si);
             // do instance creation code
             if (si.creationCode != null) {
-                // TODO: GMLScript.executeCode(i, si.creationCode);
+                si.creationCode.getCode().execute(i, null);
             }
             getObjectGroup(i.obj.getId()).instances.add(i);
             instance_count++;
@@ -278,18 +277,12 @@ public class RoomInstance {
         // have to wait for someone else to call render...
     }
 
-    public static void clearKeyCache() {
-        keyboardDownKeys.clear();
-    }
-
-    private static LinkedList<Integer> keyboardDownKeys = new LinkedList<Integer>();
-
     private void handleKeyboard() {
         // if key is down
         if (game.em.hasKeyboardEvents)
             for (Event e : game.em.keyboardEvents) {
                 boolean fired = false;
-                for (int i : getCodes(e.type))
+                for (int i : KeyboardLibrary.getCodes(e.type))
                     if (i > 0 && Keyboard.isKeyDown(i)) {
                         fired = true;
                         break;
@@ -303,9 +296,9 @@ public class RoomInstance {
             boolean state = Keyboard.getEventKeyState();
             Integer key = Keyboard.getEventKey();
             if (state)
-                keyboardDownKeys.add(key);
+                KeyboardLibrary.keyboardDownKeys.add(key);
             else
-                keyboardDownKeys.remove(key);
+                KeyboardLibrary.keyboardDownKeys.remove(key);
             if (!game.em.hasKeyPressEvents && !game.em.hasKeyReleaseEvents)
                 continue;
 
@@ -331,7 +324,7 @@ public class RoomInstance {
             if (game.em.hasKeyPressEvents && state)
                 for (Event e : game.em.keyPressEvents) {
                     boolean fired = false;
-                    for (int i : getCodes(e.type))
+                    for (int i : KeyboardLibrary.getCodes(e.type))
                         if (i == Keyboard.getEventKey() && Keyboard.getEventKeyState()) {
                             fired = true;
                             break;
@@ -344,7 +337,7 @@ public class RoomInstance {
             if (game.em.hasKeyReleaseEvents && !state)
                 for (Event e : game.em.keyReleaseEvents) {
                     boolean fired = false;
-                    for (int i : getCodes(e.type))
+                    for (int i : KeyboardLibrary.getCodes(e.type))
                         if (i == Keyboard.getEventKey() && !Keyboard.getEventKeyState()) {
                             fired = true;
                             break;
@@ -353,10 +346,10 @@ public class RoomInstance {
                         EventExecutor.executeEvent(e, this);
                 }
         }
-        if (keyboardDownKeys.isEmpty() && game.em.keyboardNoEvents != null)
+        if (KeyboardLibrary.keyboardDownKeys.isEmpty() && game.em.keyboardNoEvents != null)
             for (Event e : game.em.keyboardNoEvents)
                 EventExecutor.executeEvent(e, this);
-        if (!keyboardDownKeys.isEmpty() && game.em.keyboardAnyEvents != null)
+        if (!KeyboardLibrary.keyboardDownKeys.isEmpty() && game.em.keyboardAnyEvents != null)
             for (Event e : game.em.keyboardAnyEvents)
                 EventExecutor.executeEvent(e, this);
 
@@ -445,23 +438,5 @@ public class RoomInstance {
 
         return false;
     }
-
-    private int[] getCodes(int awtKey) {
-        int type = Runner.getLWJGLKey(awtKey);
-        if (awtKey == KeyEvent.VK_ALT)
-            return new int[]
-                { Keyboard.KEY_RMENU, Keyboard.KEY_LMENU };
-        else if (awtKey == KeyEvent.VK_CONTROL)
-            return new int[]
-                { Keyboard.KEY_RCONTROL, Keyboard.KEY_LCONTROL };
-        else if (awtKey == KeyEvent.VK_SHIFT)
-            return new int[]
-                { Keyboard.KEY_RSHIFT, Keyboard.KEY_LSHIFT };
-        else if (awtKey == KeyEvent.VK_ENTER)
-            return new int[]
-                { Keyboard.KEY_RETURN, Keyboard.KEY_LEFT };
-
-        return new int[]
-            { type };
-    }
+  
 }

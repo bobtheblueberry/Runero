@@ -4,12 +4,12 @@ import java.awt.Color;
 
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.Runner;
+import org.gcreator.runero.event.ActionInterpreter;
 import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gfx.Texture;
 import org.gcreator.runero.gml.Constant;
-import org.gcreator.runero.gml.GmlInterpreter;
 import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReferenceTable;
 import org.gcreator.runero.gml.VariableVal;
@@ -137,7 +137,7 @@ public class Instance implements Comparable<Instance> {
                 x = xprevious;
                 y = yprevious;
             }
-        GmlInterpreter.performEvent(event, this);
+        ActionInterpreter.performEvent(event, this);
     }
 
     public GameSprite getSprite() {

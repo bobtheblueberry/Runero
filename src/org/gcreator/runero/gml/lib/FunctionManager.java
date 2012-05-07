@@ -73,14 +73,21 @@ public class FunctionManager {
             case 1: // is_string(val)
                 return new Constant(MathLibrary.is_string(arg0));
             case 2: // random(x)
+                checkReal(arg0);
                 return new Constant(MathLibrary.random(arg0.dVal));
             case 3: // random_range(x1,x2)
+                checkReal(arg0);
+                checkReal(arg1);
                 return new Constant(MathLibrary.random_range(arg0.dVal, arg1.dVal));
             case 4: // irandom(x)
+                checkReal(arg0);
                 return new Constant(MathLibrary.irandom(arg0.dVal));
             case 5: // irandom_range(x1,x2)
+                checkReal(arg0);
+                checkReal(arg1);
                 return new Constant(MathLibrary.irandom_range(arg0.dVal, arg1.dVal));
             case 6: // random_set_seed(seed)
+                checkReal(arg0);
                 MathLibrary.random_set_seed(Double.doubleToLongBits(arg0.dVal));
                 return new Constant(0);
             case 7: // random_get_seed()
@@ -1012,10 +1019,7 @@ public class FunctionManager {
 
                 return null; // keyboard_unset_map
             case 219: // keyboard_check(key)
-
-                // TODO: This function
-
-                return null; // keyboard_check
+                return new Constant(KeyboardLibrary.keyboard_check((int)arg0.dVal));
             case 220: // keyboard_check_pressed(key)
 
                 // TODO: This function

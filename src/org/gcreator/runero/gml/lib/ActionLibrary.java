@@ -405,7 +405,7 @@ public class ActionLibrary {
                 return;
                 // control
             case INHERITED:
-                // This is actually handled by the GmlInterpreter class.
+                // This is actually handled by the ActionInterpreter class
                 return;
             case CODE:
                 execute_code(act, instance, other);

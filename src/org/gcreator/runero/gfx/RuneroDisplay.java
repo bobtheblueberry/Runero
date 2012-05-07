@@ -22,7 +22,7 @@ import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import org.gcreator.runero.RuneroGame;
-import org.gcreator.runero.inst.RoomInstance;
+import org.gcreator.runero.gml.lib.KeyboardLibrary;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -90,7 +90,7 @@ public class RuneroDisplay {
             Display.update();
             
             if (!Display.isActive()) {
-                RoomInstance.clearKeyCache();
+                KeyboardLibrary.clearKeyCache();
             }
             
             if (Display.isCloseRequested())

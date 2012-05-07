@@ -1,14 +1,11 @@
-package org.gcreator.runero.gml;
+package org.gcreator.runero.event;
 
 import org.gcreator.runero.RuneroGame;
-import org.gcreator.runero.event.Action;
-import org.gcreator.runero.event.Event;
-import org.gcreator.runero.event.MainEvent;
 import org.gcreator.runero.gml.lib.ActionLibrary;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameObject;
 
-public class GmlInterpreter {
+public class ActionInterpreter {
 
     public static void performEvent(Event e, Instance instance) {
         for (int i = 0; i < e.actions.size(); i++) {
@@ -43,6 +40,7 @@ public class GmlInterpreter {
         switch (act.lib.actionKind) {
             case Action.ACT_NORMAL:
             case Action.ACT_VARIABLE:
+            case Action.ACT_CODE:
 
                 if (act.lib.actionKind == ActionLibrary.INHERITED) {
                     // TODO: inherited events automatically
@@ -100,9 +98,6 @@ public class GmlInterpreter {
                 for (int t = 0; t < times; t++)
                     last = executeBlock(act.repeatAction, instance, e, i);
                 return last;
-            case Action.ACT_CODE:
-                // Execute code
-                break;
             case Action.ACT_PLACEHOLDER:
                 // Useless
                 break;
