@@ -22,6 +22,7 @@ import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import org.gcreator.runero.RuneroGame;
+import org.gcreator.runero.inst.RoomInstance;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -87,7 +88,11 @@ public class RuneroDisplay {
             game.render();
             // update window contents
             Display.update();
-
+            
+            if (!Display.isActive()) {
+                RoomInstance.clearKeyCache();
+            }
+            
             if (Display.isCloseRequested())
                 gameRunning = false;
         }

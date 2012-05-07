@@ -332,20 +332,16 @@ public class ActionLibrary {
                 // TODO: THIS
                 return;
             case PREVIOUS_ROOM:
-
-                // TODO: THIS
+                previous_room(act, instance, other);
                 return;
             case NEXT_ROOM:
-
-                // TODO: THIS
+                next_room(act, instance, other);
                 return;
             case CURRENT_ROOM:
-
-                // TODO: THIS
+                current_room(act, instance, other);
                 return;
             case ANOTHER_ROOM:
-
-                // TODO: THIS
+                another_room(act, instance, other);
                 return;
                 // main2
             case SET_ALARM:
@@ -1101,13 +1097,24 @@ public class ActionLibrary {
 
     /*BEGIN_SOUND
     END_SOUND
-    IF_SOUND
-    PREVIOUS_ROOM
-    NEXT_ROOM
-    CURRENT_ROOM
-    ANOTHER_ROOM
-    IF_PREVIOUS_ROOM
-    IF_NEXT_ROOM*/
+    */
+
+    private static void another_room(Action act, Instance instance, Instance other) {
+        RoomLibrary.room_goto(act.arguments.get(0).resVal, act.arguments.get(1).menuVal);
+    }
+
+    private static void current_room(Action act, Instance instance, Instance other) {
+        // restart room
+        RoomLibrary.room_restart(act.arguments.get(0).menuVal);
+    }
+
+    private static void next_room(Action act, Instance instance, Instance other) {
+        RoomLibrary.room_goto_next(act.arguments.get(0).menuVal);
+    }
+
+    private static void previous_room(Action act, Instance instance, Instance other) {
+        RoomLibrary.room_goto_previous(act.arguments.get(0).menuVal);
+    }
 
     // main2
     private static void set_alarm(Action a, Instance instance, Instance other) {
@@ -1183,7 +1190,7 @@ public class ActionLibrary {
 
     private static void execute_script(Action a, Instance instance, Instance other) {
         // script, arg0,arg1,arg2,arg3,arg4
-        
+
     }
 
     // GM8 Splash functions that SUCK

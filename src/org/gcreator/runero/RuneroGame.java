@@ -97,7 +97,7 @@ public class RuneroGame {
             System.exit(1);
         }
         // Go to the first room
-        room = new RoomInstance(this, rooms.get(0));
+        room = new RoomInstance(this, rooms.get(1));
         GraphicsLibrary.gfx.setTitle(room.caption);
         room.init(true);
     }
@@ -153,6 +153,16 @@ public class RuneroGame {
         }
         return null;
     }
+    
+    public GameRoom getRoom(int id) {
+        for (GameRoom r : rooms) {
+            if (r.getId() == id) {
+                return r;
+            }
+        }
+        return null;
+    }
+
 
     public void updateCaption() {
         // score lives health

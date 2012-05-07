@@ -192,6 +192,10 @@ public class RoomInstance {
             i.performEvent(g.getMainEvent(MainEvent.EV_CREATE).events.get(0));
         }
     }
+    
+    public void addInstance(Instance i) {
+        EventQueue.addCreateEvent(i);
+    }
 
     public void step() {
         EventQueue.processCreate(this);
@@ -219,52 +223,7 @@ public class RoomInstance {
                             }
             }
 
-        // if key is down
-        if (game.em.hasKeyboardEvents)
-            for (Event e : game.em.keyboardEvents) {
-                boolean fired = false;
-                for (int i : getCodes(e.type))
-                    if (i > 0 && Keyboard.isKeyDown(i)) {
-                        fired = true;
-                        break;
-                    }
-                if (fired)
-                    EventExecutor.executeEvent(e, this);
-            }
-
-        while (Keyboard.next()) {
-            char c = Keyboard.getEventCharacter();
-            if (c > 0) {
-                game.keyboard_string += c;
-                game.keyboard_lastchar = String.valueOf(c);
-            }
-
-            // key press
-            if (game.em.hasKeyPressEvents && Keyboard.getEventKeyState())
-                for (Event e : game.em.keyPressEvents) {
-                    boolean fired = false;
-                    for (int i : getCodes(e.type))
-                        if (i == Keyboard.getEventKey() && Keyboard.getEventKeyState()) {
-                            fired = true;
-                            break;
-                        }
-                    if (fired)
-                        EventExecutor.executeEvent(e, this);
-                }
-
-            // key release
-            if (game.em.hasKeyReleaseEvents && !Keyboard.getEventKeyState())
-                for (Event e : game.em.keyReleaseEvents) {
-                    boolean fired = false;
-                    for (int i : getCodes(e.type))
-                        if (i == Keyboard.getEventKey() && !Keyboard.getEventKeyState()) {
-                            fired = true;
-                            break;
-                        }
-                    if (fired)
-                        EventExecutor.executeEvent(e, this);
-                }
-        }
+        handleKeyboard();
         // millions of mouse and joystick events
 
         // normal step
@@ -298,13 +257,9 @@ public class RoomInstance {
                     continue;
                 for (Instance i : g.instances)
                     for (Instance i2 : g2.instances)
-                        if (i != i2 && RuneroCollision.checkCollision(i, i2, false)) {
-                            // TODO: FIx collision
+                        if (i != i2 && RuneroCollision.checkCollision(i, i2, false))
                             ce.collide(i, i2);
-                        }
-
             }
-
         if (game.em.hasOtherEvents) {
             // No more lives
             if (game.em.otherNoMoreLives != null && game.lives <= 0) {
@@ -321,6 +276,97 @@ public class RoomInstance {
 
         // draw
         // have to wait for someone else to call render...
+    }
+
+    public static void clearKeyCache() {
+        keyboardDownKeys.clear();
+    }
+
+    private static LinkedList<Integer> keyboardDownKeys = new LinkedList<Integer>();
+
+    private void handleKeyboard() {
+        // if key is down
+        if (game.em.hasKeyboardEvents)
+            for (Event e : game.em.keyboardEvents) {
+                boolean fired = false;
+                for (int i : getCodes(e.type))
+                    if (i > 0 && Keyboard.isKeyDown(i)) {
+                        fired = true;
+                        break;
+                    }
+                if (fired)
+                    EventExecutor.executeEvent(e, this);
+            }
+        boolean keyPressEvents = false;
+        boolean keyReleaseEvents = false;
+        while (Keyboard.next()) {
+            boolean state = Keyboard.getEventKeyState();
+            Integer key = Keyboard.getEventKey();
+            if (state)
+                keyboardDownKeys.add(key);
+            else
+                keyboardDownKeys.remove(key);
+            if (!game.em.hasKeyPressEvents && !game.em.hasKeyReleaseEvents)
+                continue;
+
+            if (!keyPressEvents && state) {
+                keyPressEvents = true;
+                if (game.em.keyPressAnyEvents != null)
+                    for (Event e : game.em.keyPressAnyEvents) {
+                        EventExecutor.executeEvent(e, this);
+                    }
+            } else if (!keyReleaseEvents && !state) {
+                keyReleaseEvents = true;
+                if (game.em.keyReleaseAnyEvents != null)
+                    for (Event e : game.em.keyReleaseAnyEvents)
+                        EventExecutor.executeEvent(e, this);
+            }
+            char c = Keyboard.getEventCharacter();
+            if (c > 0) {
+                game.keyboard_string += c;
+                game.keyboard_lastchar = String.valueOf(c);
+            }
+
+            // key press
+            if (game.em.hasKeyPressEvents && state)
+                for (Event e : game.em.keyPressEvents) {
+                    boolean fired = false;
+                    for (int i : getCodes(e.type))
+                        if (i == Keyboard.getEventKey() && Keyboard.getEventKeyState()) {
+                            fired = true;
+                            break;
+                        }
+                    if (fired)
+                        EventExecutor.executeEvent(e, this);
+                }
+
+            // key release
+            if (game.em.hasKeyReleaseEvents && !state)
+                for (Event e : game.em.keyReleaseEvents) {
+                    boolean fired = false;
+                    for (int i : getCodes(e.type))
+                        if (i == Keyboard.getEventKey() && !Keyboard.getEventKeyState()) {
+                            fired = true;
+                            break;
+                        }
+                    if (fired)
+                        EventExecutor.executeEvent(e, this);
+                }
+        }
+        if (keyboardDownKeys.isEmpty() && game.em.keyboardNoEvents != null)
+            for (Event e : game.em.keyboardNoEvents)
+                EventExecutor.executeEvent(e, this);
+        if (!keyboardDownKeys.isEmpty() && game.em.keyboardAnyEvents != null)
+            for (Event e : game.em.keyboardAnyEvents)
+                EventExecutor.executeEvent(e, this);
+
+        if (!keyPressEvents && game.em.keyPressNoEvents != null)
+            for (Event e : game.em.keyPressNoEvents)
+                EventExecutor.executeEvent(e, this);
+        if (!keyReleaseEvents && game.em.keyReleaseNoEvents != null)
+            for (Event e : game.em.keyReleaseNoEvents)
+                EventExecutor.executeEvent(e, this);
+
     }
 
     public Instance getInstance(int id) {
