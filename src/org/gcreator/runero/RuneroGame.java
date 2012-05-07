@@ -13,6 +13,7 @@ import org.gcreator.runero.gml.GmlParser;
 import org.gcreator.runero.gml.ReferenceTable;
 import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.gml.exec.Variable;
+import org.gcreator.runero.gml.lib.RoomLibrary;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.inst.RoomInstance;
 import org.gcreator.runero.res.GameBackground;
@@ -22,10 +23,12 @@ import org.gcreator.runero.res.GameObject;
 import org.gcreator.runero.res.GamePath;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameScript;
+import org.gcreator.runero.res.GameSettings;
 import org.gcreator.runero.res.GameSound;
 import org.gcreator.runero.res.GameSprite;
 import org.gcreator.runero.res.GameTimeline;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 
 /**
  * Game Engine base
@@ -37,8 +40,10 @@ public class RuneroGame {
     public static RoomInstance room;
     public static RuneroDisplay display;
     public static TextureLoader tex;
+    public static GameSettings settings;
     public EventManager em;
 
+    public int[] roomOrder;
     public ArrayList<GameRoom> rooms;
     public ArrayList<GameBackground> backgrounds;
     public ArrayList<GameObject> objects;
@@ -99,7 +104,7 @@ public class RuneroGame {
             System.exit(1);
         }
         // Go to the first room
-        room = new RoomInstance(this, rooms.get(1));
+        room = new RoomInstance(this, rooms.get(0));
         GraphicsLibrary.gfx.setTitle(room.caption);
         room.init(true);
     }
@@ -221,8 +226,9 @@ public class RuneroGame {
             room_speed = val.dVal;
             return true;
         } else if (name.equals("room")) {
-            // TODO: SET ROOM!!!
             room_index = (int) val.dVal;
+            RoomLibrary.room_goto(room_index, transition_kind);
+            transition_kind = 0;
             return true;
         } else if (name.equals("room_caption")) {
             room.caption = val.sVal;
@@ -418,10 +424,10 @@ public class RuneroGame {
             return new VariableVal(Calendar.getInstance().get(Calendar.SECOND));
         } else if (name.equals("room")) {
             return new VariableVal(room_index);
-        } else if (name.equals("room_first")) {
-            return new VariableVal(rooms.get(0).getId());
+        }  else if (name.equals("room_first")) {
+            return new VariableVal(roomOrder[0]);
         } else if (name.equals("room_last")) {
-            return new VariableVal(rooms.get(rooms.size() - 1).getId());
+            return new VariableVal(roomOrder[roomOrder.length - 1]);
         } else if (name.equals("room_width")) {
             return new VariableVal(room.width);
         } else if (name.equals("room_height")) {
@@ -463,7 +469,7 @@ public class RuneroGame {
         } else if (name.equals("mouse_x")) {
             return new VariableVal(Mouse.getX());
         } else if (name.equals("mouse_y")) {
-            return new VariableVal(Mouse.getY());
+            return new VariableVal(Display.getHeight()-Mouse.getY());
         } else if (name.equals("mouse_button")) {
             return new VariableVal(0);
         } else if (name.equals("mouse_lastbutton")) {
@@ -475,7 +481,7 @@ public class RuneroGame {
         } else if (name.equals("background_showcolor")) {
             return VariableVal.Bool(room.draw_background_color);
         } else if (name.equals("game_id")) {
-            return new VariableVal(0);// TODO: Game id
+            return new VariableVal(settings.gameId);
         } else if (name.equals("working_directory")) {
             return new VariableVal(System.getProperty("user.dir"));
         } else if (name.equals("temp_directory")) {

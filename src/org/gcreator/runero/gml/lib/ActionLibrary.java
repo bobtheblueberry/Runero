@@ -1464,9 +1464,9 @@ public class ActionLibrary {
             y2 += instance.y;
         }
         if (filled)
-            g.fillRect(x1, y1, (x2 - x1), (y2 - y1));
+            g.fillRect(x1, y1, x2, y2);
         else
-            g.drawRect(x1, y1, (x2 - x1), (y2 - y1));
+            g.drawRect(x1, y1, x2, y2);
     }
 
     private static void draw_gradient_hor(Action a, Instance instance, Instance other) {

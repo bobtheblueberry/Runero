@@ -177,11 +177,11 @@ public class FunctionManager {
             case 47: // string(val)
                 return new Constant(StringLibrary.string(arg0));
             case 48: // string_format(val,total,dec)
-                return new Constant(StringLibrary.string_format(arg0.dVal, (int)arg1.dVal, (int)arg2.dVal));
+                return new Constant(StringLibrary.string_format(arg0.dVal, (int) arg1.dVal, (int) arg2.dVal));
             case 49: // chr(val)
-                return new Constant(StringLibrary.chr((int)arg0.dVal));
+                return new Constant(StringLibrary.chr((int) arg0.dVal));
             case 50: // ansi_char(val)
-                return new Constant(StringLibrary.ansi_char((int)arg0.dVal));
+                return new Constant(StringLibrary.ansi_char((int) arg0.dVal));
             case 51: // ord(char)
                 return new Constant(StringLibrary.ord(arg0.sVal));
             case 52: // string_length(str)
@@ -835,42 +835,38 @@ public class FunctionManager {
 
                 return null; // instance_activate_region
             case 182: // sleep(millisec)
-
-                // TODO: This function
-
-                return null; // sleep
+                checkReal(arg0);
+                try {
+                    Thread.sleep((long)arg0.dVal);
+                } catch (InterruptedException e) {
+                }
             case 183: // room_goto(numb)
-
-                // TODO: This function
-
-                return null; // room_goto
+                checkReal(arg0);
+                RoomLibrary.room_goto((int) arg0.dVal, RuneroGame.game.transition_kind);
+                RuneroGame.game.transition_kind = 0;
+                return Constant.ZERO;
             case 184: // room_goto_previous()
-
-                // TODO: This function
-
-                return null; // room_goto_previous
+                RoomLibrary.room_goto_previous(RuneroGame.game.transition_kind);
+                RuneroGame.game.transition_kind = 0;
+                return Constant.ZERO;
             case 185: // room_goto_next()
                 RoomLibrary.room_goto_next(RuneroGame.game.transition_kind);
+                RuneroGame.game.transition_kind = 0;
                 return Constant.ZERO;
             case 186: // room_previous(numb)
-
-                // TODO: This function
-
-                return null; // room_previous
+                checkReal(arg0);
+                return new Constant(RoomLibrary.room_previous((int) arg0.dVal));
             case 187: // room_next(numb)
-
-                // TODO: This function
-
-                return null; // room_next
+                checkReal(arg0);
+                return new Constant(RoomLibrary.room_next((int) arg0.dVal));
             case 188: // room_restart()
-
-                // TODO: This function
-
-                return null; // room_restart
+                RoomLibrary.room_restart(RuneroGame.game.transition_kind);
+                RuneroGame.game.transition_kind = 0;
+                return Constant.ZERO;
             case 189: // game_end()
 
                 // TODO: This function
-
+                System.exit(0);
                 return null; // game_end
             case 190: // game_restart()
 
@@ -918,7 +914,7 @@ public class FunctionManager {
 
                 return null; // event_inherited
             case 199: // show_debug_message(str)
-
+                checkString(arg0);
                 // TODO: This function
 
                 return null; // show_debug_message
@@ -1018,7 +1014,7 @@ public class FunctionManager {
 
                 return null; // keyboard_unset_map
             case 219: // keyboard_check(key)
-                return new Constant(KeyboardLibrary.keyboard_check((int)arg0.dVal));
+                return new Constant(KeyboardLibrary.keyboard_check((int) arg0.dVal));
             case 220: // keyboard_check_pressed(key)
 
                 // TODO: This function
@@ -5316,15 +5312,14 @@ public class FunctionManager {
             d[i++] = c.dVal;
         return d;
     }
-    
-    
+
     // TODO: this function
-    private static  void checkString(Constant c) {
-        
+    private static void checkString(Constant c) {
+
     }
-    
- // TODO: this function
-    private  static void checkReal(Constant c) {
+
+    // TODO: this function
+    private static void checkReal(Constant c) {
         if (!c.isReal)
             ; // who cares
     }

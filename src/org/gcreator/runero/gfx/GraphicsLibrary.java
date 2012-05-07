@@ -55,6 +55,7 @@ public class GraphicsLibrary {
     }
 
     private void oval(double x, double y, double width, double height, int mode) {
+        glDisable(GL_TEXTURE_2D);
         double theta;
         double angle_increment;
         double x1;
@@ -68,7 +69,7 @@ public class GraphicsLibrary {
         glBegin(mode);
         if (mode == GL_TRIANGLE_FAN)
             glVertex2d(0, 0);
-        for (theta = 0.0; theta < Math.PI; theta += angle_increment) {
+        for (theta = 0.0; theta < Math.PI * 2 + angle_increment; theta += angle_increment) {
             x1 = (width / 2 * Math.cos(theta));
             y1 = (height / 2 * Math.sin(theta));
 
@@ -80,6 +81,8 @@ public class GraphicsLibrary {
     }
 
     public void drawOvalGradient(double x, double y, double width, double height, Color c1, Color c2) {
+
+        glDisable(GL_TEXTURE_2D);
         double theta;
         double angle_increment;
         double x1;
@@ -124,6 +127,7 @@ public class GraphicsLibrary {
     }
 
     public void drawLine(double x1, double y1, double x2, double y2) {
+        glDisable(GL_TEXTURE_2D);
         glPushMatrix();
         glBegin(GL_LINES);
         glVertex2d(x1, y1);
@@ -132,19 +136,20 @@ public class GraphicsLibrary {
         glPopMatrix();
     }
 
-    public void fillRect(double x, double y, double width, double height) {
-        glRectd(x, y, x + width, y + height);
+    public void fillRect(double x1, double y1, double x2, double y2) {
+        glDisable(GL_TEXTURE_2D);
+        glRectd(x1, y1, x2, y2);
     }
 
-    public void drawRect(double x, double y, double width, double height) {
+    public void drawRect(double x1, double y1, double x2, double y2) {
+        glDisable(GL_TEXTURE_2D);
         glPushMatrix();
-        glTranslated(x, y, 0);
         glBegin(GL_LINE_LOOP);
         {
-            glVertex2d(0, 0);
-            glVertex2d(0, height);
-            glVertex2d(width, height);
-            glVertex2d(width, 0);
+            glVertex2d(x1, y1);
+            glVertex2d(x1, y2);
+            glVertex2d(x2, y2);
+            glVertex2d(x2, y1);
         }
         glEnd();
         glPopMatrix();
@@ -220,6 +225,8 @@ public class GraphicsLibrary {
     }
 
     public void drawPoint(double x, double y) {
+        
+        glDisable(GL_TEXTURE_2D);
         glBegin(GL_POINTS);
         glVertex2d(x, y);
         glEnd();
@@ -236,16 +243,17 @@ public class GraphicsLibrary {
     }
 
     public void drawTexture(Texture t, double x, double y, double width, double height) {
-        drawTexture(t, x, y,0,0, width, height, 1, 1, 0, null, 1.0);
+        drawTexture(t, x, y, 0, 0, width, height, 1, 1, 0, null, 1.0);
     }
 
-    public void drawTexture(Texture t, double x, double y,double offx, double offy, double xscale, double yscale, double angle, Color blend,
-            double alpha) {
-        drawTexture(t, x, y,offx,offy, t.getImageWidth(), t.getImageHeight(), xscale, yscale, angle, blend, alpha);
-    }
-
-    public void drawTexture(Texture t, double x, double y, double offx, double offy, double width, double height, double xscale, double yscale,
+    public void drawTexture(Texture t, double x, double y, double offx, double offy, double xscale, double yscale,
             double angle, Color blend, double alpha) {
+        drawTexture(t, x, y, offx, offy, t.getImageWidth(), t.getImageHeight(), xscale, yscale, angle, blend, alpha);
+    }
+
+    public void drawTexture(Texture t, double x, double y, double offx, double offy, double width, double height,
+            double xscale, double yscale, double angle, Color blend, double alpha) {
+        glEnable(GL_TEXTURE_2D);
         if (blend == null)
             glColor4d(1, 1, 1, alpha);
         else
@@ -257,7 +265,7 @@ public class GraphicsLibrary {
         t.bind();
         // translate to the right location and prepare to draw
         glTranslated(x, y, 0);
-        glRotated(360-angle, 0, 0, 1);
+        glRotated(360 - angle, 0, 0, 1);
         glScaled(xscale, yscale, 0);
         // draw a quad textured to match the sprite
         glBegin(GL_QUADS);
@@ -266,13 +274,13 @@ public class GraphicsLibrary {
             glVertex2d(-offx, -offy);
 
             glTexCoord2d(t.getWidthRatio(), 0);
-            glVertex2d(width-offx, -offy);
+            glVertex2d(width - offx, -offy);
 
             glTexCoord2d(t.getWidthRatio(), t.getHeightRatio());
-            glVertex2d(width -offx, height -offx);
+            glVertex2d(width - offx, height - offy);
 
             glTexCoord2d(0, t.getHeightRatio());
-            glVertex2d(-offx, height -offy);
+            glVertex2d(-offx, height - offy);
 
         }
         glEnd();
@@ -303,18 +311,22 @@ public class GraphicsLibrary {
     }
 
     public void drawString(String text, float x, float y) {
+        glEnable(GL_TEXTURE_2D);
         font.drawString(x, y, text, 1, 1);
     }
 
     public void drawString(float x, float y, String text) {
+        glEnable(GL_TEXTURE_2D);
         font.drawString(x, y, text, 1, 1, fontAlign);
     }
 
     public void drawString(float x, float y, String text, float xscale, float yscale, float angle) {
+        glEnable(GL_TEXTURE_2D);
         font.drawString(x, y, text, 1, 1, xscale, yscale, angle, fontAlign);
     }
 
     public void drawString(double x, double y, String text, double xscale, double yscale, double angle) {
+        glEnable(GL_TEXTURE_2D);
         font.drawString((float) x, (float) y, text, 1, 1, (float) xscale, (float) yscale, (float) angle, fontAlign);
     }
 

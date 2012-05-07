@@ -34,6 +34,7 @@ public class GameRoom extends GameResource {
     public View[]                    views;
     public Tile[]                    tiles;
     public ArrayList<StaticInstance> staticInstances;
+    public int orderIndex;
 
     public GameRoom(String name)
         {

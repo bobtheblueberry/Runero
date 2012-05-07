@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 
 import org.gcreator.runero.event.Action;
 import org.gcreator.runero.event.Action.BlockAction;
@@ -31,6 +30,7 @@ import org.gcreator.runero.res.GameResource;
 import org.gcreator.runero.res.GameRoom;
 import org.gcreator.runero.res.GameRoom.Tile;
 import org.gcreator.runero.res.GameScript;
+import org.gcreator.runero.res.GameSettings;
 import org.gcreator.runero.res.GameSound;
 import org.gcreator.runero.res.GameSprite;
 import org.gcreator.runero.res.GameSprite.Mask;
@@ -44,7 +44,7 @@ import org.lateralgm.resources.library.gc.LibManager;
 public class ResourceLoader {
 
     RuneroGame game;
-    LinkedList<Preloadable> preloadables;
+    ArrayList<Preloadable> preloadables;
     File roomDir;
     File fontDir;
     File sprDir;
@@ -55,7 +55,7 @@ public class ResourceLoader {
     File pathDir;
     File tlDir;
     int rooms, fonts, sprites, scripts, objects, backgrounds, paths, timelines, sounds;
-    
+
     private static final byte SPRITE = 1;
     private static final byte BACKGROUND = 2;
     private static final byte SOUND = 3;
@@ -71,8 +71,7 @@ public class ResourceLoader {
     public ResourceLoader(RuneroGame game)
         {
             this.game = game;
-            preloadables = new LinkedList<Preloadable>();
-            actionFolder = new File(Runner.GameFolder, "actions/");
+            preloadables = new ArrayList<Preloadable>();
             roomDir = new File(Runner.GameFolder, "rooms/");
             fontDir = new File(Runner.GameFolder, "fonts/");
             sprDir = new File(Runner.GameFolder, "sprites/");
@@ -109,6 +108,7 @@ public class ResourceLoader {
         game.scripts = new ArrayList<GameScript>(scripts);
         game.timelines = new ArrayList<GameTimeline>(timelines);
         game.paths = new ArrayList<GamePath>(paths);
+        game.roomOrder = new int[rooms];
 
         int b;
         while ((b = in.read()) != -1) {
@@ -207,8 +207,69 @@ public class ResourceLoader {
                 loadGameInfo(name);
                 break;
             case SETTINGS:
-                // loadSettings(name);
+                loadSettings(name);
                 break;
+        }
+    }
+
+    private void loadSettings(String name) {
+        File f = new File(Runner.GameFolder, name);
+        GameSettings s = new GameSettings();
+        RuneroGame.settings = s;
+        try {
+            StreamDecoder in = new StreamDecoder(f);
+            s.gameId = in.read4();
+            s.startFullscreen = in.readBool();
+            s.interpolate = in.readBool();
+            s.dontDrawBorder = in.readBool();
+            s.displayCursor = in.readBool();
+            s.scaling = in.read4();
+            s.allowWindowResize = in.readBool();
+            s.alwaysOnTop = in.readBool();
+            s.colorOutsideRoom = in.read4();
+            s.setResolution = in.readBool();
+            s.colorDepth = (byte) in.read();
+            s.resolution = (byte) in.read();
+            s.frequency = (byte) in.read();
+            s.dontShowButtons = in.readBool();
+            s.useSynchronization = in.readBool();
+            s.disableScreensavers = in.readBool();
+            s.letF4SwitchFullscreen = in.readBool();
+            s.letF1ShowGameInfo = in.readBool();
+            s.letEscEndGame = in.readBool();
+            s.letF5SaveF6Load = in.readBool();
+            s.letF9Screenshot = in.readBool();
+            s.treatCloseAsEscape = in.readBool();
+            s.gamePriority = (byte) in.read();
+            s.freezeOnLoseFocus = in.readBool();
+            s.loadBarMode = (byte) in.read();
+            s.showCustomLoadImage = in.readBool();
+            s.imagePartiallyTransparent = in.readBool();
+            s.loadImageAlpha = in.read4();
+            s.scaleProgressBar = in.readBool();
+            s.displayErrors = in.readBool();
+            s.writeToLog = in.readBool();
+            s.abortOnError = in.readBool();
+            s.treatUninitializedAs0 = in.readBool();
+            s.author = in.readStr();
+            s.version = in.readStr();
+            s.lastChanged = in.readD();
+            s.information = in.readStr();
+            s.includeFolder = in.read4();
+            s.overwriteExisting = in.readBool();
+            s.removeAtGameEnd = in.readBool();
+            s.versionMajor = in.read4();
+            s.versionMinor = in.read4();
+            s.versionRelease = in.read4();
+            s.versionBuild = in.read4();
+            s.company = in.readStr();
+            s.product = in.readStr();
+            s.copyright = in.readStr();
+            s.description = in.readStr();
+            in.close();
+        } catch (IOException e) {
+            System.out.println("Cannot load settings!");
+            e.printStackTrace();
         }
     }
 
@@ -302,9 +363,11 @@ public class ResourceLoader {
         s.top = in.read4();
         s.bottom = in.read4();
         loadMask(s, in);
-
         in.close();
         game.sprites.add(s);
+        if (s.preload) {
+            preloadables.add(s);
+        }
     }
 
     private void loadMask(GameSprite s, StreamDecoder in) throws IOException {
@@ -336,11 +399,11 @@ public class ResourceLoader {
 
     private void add(boolean b, Mask m, int width, int height) {
         m.map[x][y] = b;
-        if (x + 1 >= width) {
-            x = 0;
-            y++;
-        } else
+        if (y + 1 >= height) {
+            y = 0;
             x++;
+        } else
+            y++;
     }
 
     private void loadObject(String name) throws IOException {
@@ -376,12 +439,15 @@ public class ResourceLoader {
         game.objects.add(o);
     }
 
+    int roomi;
+
     private void loadRoom(String name) throws IOException {
-        // First thing is to load rooms
         File rf = new File(roomDir, name);
         StreamDecoder in = new StreamDecoder(rf);
         GameRoom room = new GameRoom(in.readStr());
         room.setId(in.read4());
+        room.orderIndex = roomi;
+        game.roomOrder[roomi++] = room.getId();
         room.caption = in.readStr();
         room.setWidth(in.read4());
         room.setHeight(in.read4());
@@ -545,7 +611,6 @@ public class ResourceLoader {
             LibArgument la = r.libArguments[i];
             Argument arg = a.arguments.get(i);
             if (arg.val == null) {
-                System.out.println("Null arg: " + i + " " + r.name);
                 continue;
             }
             boolean expr = false;
