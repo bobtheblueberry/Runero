@@ -383,10 +383,6 @@ public class RoomInstance {
         }
         // draw backgrounds
         drawBackgrounds(g, false);
-        GraphicsLibrary.gfx.setColor(Color.blue);
-        for (int i = 0; i < width; i++)
-            for (int j = 0; j < height; j++)
-                     g.drawPoint( i, j);
         
         // Draw instances
         for (ObjectGroup og : instanceGroups)
