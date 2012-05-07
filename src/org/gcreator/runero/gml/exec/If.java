@@ -8,10 +8,10 @@ public class If implements Statement {
 
     public ExprArgument condition;
     public ArrayList<Statement> exec;
-    
+
     public boolean hasElse;
     public ArrayList<Statement> elseExec;
-    
+
     @Override
     public void execute(Context context) {
         Constant c = condition.solve(context.instance, context.other);
@@ -19,7 +19,7 @@ public class If implements Statement {
             context.execute(exec);
         else if (hasElse)
             context.execute(elseExec);
-            
+
     }
 
 }

@@ -87,12 +87,12 @@ public class ActionInterpreter {
                 break;
             case Action.ACT_ELSE:
                 // else the game programmer is an idiot
+                System.out.println("you're an idiot");
                 break;
             case Action.ACT_EXIT:
                 // stop performing event.
                 return -1;
             case Action.ACT_REPEAT:
-                // TODO: Check to see what types GM uses
                 int times = Integer.parseInt(act.arguments.get(0).val);
                 int last = i;
                 for (int t = 0; t < times; t++)
@@ -154,7 +154,6 @@ public class ActionInterpreter {
                 return true;
             }
         } else {
-
             // must apply to an object
             if (RuneroGame.room.hasObjectGroup(act.appliesTo))
                 for (Instance i : RuneroGame.room.getObjectGroup(act.appliesTo).instances) {

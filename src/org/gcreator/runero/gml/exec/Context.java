@@ -18,10 +18,6 @@ public class Context {
         this.other = other;
     }
 
-    public Context() {
-        this(null, null);
-    }
-
     boolean good;
 
     public void setGood(boolean b) {
@@ -49,7 +45,7 @@ public class Context {
     public void execute(ArrayList<Statement> code) {
         //TODO: scope
         for (Statement s : code)
-            s.equals(this);
+            s.execute(this);
     }
     
     public void with (Instance inst, ArrayList<Statement> code) {

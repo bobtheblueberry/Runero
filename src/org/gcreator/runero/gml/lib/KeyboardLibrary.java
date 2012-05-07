@@ -15,8 +15,10 @@ public abstract class KeyboardLibrary {
     
     public static boolean keyboard_check(int key) {
         for (int i : getCodes(key))
-            if (Keyboard.isKeyDown(i))
+            if (Keyboard.isKeyDown(i)) {
+                System.out.println("key is down " + i + " " + key);
                 return true;
+            }
         return false;
     }
     

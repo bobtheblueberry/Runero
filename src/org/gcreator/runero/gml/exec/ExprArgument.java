@@ -48,11 +48,7 @@ public class ExprArgument {
                 exp.add(new Thing(v.getConstant()));
             } else if (e.type == Type.FUNCTION) {
                 Constant res = e.function.solve(instance, other);
-                if (res == null) {
-                    System.err.println("unimplemented/unknown function: " + e.function.name);
-                    exp.add(new Thing(new Constant(0)));
-                } else
-                    exp.add(new Thing(res));
+                exp.add(new Thing(res));
             } else if (e.type == Type.PARENTHESIS) {
                 exp.add(new Thing(e.parenthesis.solve(instance, other)));
             } else if (e.type == Type.OPERATOR) {

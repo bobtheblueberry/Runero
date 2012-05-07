@@ -6,7 +6,7 @@ public class Return implements Statement {
 
     @Override
     public void execute(Context context) {
-        context.returnStatement(value.solve(context.instance, context.other));
+        context.returnStatement((value == null) ? null : value.solve(context.instance, context.other));
     }
 
 }

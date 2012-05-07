@@ -5326,6 +5326,7 @@ public class FunctionManager {
     
  // TODO: this function
     private  static void checkReal(Constant c) {
-        
+        if (!c.isReal)
+            ; // who cares
     }
 }

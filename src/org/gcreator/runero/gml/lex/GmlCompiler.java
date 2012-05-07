@@ -270,7 +270,9 @@ public class GmlCompiler {
                 next = next();
                 if (next.token == END)
                     break;
-                list.add(getStatement(next));
+                Statement s = getStatement(next);
+                if (s != null)
+                    list.add(s);
             }
         } else {
             list.add(getStatement(next));

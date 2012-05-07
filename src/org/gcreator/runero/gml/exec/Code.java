@@ -17,8 +17,7 @@ public class Code {
     
     Statement[] code;
     public void execute(Instance instance, Instance other) {
-        System.out.println("execute code: " + code.length + " statements");
-        Context c = new Context();
+        Context c = new Context(instance, other);
         for (Statement s : code) {
             if (!c.isGood())
                 return;
