@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.gml.Constant;
 import org.lateralgm.file.gc.StreamDecoder;
 
@@ -849,10 +850,8 @@ public class FunctionManager {
 
                 return null; // room_goto_previous
             case 185: // room_goto_next()
-
-                // TODO: This function
-
-                return null; // room_goto_next
+                RoomLibrary.room_goto_next(RuneroGame.game.transition_kind);
+                return Constant.ZERO;
             case 186: // room_previous(numb)
 
                 // TODO: This function

@@ -40,11 +40,12 @@ public class ErrorDialog extends JDialog implements ActionListener {
         this(parent, title, message, throwableToString(e));
     }
 
-    public ErrorDialog(Frame parent, String title, String message, String debugInfo) {
+    public ErrorDialog(Frame parent, String title, String message, String text) {
         super(parent, title, true);
         setResizable(false);
 
-        this.debugInfo = new JTextArea(debugInfo);
+        this.debugInfo = new JTextArea(text);
+        debugInfo.setEditable(false);
         JScrollPane scroll = new JScrollPane(this.debugInfo);
 
         Dimension dim = new Dimension(scroll.getWidth(), DEBUG_HEIGHT);

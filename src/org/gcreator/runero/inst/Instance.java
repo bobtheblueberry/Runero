@@ -63,7 +63,7 @@ public class Instance implements Comparable<Instance> {
     public int id;
 
     public int parentId;                       // not accessed directly in GML, must use GML
-                         // function
+    // function
     /**
      * When an instance is marked as dead then it does nothing and waits to be destroyed
      */
@@ -232,26 +232,24 @@ public class Instance implements Comparable<Instance> {
             System.out.println("Sprite has no sub-images " + s.getName());
             return;
         }
-        
 
-  //      SubImage si = s.subImages.get((int) image_index);
-    //   g.setColor(Color.RED);
-        // if (s.shape == MaskShape.PRECISE)
-     /*   for (int i = 0; i < s.width; i++)
-            for (int j = 0; j < s.height; j++)
-
-                // if (si.mask.map[i][j])
-                {
-                g.drawLine((x - s.x),  (y - s.y), (x - s.x) + i, (y - s.y) + j); }
-*/
-        
         s.load(); // load sub image files
         Texture img = s.getTexture((int) Math.round(image_index));
         if (img == null) {
             System.out.println("Null image for sprite " + s.getName() + " index " + image_index);
             return;
         }
-       g.drawTexture(img, x - s.x, y - s.y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
+        g.drawTexture(img, x, y, s.y, s.y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
+
+        /*
+        SubImage si = s.subImages.get((int) image_index);
+        g.setColor(Color.RED);
+        if (s.shape == MaskShape.PRECISE)
+            for (int i = 0; i < s.width; i++)
+                for (int j = 0; j < s.height; j++)
+                   if (!si.mask.map[i][j]) 
+                        g.drawPoint((x - s.x) + i, (y - s.y) + j);
+        */
 
     }
 

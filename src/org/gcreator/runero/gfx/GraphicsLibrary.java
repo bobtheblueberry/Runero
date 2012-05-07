@@ -236,15 +236,15 @@ public class GraphicsLibrary {
     }
 
     public void drawTexture(Texture t, double x, double y, double width, double height) {
-        drawTexture(t, x, y, width, height, 1, 1, 0, null, 1.0);
+        drawTexture(t, x, y,0,0, width, height, 1, 1, 0, null, 1.0);
     }
 
-    public void drawTexture(Texture t, double x, double y, double xscale, double yscale, double angle, Color blend,
+    public void drawTexture(Texture t, double x, double y,double offx, double offy, double xscale, double yscale, double angle, Color blend,
             double alpha) {
-        drawTexture(t, x, y, t.getImageWidth(), t.getImageHeight(), 1, 1, 0, blend, alpha);
+        drawTexture(t, x, y,offx,offy, t.getImageWidth(), t.getImageHeight(), xscale, yscale, angle, blend, alpha);
     }
 
-    public void drawTexture(Texture t, double x, double y, double width, double height, double xscale, double yscale,
+    public void drawTexture(Texture t, double x, double y, double offx, double offy, double width, double height, double xscale, double yscale,
             double angle, Color blend, double alpha) {
         if (blend == null)
             glColor4d(1, 1, 1, alpha);
@@ -255,24 +255,24 @@ public class GraphicsLibrary {
         glPushMatrix();
         // bind to the appropriate texture for this sprite
         t.bind();
-
         // translate to the right location and prepare to draw
         glTranslated(x, y, 0);
-        glRotated(angle, xscale, yscale, 0);
+        glRotated(360-angle, 0, 0, 1);
+        glScaled(xscale, yscale, 0);
         // draw a quad textured to match the sprite
         glBegin(GL_QUADS);
         {
             glTexCoord2d(0, 0);
-            glVertex2d(0, 0);
+            glVertex2d(-offx, -offy);
 
             glTexCoord2d(t.getWidthRatio(), 0);
-            glVertex2d(width, 0);
+            glVertex2d(width-offx, -offy);
 
             glTexCoord2d(t.getWidthRatio(), t.getHeightRatio());
-            glVertex2d(width, height);
+            glVertex2d(width -offx, height -offx);
 
             glTexCoord2d(0, t.getHeightRatio());
-            glVertex2d(0, height);
+            glVertex2d(-offx, height -offy);
 
         }
         glEnd();

@@ -68,6 +68,8 @@ public class RuneroGame {
     public String caption_health; // The caption used for the health.
     public int room_index; // the current room index; 'room' in GML
     public int cursor_sprite;
+    public int transition_kind;
+    public int transition_steps = 80;
 
     public String keyboard_string = "";
     public int mouse_button;
@@ -77,7 +79,7 @@ public class RuneroGame {
     public String keyboard_lastchar = "";
 
     public int fps = 100002;
-    
+
     public RuneroGame()
         {
             super();
@@ -97,7 +99,7 @@ public class RuneroGame {
             System.exit(1);
         }
         // Go to the first room
-        room = new RoomInstance(this, rooms.get(0));
+        room = new RoomInstance(this, rooms.get(1));
         GraphicsLibrary.gfx.setTitle(room.caption);
         room.init(true);
     }
@@ -153,7 +155,7 @@ public class RuneroGame {
         }
         return null;
     }
-    
+
     public GameRoom getRoom(int id) {
         for (GameRoom r : rooms) {
             if (r.getId() == id) {
@@ -162,7 +164,6 @@ public class RuneroGame {
         }
         return null;
     }
-
 
     public void updateCaption() {
         // score lives health
@@ -337,7 +338,7 @@ public class RuneroGame {
             room.backgrounds[i].alpha = val.dVal;
             return true;
         }
-        //TODO: views, tiles
+        // TODO: views, tiles
         return false;
     }
 
@@ -387,9 +388,11 @@ public class RuneroGame {
             return arguments[14];
         } else if (name.equals("argument15")) {
             return arguments[15];
-        }
-
-        else if (name.equals("instance_count")) {
+        } else if (name.equals("transition_kind")) {
+            return new VariableVal(transition_kind);
+        } else if (name.equals("transition_steps")) {
+            return new VariableVal(transition_steps);
+        } else if (name.equals("instance_count")) {
             return new VariableVal(room.getInstanceCount());
         } else if (name.equals("instance_id")) {// TODO: this is an array
             return new VariableVal(0);
@@ -418,7 +421,7 @@ public class RuneroGame {
         } else if (name.equals("room_first")) {
             return new VariableVal(rooms.get(0).getId());
         } else if (name.equals("room_last")) {
-            return new VariableVal(rooms.get(rooms.size()-1).getId());
+            return new VariableVal(rooms.get(rooms.size() - 1).getId());
         } else if (name.equals("room_width")) {
             return new VariableVal(room.width);
         } else if (name.equals("room_height")) {
@@ -482,7 +485,7 @@ public class RuneroGame {
         } else if (name.equals("secure_mode")) {
             return new VariableVal(0); // ff that stuff
         }
-        
+
         return null;
     }
 }

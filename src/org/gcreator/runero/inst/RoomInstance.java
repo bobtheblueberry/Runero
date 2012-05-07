@@ -60,7 +60,7 @@ public class RoomInstance {
 
     public void init(boolean gameStart) {
         loadInstances();
-        
+
         // Create Events
         if (game.em.hasCreateEvents)
             EventExecutor.executeEvent(game.em.create, this);
@@ -95,9 +95,10 @@ public class RoomInstance {
      * @return
      */
     public ObjectGroup getObjectGroup2(int id) {
-        for (ObjectGroup g : instanceGroups)
+        for (ObjectGroup g : instanceGroups) {
             if (g.obj.getId() == id)
                 return g;
+        }
         return null;
     }
 
@@ -191,7 +192,7 @@ public class RoomInstance {
             i.performEvent(g.getMainEvent(MainEvent.EV_CREATE).events.get(0));
         }
     }
-    
+
     public void addInstance(Instance i) {
         EventQueue.addCreateEvent(i);
     }
@@ -247,6 +248,7 @@ public class RoomInstance {
 
             // TODO: Intersect boundary
         }
+
         if (game.em.hasCollisionEvents)
             for (CollisionEvent ce : game.em.collision) {
                 // look for instances
@@ -261,14 +263,17 @@ public class RoomInstance {
             }
         if (game.em.hasOtherEvents) {
             // No more lives
+
             if (game.em.otherNoMoreLives != null && game.lives <= 0) {
                 EventExecutor.executeEvent(game.em.otherNoMoreLives, this);
             }
+
             // No more health
             if (game.em.otherNoMoreLives != null && game.health <= 0) {
                 EventExecutor.executeEvent(game.em.otherNoMoreHealth, this);
             }
         }
+
         // end step
         if (game.em.hasStepEndEvents)
             EventExecutor.executeEvent(game.em.stepEnd, this);
@@ -438,5 +443,5 @@ public class RoomInstance {
 
         return false;
     }
-  
+
 }
