@@ -118,7 +118,7 @@ public class VariableManager {
                     Runner.Error("Unknown object ID " + ref);
                     return;
                 }
-                ObjectGroup o = RuneroGame.room.getObjectGroup2(ref);
+                ObjectGroup o = RuneroGame.room.getObjectGroup(ref);
                 if (o == null || o.instances.isEmpty()) {
                     Runner.Error("No instance of " + g.getName() + " in room");
                     return;
@@ -207,7 +207,7 @@ public class VariableManager {
                 Runner.Error("Unknown object ID " + ref);
                 return null;
             }
-            ObjectGroup o = RuneroGame.room.getObjectGroup2(ref);
+            ObjectGroup o = RuneroGame.room.getObjectGroup(ref);
             if (o == null || o.instances.isEmpty()) {
                 Runner.Error("No instance of " + g.getName() + " in room");
                 return null;

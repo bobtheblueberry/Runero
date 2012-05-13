@@ -36,6 +36,7 @@ import org.gcreator.runero.gml.VariableManager;
 import org.gcreator.runero.gml.VariableVal;
 import org.gcreator.runero.gml.exec.VariableRef;
 import org.gcreator.runero.inst.Instance;
+import org.gcreator.runero.inst.ObjectGroup;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameObject;
@@ -727,9 +728,10 @@ public class ActionLibrary {
         double number = GmlParser.getExpression(act.arguments.get(1).exprVal, instance, other);
         int op = act.arguments.get(2).menuVal;
 
-        if (!RuneroGame.room.hasObjectGroup(object))
+        ObjectGroup g = RuneroGame.room.getObjectGroup(object);
+        if (g == null)
             return false;
-        int objNum = RuneroGame.room.getObjectGroup(object).instances.size();
+        int objNum = g.instances.size();
         if (op == 0)
             return objNum == number;
         else if (op == 1)

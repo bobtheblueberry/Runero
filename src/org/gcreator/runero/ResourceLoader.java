@@ -532,6 +532,8 @@ public class ResourceLoader {
         StreamDecoder in = new StreamDecoder(f);
         GameBackground b = new GameBackground(in.readStr());
         b.setId(in.read4());
+        b.width = in.read4();
+        b.height = in.read4();
         b.transparent = in.readBool();
         b.smoothEdges = in.readBool();
         b.preload = in.readBool();

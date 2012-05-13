@@ -31,7 +31,7 @@ public class EventQueue {
             // remove from here
             r.getObjectGroup(i.oldObjId).instances.remove(i.inst);
             // and add to here
-            r.getObjectGroup(i.inst.obj.getId()).add(i.inst);
+            r.createObjectGroup(i.inst.obj.getId()).add(i.inst);
         }
         change.clear();
     }
@@ -40,7 +40,7 @@ public class EventQueue {
         if (create.isEmpty())
             return;
         for (Instance i : create)
-            r.getObjectGroup(i.obj.getId()).instances.add(i);
+            r.createObjectGroup(i.obj.getId()).instances.add(i);
         create.clear();
     }
 
@@ -48,18 +48,20 @@ public class EventQueue {
         if (destroy.isEmpty())
             return;
         for (Instance i : destroy) {
-            ObjectGroup g = r.getObjectGroup2(i.obj.getId());
+            ObjectGroup g = r.getObjectGroup(i.obj.getId());
             if (g == null)
                 return;
             g.instances.remove(i);
-            if (g.instances.size() == 0)
+            if (g.instances.size() == 0) {
                 r.instanceGroups.remove(g);
+            }
         }
         destroy.clear();
     }
 
-    private EventQueue() {
-    }
+    private EventQueue()
+        {
+        }
 
     public static void addChangeEvent(Instance i, int oldId) {
         change.add(new ChangeInstance(i, oldId));
@@ -77,9 +79,10 @@ public class EventQueue {
         int oldObjId;
         Instance inst;
 
-        public ChangeInstance(Instance i, int oldId) {
-            this.inst = i;
-        }
+        public ChangeInstance(Instance i, int oldId)
+            {
+                this.inst = i;
+            }
     }
 
 }

@@ -36,5 +36,8 @@ public class MainEvent implements Comparable<MainEvent> {
     public int compareTo(MainEvent o) {
         return Byte.valueOf(mainEvent).compareTo(o.mainEvent);
     }
-
+    
+    public String toString() {
+        return "Main Event (" + mainEvent + ") ";
+    }
 }

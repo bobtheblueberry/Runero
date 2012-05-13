@@ -121,4 +121,8 @@ public class Event {
     public void addAction(Action a) {
         actions.add(a);
     }
+    
+    public String toString() {
+        return "Event " + parent + " (" + type + ") for " + object.getName();
+    }
 }

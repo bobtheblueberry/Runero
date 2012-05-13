@@ -14,7 +14,6 @@ public class EventExecutor {
                 if (g.obj.getId() == e.object.getId())
                     for (Instance i : g.instances)
                         i.performEvent(e);
-
     }
 
     /**
@@ -24,7 +23,7 @@ public class EventExecutor {
      * @param room
      */
     public static void executeEvent(Event e, RoomInstance room) {
-        ObjectGroup g = room.getObjectGroup2(e.object.getId());
+        ObjectGroup g = room.getObjectGroup(e.object.getId());
         if (g == null) // No instances
             return;
         for (Instance i : g.instances)

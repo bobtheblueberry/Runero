@@ -350,14 +350,18 @@ public class RuneroGame {
 
     public VariableVal getVariable(Variable v, Instance instance, Instance other) {
         String name = v.name;
-        if (v.isArray)
+        int i = 0;
+        if (v.isArray) {
             name = GmlParser.getArrayName(v, instance, other);
+            i = (int) Math.round(v.arrayIndex.solve(instance, other).dVal);
+        }
         if (name.equals("gamemaker_registered")) {
             return VariableVal.ONE;
         }// else if (name.equals("argument_relative")) {
          // new VariableVal(argument_relative);
          // }
          // else if (name.equals("argument")) {
+         // [i]
          // new VariableVal(arguments);
          // }
 
@@ -424,7 +428,7 @@ public class RuneroGame {
             return new VariableVal(Calendar.getInstance().get(Calendar.SECOND));
         } else if (name.equals("room")) {
             return new VariableVal(room_index);
-        }  else if (name.equals("room_first")) {
+        } else if (name.equals("room_first")) {
             return new VariableVal(roomOrder[0]);
         } else if (name.equals("room_last")) {
             return new VariableVal(roomOrder[roomOrder.length - 1]);
@@ -459,17 +463,17 @@ public class RuneroGame {
         } else if (name.equals("error_last")) {
             return new VariableVal(Runner.error_last);
         } else if (name.equals("keyboard_key")) {
-            return new VariableVal('c');// TODO ...
+            return new VariableVal(keyboard_key);
         } else if (name.equals("keyboard_lastkey")) {
-            return new VariableVal('c');
+            return new VariableVal(keyboard_lastkey);
         } else if (name.equals("keyboard_lastchar")) {
-            return new VariableVal('c');
+            return new VariableVal(keyboard_lastchar + "");
         } else if (name.equals("keyboard_string")) {
-            return new VariableVal("keyboard_string");// TODO
+            return new VariableVal(keyboard_string);
         } else if (name.equals("mouse_x")) {
             return new VariableVal(Mouse.getX());
         } else if (name.equals("mouse_y")) {
-            return new VariableVal(Display.getHeight()-Mouse.getY());
+            return new VariableVal(Display.getHeight() - Mouse.getY());
         } else if (name.equals("mouse_button")) {
             return new VariableVal(0);
         } else if (name.equals("mouse_lastbutton")) {
@@ -490,6 +494,47 @@ public class RuneroGame {
             return new VariableVal(System.getProperty("user.dir"));
         } else if (name.equals("secure_mode")) {
             return new VariableVal(0); // ff that stuff
+        } else if (name.equals("background_color")) {
+            return new VariableVal(room.background_color.getRGB());
+        } else if (name.equals("background_showcolor")) {
+            return VariableVal.Bool(room.draw_background_color);
+        } else if (name.equals("background_visible")) {
+            return VariableVal.Bool(room.backgrounds[i].visible);
+        } else if (name.equals("background_foreground")) {
+            return VariableVal.Bool(room.backgrounds[i].foreground);
+        } else if (name.equals("background_index")) {
+            return new VariableVal(room.backgrounds[i].backgroundId);
+        } else if (name.equals("background_x")) {
+            return new VariableVal(room.backgrounds[i].x);
+        } else if (name.equals("background_y")) {
+            return new VariableVal(room.backgrounds[i].y);
+        } else if (name.equals("background_width")) {
+            GameBackground b = getBackground(room.backgrounds[i].backgroundId);
+            if (b == null)
+                return VariableVal.ZERO;
+            return new VariableVal(b.width);
+        } else if (name.equals("background_height")) {
+            GameBackground b = getBackground(room.backgrounds[i].backgroundId);
+            if (b == null)
+                return VariableVal.ZERO;
+            return new VariableVal(b.height);
+        } else if (name.equals("background_htiled")) {
+            return VariableVal.Bool(room.backgrounds[i].tileHoriz);
+        } else if (name.equals("background_vtiled")) {
+            return VariableVal.Bool(room.backgrounds[i].tileHoriz);
+        } else if (name.equals("background_xscale")) {
+            return new VariableVal(room.backgrounds[i].xscale);
+        } else if (name.equals("background_yscale")) {
+            return new VariableVal(room.backgrounds[i].yscale);
+        } else if (name.equals("background_hspeed")) {
+            return new VariableVal(room.backgrounds[i].hSpeed);
+        } else if (name.equals("background_vspeed")) {
+            return new VariableVal(room.backgrounds[i].vSpeed);
+        } else if (name.equals("background_blend")) {
+            Color c = room.backgrounds[i].blend;
+            return new VariableVal(c == null ? 0 : c.getRGB());
+        } else if (name.equals("background_alpha")) {
+            return new VariableVal(room.backgrounds[i].alpha);
         }
 
         return null;

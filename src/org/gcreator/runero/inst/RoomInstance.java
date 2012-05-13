@@ -76,7 +76,7 @@ public class RoomInstance {
         System.out.println("Instances: " + instance_count);
     }
 
-    public ObjectGroup getObjectGroup(int id) {
+    public ObjectGroup createObjectGroup(int id) {
         for (ObjectGroup g : instanceGroups)
             if (g.obj.getId() == id)
                 return g;
@@ -94,7 +94,7 @@ public class RoomInstance {
      * @param id
      * @return
      */
-    public ObjectGroup getObjectGroup2(int id) {
+    public ObjectGroup getObjectGroup(int id) {
         for (ObjectGroup g : instanceGroups) {
             if (g.obj.getId() == id)
                 return g;
@@ -117,7 +117,7 @@ public class RoomInstance {
             if (si.creationCode != null) {
                 si.creationCode.getCode().execute(i, null);
             }
-            getObjectGroup(i.obj.getId()).instances.add(i);
+            createObjectGroup(i.obj.getId()).instances.add(i);
             instance_count++;
             instance_nextid = Math.max(instance_nextid + 1, i.id + 1);
         }
@@ -201,6 +201,7 @@ public class RoomInstance {
         EventQueue.processCreate(this);
         EventQueue.processChange(this);
         EventQueue.processDestroy(this);
+
         // begin step
         if (game.em.hasStepBeginEvents)
             EventExecutor.executeEvent(game.em.stepBegin, this);
@@ -235,6 +236,10 @@ public class RoomInstance {
         for (ObjectGroup g : instanceGroups)
             for (Instance i : g.instances)
                 i.move();
+        // Move backgrounds
+        for (Background b : backgrounds)
+            if (b != null)
+                b.step();
 
         if (game.em.hasOtherEvents) {
             // TODO: path end
@@ -253,8 +258,8 @@ public class RoomInstance {
         if (game.em.hasCollisionEvents)
             for (CollisionEvent ce : game.em.collision) {
                 // look for instances
-                ObjectGroup g = getObjectGroup2(ce.event.object.getId());
-                ObjectGroup g2 = getObjectGroup2(ce.otherId);
+                ObjectGroup g = getObjectGroup(ce.event.object.getId());
+                ObjectGroup g2 = getObjectGroup(ce.otherId);
                 if (g == null || g2 == null)
                     continue;
                 for (Instance i : g.instances)
@@ -408,7 +413,7 @@ public class RoomInstance {
     }
 
     private void drawBackgrounds(GraphicsLibrary g, boolean foreground) {
-        for (GameRoom.Background gb : room.backgrounds) {
+        for (GameRoom.Background gb : backgrounds) {
             if (gb.visible && gb.foreground == foreground) {
                 paintBackground(g, gb);
             }
@@ -447,8 +452,7 @@ public class RoomInstance {
     }
 
     private void handleMouse() {
-        
-        
+
         /*
          # There are a million different specialized mouse events.
 

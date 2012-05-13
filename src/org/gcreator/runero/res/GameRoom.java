@@ -3,6 +3,8 @@ package org.gcreator.runero.res;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import org.gcreator.runero.RuneroGame;
+
 public class GameRoom extends GameResource {
 
     public Color background_color;
@@ -44,8 +46,8 @@ public class GameRoom extends GameResource {
     public static class Background {
         public boolean visible;
         public boolean foreground;
-        public int     x;
-        public int     y;
+        public double  x;
+        public double  y;
         public boolean tileHoriz;
         public boolean tileVert;
         public double     hSpeed;
@@ -57,6 +59,13 @@ public class GameRoom extends GameResource {
         public Color blend;
         public double alpha = 1.0;
 
+        public void step() {
+            x += hSpeed;
+            y += vSpeed;
+            x %= RuneroGame.room.width;
+            y %= RuneroGame.room.height;
+        }
+        
         public Background copy() {
             Background b = new Background();
             b.visible = visible;
