@@ -245,12 +245,12 @@ public class Instance implements Comparable<Instance> {
         
         SubImage si = s.subImages.get(((int) Math.round(image_index))% s.subImages.size());
         g.setColor(Color.GREEN, 0.5);
-        if (s.shape == MaskShape.PRECISE)
+        if (s.shape == org.gcreator.runero.res.GameSprite.MaskShape.PRECISE)
             for (int i = 0; i < s.width; i++)
                 for (int j = 0; j < s.height; j++)
                    if (si.mask.map[i][j]) 
                         g.drawPoint((x - s.x) + i, (y - s.y) + j);
-        */ 
+         */
     }
 
     public double getSpeed() {

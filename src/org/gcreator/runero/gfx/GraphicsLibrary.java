@@ -149,7 +149,7 @@ public class GraphicsLibrary {
             glVertex2d(x1, y1);
             glVertex2d(x1, y2);
             glVertex2d(x2, y2);
-            glVertex2d(x2, y1);
+            glVertex2d(x2, y1-1);
         }
         glEnd();
         glPopMatrix();
@@ -225,7 +225,7 @@ public class GraphicsLibrary {
     }
 
     public void drawPoint(double x, double y) {
-        
+
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_POINTS);
         glVertex2d(x, y);
@@ -246,6 +246,10 @@ public class GraphicsLibrary {
         drawTexture(t, x, y, 0, 0, width, height, 1, 1, 0, null, 1.0);
     }
 
+    public void drawTexture(Texture t, double x, double y, double width, double height, double offx, double offy) {
+        drawTexture(t, x, y, offx, offy, width, height, 1, 1, 0, null, 1.0);
+    }
+
     public void drawTexture(Texture t, double x, double y, double offx, double offy, double xscale, double yscale,
             double angle, Color blend, double alpha) {
         drawTexture(t, x, y, offx, offy, t.getImageWidth(), t.getImageHeight(), xscale, yscale, angle, blend, alpha);
@@ -264,7 +268,7 @@ public class GraphicsLibrary {
         // bind to the appropriate texture for this sprite
         t.bind();
         // translate to the right location and prepare to draw
-        glTranslated(x, y-1, 0);
+        glTranslated(x, y - 1, 0);
         glRotated(360 - angle, 0, 0, 1);
         glScaled(xscale, yscale, 0);
         // draw a quad textured to match the sprite

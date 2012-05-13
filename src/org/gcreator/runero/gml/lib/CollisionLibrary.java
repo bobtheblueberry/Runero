@@ -19,7 +19,7 @@ public abstract class CollisionLibrary {
         if (g == null)
             return false;
         for (Instance i : g.instances) {
-            if (RuneroCollision.checkCollision(inst, i, true))
+            if (RuneroCollision.checkCollision(inst, i))
                 return true;
         }
         return false;

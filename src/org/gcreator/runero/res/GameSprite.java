@@ -34,8 +34,10 @@ public class GameSprite extends GameResource implements Preloadable {
         }
 
     public Rectangle getBounds() {
-        if (bounds == null)
+        if (bounds == null) {
             bounds = new Rectangle(Math.abs(right - left), Math.abs(bottom - top));
+            bounds.translate(left, top);
+        }
         return bounds;
     }
 

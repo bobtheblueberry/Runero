@@ -1403,7 +1403,7 @@ public class ActionLibrary {
             y += instance.y;
         }
         Texture img = s.getTexture(subImage % s.subImages.size());
-        g.drawTexture(img, x, y);
+        g.drawTexture(img, x, y, s.width, s.height, s.x, s.y);
     }
 
     private static void draw_background(Action a, Instance instance, Instance other) {
