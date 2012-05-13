@@ -44,7 +44,7 @@ public class Context {
     
     public void execute(ArrayList<Statement> code) {
         //TODO: scope
-        for (Statement s : code)
+        for (Statement s : code) 
             s.execute(this);
     }
     

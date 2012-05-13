@@ -264,7 +264,7 @@ public class GraphicsLibrary {
         // bind to the appropriate texture for this sprite
         t.bind();
         // translate to the right location and prepare to draw
-        glTranslated(x, y, 0);
+        glTranslated(x, y-1, 0);
         glRotated(360 - angle, 0, 0, 1);
         glScaled(xscale, yscale, 0);
         // draw a quad textured to match the sprite

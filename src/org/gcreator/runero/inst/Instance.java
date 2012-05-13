@@ -240,17 +240,17 @@ public class Instance implements Comparable<Instance> {
             return;
         }
         g.drawTexture(img, x, y, s.x, s.y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
-
-        /*
-        SubImage si = s.subImages.get((int) image_index);
-        g.setColor(Color.RED);
+        
+        /** Code to draw mask over the sprite
+        
+        SubImage si = s.subImages.get(((int) Math.round(image_index))% s.subImages.size());
+        g.setColor(Color.GREEN, 0.5);
         if (s.shape == MaskShape.PRECISE)
             for (int i = 0; i < s.width; i++)
                 for (int j = 0; j < s.height; j++)
                    if (si.mask.map[i][j]) 
                         g.drawPoint((x - s.x) + i, (y - s.y) + j);
-        */
-
+        */ 
     }
 
     public double getSpeed() {

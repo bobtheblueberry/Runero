@@ -1,4 +1,4 @@
-package org.gcreator.runero.collision;
+package org.gcreator.runero;
 
 /*
  * Copyright (c) 2008 Golden T Studios.
@@ -42,8 +42,11 @@ public abstract class RuneroCollision {
         else
             sp2 = i2.getSprite();
 
-        if (sp1 == null || sp2 == null)
+        if (sp1 == null || sp2 == null) {
+            //cannot check collision with spriteless object
+            // FIXME  should have a point if no sprite?
             return false;
+        }
 
         Rectangle r1 = new Rectangle(sp1.getBounds());
         Rectangle r2 = new Rectangle(sp2.getBounds());
@@ -56,7 +59,6 @@ public abstract class RuneroCollision {
                 return isPixelCollide(i1, i2);
             return true;
         }
-
         return false;
 
     }

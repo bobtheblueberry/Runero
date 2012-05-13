@@ -89,9 +89,9 @@ public class ResourceLoader {
             throw new IOException("Failed to load Libraries");
 
         File res = new File(Runner.GameFolder, "resources.dat");
-        if (!res.exists()) 
+        if (!res.exists())
             throw new IOException("No resource data file! Did you export ?");
-        
+
         StreamDecoder in = new StreamDecoder(res);
         sprites = in.read4();
         backgrounds = in.read4();
@@ -394,7 +394,6 @@ public class ResourceLoader {
                     add(r, mask, s.width, s.height);
                 }
             }
-
         }
     }
 
@@ -402,11 +401,12 @@ public class ResourceLoader {
 
     private void add(boolean b, Mask m, int width, int height) {
         m.map[x][y] = b;
-        if (y + 1 >= height) {
-            y = 0;
-            x++;
-        } else
+
+        if (x + 1 >= width) {
+            x = 0;
             y++;
+        } else
+            x++;
     }
 
     private void loadObject(String name) throws IOException {

@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.gcreator.runero.RuneroCollision;
 import org.gcreator.runero.RuneroGame;
-import org.gcreator.runero.collision.RuneroCollision;
 import org.gcreator.runero.event.CollisionEvent;
 import org.gcreator.runero.event.Event;
 import org.gcreator.runero.event.EventExecutor;

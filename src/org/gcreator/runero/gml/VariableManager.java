@@ -82,7 +82,7 @@ public class VariableManager {
                 // WTF
             }
             int ref = (int) first.realVal;
-            v = r.ref.get(r.ref.size() - 2);
+            v = r.ref.get(r.ref.size() - 1);
 
             Variable lastvar = r.ref.get(r.ref.size() - 1);
             String var = lastvar.name;
@@ -123,7 +123,7 @@ public class VariableManager {
                     Runner.Error("No instance of " + g.getName() + " in room");
                     return;
                 }
-                for (Instance i : o.instances)
+                for (Instance i : o.instances) 
                     i.setVariable(v, val, other);
             }
         }

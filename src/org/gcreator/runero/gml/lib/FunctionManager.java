@@ -7,6 +7,7 @@ import java.io.InputStream;
 
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.gml.Constant;
+import org.gcreator.runero.inst.Instance;
 import org.lateralgm.file.gc.StreamDecoder;
 
 public class FunctionManager {
@@ -47,7 +48,7 @@ public class FunctionManager {
         return -1;
     }
 
-    public static Constant getFunction(int id, Constant... args) {
+    public static Constant getFunction(int id, Instance instance, Constant... args) {
 
         Constant arg0 = null, arg1 = null, arg2 = null, arg3 = null, arg4 = null, arg5 = null;
         if (args.length > 0) {
@@ -530,10 +531,12 @@ public class FunctionManager {
 
                 return null; // place_empty
             case 121: // place_meeting(x,y,obj)
-
-                // TODO: This function
-
-                return null; // place_meeting
+                checkReal(arg0);
+                checkReal(arg1);
+                checkReal(arg2);
+                if (CollisionLibrary.place_meeting(instance, arg0.dVal, arg1.dVal, (int)arg2.dVal))
+                    return Constant.TRUE;
+                return Constant.FALSE;
             case 122: // place_snapped(hsnap,vsnap)
 
                 // TODO: This function

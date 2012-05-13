@@ -28,7 +28,6 @@ public class RuneroDisplay {
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glAlphaFunc(GL_ALWAYS, 0);
             glEnable(GL_BLEND);
-
             
             // disable the OpenGL depth test since we're rendering 2D graphics
             glDisable(GL_DEPTH_TEST);

@@ -32,7 +32,7 @@ public class Function implements Statement {
         int i = 0;
         for (ExprArgument arg : args)
             c[i++] = arg.solve(instance, other);
-        Constant res = FunctionManager.getFunction(id, c);
+        Constant res = FunctionManager.getFunction(id, instance, c);
         if (res == null) {
             System.err.println("Unimplemented/Unknown function: " + name);
             res = Constant.ZERO;

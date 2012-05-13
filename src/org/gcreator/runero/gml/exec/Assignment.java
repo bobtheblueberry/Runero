@@ -66,5 +66,9 @@ public class Assignment implements Statement {
                 break;
         }
     }
+    
+    public String toString() {
+        return variable + " " + op + " " + value;
+    }
 
 }

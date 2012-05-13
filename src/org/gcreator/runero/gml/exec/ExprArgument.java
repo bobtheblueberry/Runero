@@ -226,4 +226,8 @@ public class ExprArgument {
         Constant c;
         Operator op;
     }
+    
+    public String toString() {
+        return debugVal;
+    }
 }
