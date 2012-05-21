@@ -10,6 +10,7 @@ public class Runner {
     public static ResourceLoader rl;
     public static boolean error_occurred = false;
     public static String error_last = "";
+    public static boolean JAR;
 
     public static File GameFolder;
 
@@ -40,9 +41,23 @@ public class Runner {
 
     public Runner(File folder)
         {
+            this(folder, false);
+        }
+
+    public Runner(File folder, boolean jar)
+        {
+            JAR = jar;
             // Load LWJGL
             try {
-                new LWJGLDownloader().checkLWJGL();
+                File f;
+                if (jar)
+                    f = new File("LWJGL/");
+                else
+                    f = new File("plugins/shared/");
+                if (!f.exists())
+                    f.mkdirs();
+
+                new LWJGLDownloader(f).checkLWJGL();
             } catch (IOException e) {
                 System.err.println("Error download LWJGL");
                 e.printStackTrace();

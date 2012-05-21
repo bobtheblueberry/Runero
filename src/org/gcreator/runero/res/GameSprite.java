@@ -1,7 +1,6 @@
 package org.gcreator.runero.res;
 
 import java.awt.Rectangle;
-import java.io.File;
 import java.util.ArrayList;
 
 import org.gcreator.runero.Preloadable;
@@ -63,20 +62,20 @@ public class GameSprite extends GameResource implements Preloadable {
     }
 
     public class SubImage {
-        File file;
+        String name;
         Texture image;
         public Mask mask;
 
-        public SubImage(File f)
+        public SubImage(String name)
             {
-                this.file = f;
+                this.name = name;
             }
 
         protected Texture load() {
             if (image != null)
                 return image;
 
-            return image = RuneroGame.tex.getTexture(file);
+            return image = RuneroGame.tex.getTexture("sprites", name);
         }
     }
 

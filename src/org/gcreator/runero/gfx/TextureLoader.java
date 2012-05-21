@@ -19,7 +19,16 @@
 
 package org.gcreator.runero.gfx;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_RGBA;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glTexImage2D;
+import static org.lwjgl.opengl.GL11.glTexParameteri;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -32,6 +41,7 @@ import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.zip.InflaterInputStream;
 
+import org.gcreator.runero.Runner;
 import org.lwjgl.BufferUtils;
 
 public class TextureLoader {
@@ -58,19 +68,25 @@ public class TextureLoader {
      * @return The loaded texture
      * @throws IOException Indicates a failure to access the resource
      */
-    public Texture getTexture(File res) {
+    public Texture getTexture(String dir, String res) {
+        String path = dir + "/" + res;
         try {
             long start = System.currentTimeMillis();
             int target = GL_TEXTURE_2D;
-
-            InflaterInputStream in = new InflaterInputStream(new BufferedInputStream(new FileInputStream(res)));
+            InflaterInputStream in;
+            if (Runner.JAR)
+                in = new InflaterInputStream(new BufferedInputStream(TextureLoader.class.getResourceAsStream("/res/"
+                        + path)));
+            else
+                in = new InflaterInputStream(new BufferedInputStream(new FileInputStream(Runner.GameFolder.getPath()
+                        + File.separator)));
             int width = read4(in);
             int height = read4(in);
             int texWidth = read4(in);
             int texHeight = read4(in);
             byte[] data = new byte[texWidth * texHeight * 4];
             int tmp = 0;
-            int inc = (texWidth-width)*4;
+            int inc = (texWidth - width) * 4;
             for (int j = 0; j < height; j++) {
                 for (int i = 0; i < width; i++) {
                     for (int k = 0; k < 4; k++)
@@ -103,11 +119,11 @@ public class TextureLoader {
             // produce a texture from the byte buffer
             glTexImage2D(target, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer);
             long time = System.currentTimeMillis() - start;
-            System.out.println("Loaded " + res.getName() + " in " + time + " ms");
+            System.out.println("Loaded " + path + " in " + time + " ms");
 
             return texture;
         } catch (IOException exc) {
-            System.err.println("Cannot load texture " + res);
+            System.err.println("Cannot load texture " + path);
             exc.printStackTrace();
         }
         return null;

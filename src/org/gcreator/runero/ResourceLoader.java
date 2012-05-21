@@ -55,6 +55,7 @@ public class ResourceLoader {
     File pathDir;
     File tlDir;
     int rooms, fonts, sprites, scripts, objects, backgrounds, paths, timelines, sounds;
+    boolean jar;
 
     private static final byte SPRITE = 1;
     private static final byte BACKGROUND = 2;
@@ -71,6 +72,7 @@ public class ResourceLoader {
     public ResourceLoader(RuneroGame game)
         {
             this.game = game;
+            this.jar = Runner.JAR;
             preloadables = new ArrayList<Preloadable>();
             roomDir = new File(Runner.GameFolder, "rooms/");
             fontDir = new File(Runner.GameFolder, "fonts/");
@@ -88,11 +90,7 @@ public class ResourceLoader {
         if (!LibManager.autoLoad())
             throw new IOException("Failed to load Libraries");
 
-        File res = new File(Runner.GameFolder, "resources.dat");
-        if (!res.exists())
-            throw new IOException("No resource data file! Did you export ?");
-
-        StreamDecoder in = new StreamDecoder(res);
+        StreamDecoder in = getInputStream("resources.dat");
         sprites = in.read4();
         backgrounds = in.read4();
         sounds = in.read4();
@@ -112,6 +110,9 @@ public class ResourceLoader {
         game.timelines = new ArrayList<GameTimeline>(timelines);
         game.paths = new ArrayList<GamePath>(paths);
         game.roomOrder = new int[rooms];
+
+        for (int i = 0; i < rooms; i++)
+            game.roomOrder[i] = in.read4();
 
         int b;
         while ((b = in.read()) != -1) {
@@ -215,12 +216,25 @@ public class ResourceLoader {
         }
     }
 
+    private StreamDecoder getInputStream(String name) throws FileNotFoundException {
+        if (jar)
+            return new StreamDecoder(ResourceLoader.class.getResourceAsStream("/res/" + name));
+        else
+            return new StreamDecoder(new FileInputStream(new File(Runner.GameFolder, name)));
+    }
+
+    private StreamDecoder getInputStream(File parent, String name) throws FileNotFoundException {
+        if (jar)
+            return new StreamDecoder(ResourceLoader.class.getResourceAsStream("/res/" + parent.getName() + "/" + name));
+        else
+            return new StreamDecoder(new FileInputStream(new File(parent, name)));
+    }
+
     private void loadSettings(String name) {
-        File f = new File(Runner.GameFolder, name);
         GameSettings s = new GameSettings();
         RuneroGame.settings = s;
         try {
-            StreamDecoder in = new StreamDecoder(f);
+            StreamDecoder in = getInputStream(name);
             s.gameId = in.read4();
             s.startFullscreen = in.readBool();
             s.interpolate = in.readBool();
@@ -314,8 +328,7 @@ public class ResourceLoader {
     }
 
     private void loadFont(String name) throws IOException {
-        File f = new File(fontDir, name);
-        StreamDecoder in = new StreamDecoder(f);
+        StreamDecoder in = getInputStream(fontDir, name);
         GameFont fnt = new GameFont(in.readStr());
         fnt.setId(in.read4());
         fnt.fontName = in.readStr();
@@ -331,18 +344,16 @@ public class ResourceLoader {
     }
 
     private void loadSprite(String name) throws IOException {
-        File f = new File(sprDir, name);
-        StreamDecoder in = new StreamDecoder(f);
+        StreamDecoder in = getInputStream(sprDir, name);
 
         GameSprite s = new GameSprite(in.readStr());
         s.setId(in.read4());
         s.width = in.read4();
         s.height = in.read4();
         int subimgs = in.read4();
-        for (int i = 0; i < subimgs; i++) {
-            File sf = new File(sprDir, in.readStr());
-            s.subImages.add(s.new SubImage(sf));
-        }
+        for (int i = 0; i < subimgs; i++)
+            s.subImages.add(s.new SubImage(in.readStr()));
+
         s.transparent = in.readBool();
         int shape = in.read();
         if (shape == 0)
@@ -410,8 +421,7 @@ public class ResourceLoader {
     }
 
     private void loadObject(String name) throws IOException {
-        File f = new File(objDir, name);
-        StreamDecoder in = new StreamDecoder(f);
+        StreamDecoder in = getInputStream(objDir, name);
         GameObject o = new GameObject(in.readStr());
         o.setId(in.read4());
         o.spriteId = in.read4();
@@ -442,15 +452,18 @@ public class ResourceLoader {
         game.objects.add(o);
     }
 
-    int roomi;
+    private int getIndex(int id) {
+        for (int i = 0; i < rooms; i++)
+            if (game.roomOrder[i] == id)
+                return i;
+        return -1;
+    }
 
     private void loadRoom(String name) throws IOException {
-        File rf = new File(roomDir, name);
-        StreamDecoder in = new StreamDecoder(rf);
+        StreamDecoder in = getInputStream(roomDir, name);
         GameRoom room = new GameRoom(in.readStr());
         room.setId(in.read4());
-        room.orderIndex = roomi;
-        game.roomOrder[roomi++] = room.getId();
+        room.orderIndex = getIndex(room.getId());
         room.caption = in.readStr();
         room.setWidth(in.read4());
         room.setHeight(in.read4());
@@ -528,8 +541,7 @@ public class ResourceLoader {
     }
 
     private void loadBackground(String name) throws IOException {
-        File f = new File(bgDir, name);
-        StreamDecoder in = new StreamDecoder(f);
+        StreamDecoder in = getInputStream(bgDir, name);
         GameBackground b = new GameBackground(in.readStr());
         b.setId(in.read4());
         b.width = in.read4();
@@ -544,8 +556,7 @@ public class ResourceLoader {
         b.vOffset = in.read4();
         b.hSep = in.read4();
         b.vSep = in.read4();
-        String bgImage = in.readStr();
-        b.imageFile = new File(bgDir, bgImage);
+        b.fileName = in.readStr();
         in.close();
         game.backgrounds.add(b);
         if (b.preload) {
@@ -554,8 +565,7 @@ public class ResourceLoader {
     }
 
     private void loadGameInfo(String name) throws IOException {
-        File f = new File(Runner.GameFolder, name);
-        StreamDecoder in = new StreamDecoder(f);
+        StreamDecoder in = getInputStream(name);
         GameInformation g = new GameInformation();
         g.text = in.readStr();
         g.backgroundColor = new java.awt.Color(in.read4());

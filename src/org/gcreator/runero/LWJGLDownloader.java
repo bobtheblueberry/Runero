@@ -31,12 +31,9 @@ public class LWJGLDownloader {
 
     static OS osType;
 
-    public LWJGLDownloader()
+    public LWJGLDownloader(File f)
         {
-            folder = new File("plugins/shared/");
-            if (!folder.exists())
-                folder.mkdir();
-            
+            folder = f;
         }
 
     public void checkLWJGL() throws IOException {
