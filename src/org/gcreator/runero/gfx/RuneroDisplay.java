@@ -76,5 +76,6 @@ public class RuneroDisplay {
             if (Display.isCloseRequested())
                 gameRunning = false;
         }
+        System.out.println("Game ended");
     }
 }

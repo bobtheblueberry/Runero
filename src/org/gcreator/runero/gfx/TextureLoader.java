@@ -79,7 +79,7 @@ public class TextureLoader {
                         + path)));
             else
                 in = new InflaterInputStream(new BufferedInputStream(new FileInputStream(Runner.GameFolder.getPath()
-                        + File.separator)));
+                        + File.separator + path)));
             int width = read4(in);
             int height = read4(in);
             int texWidth = read4(in);
