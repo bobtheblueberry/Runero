@@ -18,5 +18,10 @@ package org.gcreator.runero.gml.exec;
  */
 public interface Statement {
 
-    public void execute(Context context);
+    /**
+     * 
+     * @param context
+     * @return 0 for normal statement, Context.BREAK for break, etc.
+     */
+    public int execute(Context context);
 }

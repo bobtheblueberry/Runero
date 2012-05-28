@@ -8,9 +8,10 @@ public class While implements Statement {
     public ArrayList<Statement> exec;
     
     @Override
-    public void execute(Context context) {
+    public int execute(Context context) {
         while (condition.solve(context.instance, context.other).dVal > 0.5)
             context.execute(exec);
+        return 0;
     }
 
 }

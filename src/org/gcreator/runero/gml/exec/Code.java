@@ -19,8 +19,7 @@ public class Code {
     public void execute(Instance instance, Instance other) {
         Context c = new Context(instance, other);
         for (Statement s : code) {
-            if (!c.isGood())
-                return;
+            //TODO: break, continue
             s.execute(c); //TODO: scope
         }
     }

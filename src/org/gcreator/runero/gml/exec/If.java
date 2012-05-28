@@ -13,14 +13,13 @@ public class If implements Statement {
     public ArrayList<Statement> elseExec;
 
     @Override
-    public void execute(Context context) {
+    public int execute(Context context) {
         Constant c = condition.solve(context.instance, context.other);
-        if (c.dVal > 0.5) {
+        if (c.dVal > 0.5)
             context.execute(exec);
-        }
         else if (hasElse)
             context.execute(elseExec);
-
+        return 0;
     }
 
 }

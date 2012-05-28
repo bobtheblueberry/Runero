@@ -11,34 +11,21 @@ public class Context {
     public Instance instance;
     public Instance other;
     public Constant returnVal;
+    public Scope scope;
+    
+    public static final int BREAK = 1;
+    public static final int CONTINUE = 2;
+    public static final int RETURN = 3;
 
     public Context(Instance instance, Instance other) {
         hasInstance = instance != null;
         this.instance = instance;
         this.other = other;
+        this.scope = new Scope();
     }
 
-    boolean good;
-
-    public void setGood(boolean b) {
-        good = b;
-    }
-
-    public boolean isGood() {
-        return true;
-    }
-    
-    public void breakLoop() {
-        //TODO: This
-    }
-    
-    public void continueLoop() {
-        //TODO: this
-    }
     
     public void returnStatement(Constant val) {
-        //TODO: this
-        good = false;
         returnVal = val;
     }
     

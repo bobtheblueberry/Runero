@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.swing.JOptionPane;
+
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.gml.Constant;
 import org.gcreator.runero.inst.Instance;
@@ -49,7 +51,6 @@ public class FunctionManager {
     }
 
     public static Constant getFunction(int id, Instance instance, Constant... args) {
-
         Constant arg0 = null, arg1 = null, arg2 = null, arg3 = null, arg4 = null, arg5 = null;
         if (args.length > 0) {
             arg0 = args[0];
@@ -2525,9 +2526,9 @@ public class FunctionManager {
                 return null; // load_info
             case 521: // show_message(str)
 
-                // TODO: This function
-
-                return null; // show_message
+                // TODO: This function, really
+                JOptionPane.showMessageDialog(null, arg0.sVal);
+                return Constant.ZERO; // show_message
             case 522: // show_message_ext(str,but1,but2,but3)
 
                 // TODO: This function
@@ -5303,6 +5304,14 @@ public class FunctionManager {
                 // TODO: This function
 
                 return null; // d3d_model_floor
+                
+                // Custom functions
+            case 1077: // sysout(str)
+                System.out.println(arg0);
+                return Constant.ZERO;
+            case 1078: // syserr(str)
+                System.err.println(arg0);
+                return Constant.ZERO;
 
         }
         return null;

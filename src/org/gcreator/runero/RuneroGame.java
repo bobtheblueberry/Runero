@@ -170,6 +170,42 @@ public class RuneroGame {
         return null;
     }
 
+    public GameScript getScript(int id) {
+        for (GameScript r : scripts) {
+            if (r.getId() == id) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    public GameSound getSound(int id) {
+        for (GameSound r : sounds) {
+            if (r.getId() == id) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    public GamePath getPath(int id) {
+        for (GamePath r : paths) {
+            if (r.getId() == id) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    public GameTimeline getTimeline(int id) {
+        for (GameTimeline r : timelines) {
+            if (r.getId() == id) {
+                return r;
+            }
+        }
+        return null;
+    }
+
     public void updateCaption() {
         // score lives health
         String caption = room.room.caption;

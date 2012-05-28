@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import org.gcreator.runero.RuneroGame;
+import org.gcreator.runero.RuneroSound;
 import org.gcreator.runero.event.Action;
 import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gfx.Texture;
@@ -40,6 +41,7 @@ import org.gcreator.runero.inst.ObjectGroup;
 import org.gcreator.runero.res.GameBackground;
 import org.gcreator.runero.res.GameFont;
 import org.gcreator.runero.res.GameObject;
+import org.gcreator.runero.res.GameSound;
 import org.gcreator.runero.res.GameSprite;
 import org.lwjgl.input.Mouse;
 
@@ -325,8 +327,7 @@ public class ActionLibrary {
                 set_sprite_old(act, instance, other);
                 return;
             case BEGIN_SOUND:
-
-                // TODO: THIS
+                begin_sound(act, instance, other);
                 return;
             case END_SOUND:
 
@@ -1096,8 +1097,14 @@ public class ActionLibrary {
         instance.image_xscale = scale;
         instance.image_yscale = scale;
     }
-
-    /*BEGIN_SOUND
+    
+    private static void begin_sound(Action act, Instance instance, Instance other) {
+        // sound, loop
+        GameSound s = RuneroGame.game.getSound(act.arguments.get(0).resVal);
+        boolean loop = act.arguments.get(1).boolVal;
+        RuneroSound.play(s, loop);
+    }
+    /*
     END_SOUND
     */
 
@@ -1128,11 +1135,9 @@ public class ActionLibrary {
     private static void sleep(Action a, Instance instance, Instance other) {
         double seconds = GmlParser.getExpression(a.arguments.get(0).exprVal, instance, other);
         boolean redraw = a.arguments.get(0).boolVal;
-        if (redraw) {
-            // TODO: REDRAW
-        }
+        if (redraw) 
+            GraphicsLibrary.gfx.screen_redraw();
         try {
-            System.out.println("sleep " + seconds);
             Thread.sleep((long) seconds);
         } catch (InterruptedException e) {
             System.out.println("Somebody bitched while game slept.");

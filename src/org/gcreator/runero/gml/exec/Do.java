@@ -11,17 +11,18 @@ public class Do implements Statement {
     public ExprArgument condition;
 
     @Override
-    public void execute(Context context) {
+    public int execute(Context context) {
         while (true) {
             context.execute(code);
             Constant c = condition.solve(context.instance, context.other);
             if (c.isString) {
                 Runner.Error("do {} while (string?) wtf!");
-                return;
+                return 0;
             }
             if (c.dVal <= 0.5)
                 break;
         }
+        return 0;
     }
 
 }

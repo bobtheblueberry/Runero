@@ -33,6 +33,7 @@ import org.gcreator.runero.res.GameScript;
 import org.gcreator.runero.res.GameSettings;
 import org.gcreator.runero.res.GameSound;
 import org.gcreator.runero.res.GameSprite;
+import org.gcreator.runero.res.GameSound.SoundKind;
 import org.gcreator.runero.res.GameSprite.Mask;
 import org.gcreator.runero.res.GameSprite.MaskShape;
 import org.gcreator.runero.res.GameTimeline;
@@ -187,13 +188,13 @@ public class ResourceLoader {
                 loadBackground(name);
                 break;
             case SOUND:
-                // loadSound(name);
+                loadSound(name);
                 break;
             case PATH:
                 // loadPath(name);
                 break;
             case SCRIPT:
-                // loadScript(name);
+                 loadScript(name);
                 break;
             case FONT:
                 loadFont(name);
@@ -215,7 +216,46 @@ public class ResourceLoader {
                 break;
         }
     }
-
+    
+    private void loadSound(String name) throws IOException {
+        StreamDecoder in = getInputStream(sndDir, name);
+        GameSound s = new GameSound(in.readStr());
+        s.setId(in.read4());
+        int k = in.read();
+        if (k == 0)
+            s.kind = SoundKind.NORMAL;
+        else if (k == 1)
+            s.kind = SoundKind.MULTIMEDIA;
+        else if (k == 2)
+            s.kind = SoundKind.BACKGROUND;
+        else if (k == 3)
+            s.kind = SoundKind.SPATIAL;
+        s.fileType = in.readStr();
+        s.origName = in.readStr();
+        s.fileName = s.getName() + s.fileType;
+        s.chorus = in.readBool();
+        s.echo = in.readBool();
+        s.flanger = in.readBool();
+        s.gargle = in.readBool();
+        s.reverb = in.readBool();
+        s.volume = in.readD();
+        s.pan = in.read4();
+        s.preload = in.readBool();
+        game.sounds.add(s);
+        if (s.preload) {
+            preloadables.add(s);
+        }
+        in.close();
+    }
+    
+    private void loadScript(String name) throws IOException {
+        StreamDecoder in = getInputStream(scrDir, name);
+        GameScript s = new GameScript(in.readStr());
+        s.setId(in.read4());
+        s.code = CodeRes.load(in.readStr());
+        game.scripts.add(s);
+        in.close();
+    }
     private StreamDecoder getInputStream(String name) throws FileNotFoundException {
         if (jar)
             return new StreamDecoder(ResourceLoader.class.getResourceAsStream("/res/" + name));

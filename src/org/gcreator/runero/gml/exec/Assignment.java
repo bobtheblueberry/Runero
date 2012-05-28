@@ -19,7 +19,7 @@ public class Assignment implements Statement {
         }
 
     @Override
-    public void execute(Context context) {
+    public int execute(Context context) {
         // TODO Auto-generated method stub
         Constant c = value.solve(context.instance, context.other);
         switch (op) {
@@ -65,6 +65,7 @@ public class Assignment implements Statement {
                 VariableManager.setVariable(variable, c, context.instance, context.other);
                 break;
         }
+        return 0;
     }
     
     public String toString() {

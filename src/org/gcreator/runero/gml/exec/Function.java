@@ -16,11 +16,14 @@ public class Function implements Statement {
             this.name = name;
             args = new ArrayList<ExprArgument>();
             id = FunctionManager.getId(name);
+            if (id < 0)
+                System.err.println("WARNING: No such function " + name);
         }
 
     @Override
-    public void execute(Context context) {
+    public int execute(Context context) {
         solve(context.instance, context.other);
+        return 0;
     }
 
     public Constant solve(Instance instance, Instance other) {

@@ -3,8 +3,8 @@ package org.gcreator.runero.gml.exec;
 public class Continue implements Statement {
 
     @Override
-    public void execute(Context context) {
-        context.continueLoop();
+    public int execute(Context context) {
+        return Context.CONTINUE;
     }
 
 }

@@ -10,12 +10,13 @@ public class For implements Statement {
     public ArrayList<Statement> code;
     
     @Override
-    public void execute(Context context) {
+    public int execute(Context context) {
         initial.execute(context);
         while (condition.solve(context.instance, context.other).dVal > 0.5) {
             context.execute(code);
             increcement.execute(context);
         }
+        return 0;
     }
 
 }
