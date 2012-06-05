@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import org.gcreator.runero.RuneroGame;
-import org.gcreator.runero.RuneroSound;
+import org.gcreator.runero.audio.RuneroSound;
 import org.gcreator.runero.event.Action;
 import org.gcreator.runero.gfx.GraphicsLibrary;
 import org.gcreator.runero.gfx.Texture;
@@ -697,8 +697,10 @@ public class ActionLibrary {
 
     private static boolean if_sound(Action act, Instance instance, Instance other) {
         // sound resource
-        // TODO This, and sound system
-        return false;
+        GameSound s = RuneroGame.game.getSound(act.arguments.get(0).resVal);
+        if (s == null)
+            return false;
+        return RuneroSound.isPlaying(s);
     }
 
     private static boolean if_mouse(Action act, Instance instance, Instance other) {

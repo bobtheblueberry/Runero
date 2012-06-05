@@ -3,7 +3,11 @@ package org.gcreator.runero;
 import java.io.File;
 import java.io.IOException;
 
+import org.gcreator.runero.audio.RuneroSound;
+import org.gcreator.runero.event.Action;
+import org.gcreator.runero.event.Event;
 import org.gcreator.runero.gfx.RuneroDisplay;
+import org.gcreator.runero.inst.Instance;
 
 public class Runner {
 
@@ -11,15 +15,19 @@ public class Runner {
     public static boolean error_occurred = false;
     public static String error_last = "";
     public static boolean JAR;
+    
+    public static Action curAction;
+    public static Event curEvent;
+    public static Instance curObject;
 
     public static File GameFolder;
 
-    public static void Error(final String message) {
+    public static void Error(String message) {
         error_occurred = true;
         error_last = message;
-
+        
         StackTraceElement[] e = new Throwable().getStackTrace();
-        String s = "";
+        String s = curObject + " " +  curEvent + " " + curAction + "\n"; 
         for (StackTraceElement el : e)
             s += el + "\n";
         System.err.println(message);
@@ -76,6 +84,7 @@ public class Runner {
                 e.printStackTrace();
                 return;
             }
+            RuneroSound.setupAudio();
             game.loadGame();
             RuneroGame.display = new RuneroDisplay();
             RuneroGame.display.start(game);

@@ -182,8 +182,8 @@ public class GmlCompiler {
         Return r = new Return();
         if (hasNext()) {
             TokenWord next = next();
-            // TODO: test this
             if (next.token != SEMICOLON) {
+                i--;
                 r.value = getArgument(true);
             }
         }

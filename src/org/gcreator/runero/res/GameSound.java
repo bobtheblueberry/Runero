@@ -23,6 +23,7 @@ public class GameSound extends GameResource implements Preloadable {
     public boolean flanger;
     public boolean gargle;
     public boolean reverb;
+    
     public double volume;
     public double pan;
     public boolean preload;

@@ -415,7 +415,7 @@ public class GmlTokenizer {
             if (tw.token == PAR_OPEN) { // ( ) . x but not ( 1 2 3 ) cause that messed up like for ( a;b;c)
                 if (tw instanceof TokenWordPair) // function
                     cond = false;
-                if (i + 1 > tokensOrig.size())
+                if (i + 1 >= tokensOrig.size())
                     cond = false;
                 else {
                     TokenWord next = tokensOrig.get(i + 1);

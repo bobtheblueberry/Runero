@@ -47,4 +47,8 @@ public class Action {
                                // last action in the event, or there is
                                // an empty block after the question
     }
+    
+    public String toString() {
+        return "Action " + lib.name;
+    }
 }

@@ -132,6 +132,16 @@ public class EventManager {
                     otherGameEnd = new LinkedList<Event>();
                 otherGameEnd.add(e);
                 break;
+            case Event.EV_ROOM_START:
+                if (otherRoomStart == null)
+                    otherRoomStart = new LinkedList<Event>();
+                otherRoomStart.add(e);
+                break;
+            case Event.EV_ROOM_END:
+                if (otherRoomEnd == null)
+                    otherRoomEnd = new LinkedList<Event>();
+                otherRoomEnd.add(e);
+                break;
             case Event.EV_NO_MORE_LIVES:
                 if (otherNoMoreLives == null)
                     otherNoMoreLives = new LinkedList<Event>();
@@ -679,6 +689,8 @@ public class EventManager {
     public LinkedList<Event> otherBoundary;
     public LinkedList<Event> otherGameStart;
     public LinkedList<Event> otherGameEnd;
+    public LinkedList<Event> otherRoomStart;
+    public LinkedList<Event> otherRoomEnd;
     public LinkedList<Event> otherNoMoreLives;
     public LinkedList<Event> otherAnimationEnd;
     public LinkedList<Event> otherEndofPath;

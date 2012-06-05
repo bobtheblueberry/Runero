@@ -104,7 +104,7 @@ public class RuneroGame {
             System.exit(1);
         }
         // Go to the first room
-        room = new RoomInstance(this, rooms.get(0));
+        room = new RoomInstance(this, RuneroGame.game.getRoom(RuneroGame.game.roomOrder[0]));
         GraphicsLibrary.gfx.setTitle(room.caption);
         room.init(true);
     }

@@ -535,7 +535,7 @@ public class FunctionManager {
                 checkReal(arg0);
                 checkReal(arg1);
                 checkReal(arg2);
-                if (CollisionLibrary.place_meeting(instance, arg0.dVal, arg1.dVal, (int)arg2.dVal))
+                if (CollisionLibrary.place_meeting(instance, arg0.dVal, arg1.dVal, (int) arg2.dVal))
                     return Constant.TRUE;
                 return Constant.FALSE;
             case 122: // place_snapped(hsnap,vsnap)
@@ -841,7 +841,7 @@ public class FunctionManager {
             case 182: // sleep(millisec)
                 checkReal(arg0);
                 try {
-                    Thread.sleep((long)arg0.dVal);
+                    Thread.sleep((long) arg0.dVal);
                 } catch (InterruptedException e) {
                 }
             case 183: // room_goto(numb)
@@ -5304,7 +5304,7 @@ public class FunctionManager {
                 // TODO: This function
 
                 return null; // d3d_model_floor
-                
+
                 // Custom functions
             case 1077: // sysout(str)
                 System.out.println(arg0);

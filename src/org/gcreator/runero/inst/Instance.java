@@ -284,7 +284,7 @@ public class Instance implements Comparable<Instance> {
     }
 
     public String toString() {
-        return obj.getName() + " at (" + x + "," + y + ")";
+        return obj.getName() + " at (" + Math.round(x) + "," + Math.round(y) + ")";
     }
 
     /* Variable Code */

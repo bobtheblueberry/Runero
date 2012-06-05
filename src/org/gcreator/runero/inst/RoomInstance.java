@@ -65,13 +65,16 @@ public class RoomInstance {
         if (game.em.hasCreateEvents)
             EventExecutor.executeEvent(game.em.create, this);
 
-        if (gameStart && game.em.otherGameStart != null)
+        if (gameStart && game.em.otherGameStart != null) 
             EventExecutor.executeEvent(game.em.otherGameStart, this);
 
         if (room.creation_code != null) {
             room.creation_code.getCode().execute(null, null);
         }
 
+        if (gameStart && game.em.otherRoomStart != null) 
+            EventExecutor.executeEvent(game.em.otherRoomStart, this);
+        
         System.out.println("New room " + room.getName() + "(" + width + "," + height + ")");
         System.out.println("Instances: " + instance_count);
     }

@@ -15,9 +15,11 @@ public class Function implements Statement {
         {
             this.name = name;
             args = new ArrayList<ExprArgument>();
-            id = FunctionManager.getId(name);
-            if (id < 0)
-                System.err.println("WARNING: No such function " + name);
+            if (FunctionManager.ids != null) {
+                id = FunctionManager.getId(name);
+                if (id < 0)
+                    System.err.println("WARNING: No such function " + name);
+            }
         }
 
     @Override

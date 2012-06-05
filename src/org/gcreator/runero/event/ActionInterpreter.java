@@ -1,6 +1,7 @@
 package org.gcreator.runero.event;
 
 import org.gcreator.runero.RuneroGame;
+import org.gcreator.runero.Runner;
 import org.gcreator.runero.gml.lib.ActionLibrary;
 import org.gcreator.runero.inst.Instance;
 import org.gcreator.runero.res.GameObject;
@@ -10,6 +11,9 @@ public class ActionInterpreter {
     public static void performEvent(Event e, Instance instance) {
         for (int i = 0; i < e.actions.size(); i++) {
             Action act = e.actions.get(i);
+            Runner.curAction = act;
+            Runner.curObject = instance;
+            Runner.curEvent = e;
             try {
                 i = performAction(act, e, instance, i);
             } catch (Exception exc) {

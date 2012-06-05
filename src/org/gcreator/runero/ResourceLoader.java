@@ -32,8 +32,8 @@ import org.gcreator.runero.res.GameRoom.Tile;
 import org.gcreator.runero.res.GameScript;
 import org.gcreator.runero.res.GameSettings;
 import org.gcreator.runero.res.GameSound;
-import org.gcreator.runero.res.GameSprite;
 import org.gcreator.runero.res.GameSound.SoundKind;
+import org.gcreator.runero.res.GameSprite;
 import org.gcreator.runero.res.GameSprite.Mask;
 import org.gcreator.runero.res.GameSprite.MaskShape;
 import org.gcreator.runero.res.GameTimeline;
@@ -194,7 +194,7 @@ public class ResourceLoader {
                 // loadPath(name);
                 break;
             case SCRIPT:
-                 loadScript(name);
+                loadScript(name);
                 break;
             case FONT:
                 loadFont(name);
@@ -216,7 +216,7 @@ public class ResourceLoader {
                 break;
         }
     }
-    
+
     private void loadSound(String name) throws IOException {
         StreamDecoder in = getInputStream(sndDir, name);
         GameSound s = new GameSound(in.readStr());
@@ -247,15 +247,17 @@ public class ResourceLoader {
         }
         in.close();
     }
-    
+
     private void loadScript(String name) throws IOException {
         StreamDecoder in = getInputStream(scrDir, name);
         GameScript s = new GameScript(in.readStr());
         s.setId(in.read4());
+        System.out.println("Loading code for script " + name);
         s.code = CodeRes.load(in.readStr());
         game.scripts.add(s);
         in.close();
     }
+
     private StreamDecoder getInputStream(String name) throws FileNotFoundException {
         if (jar)
             return new StreamDecoder(ResourceLoader.class.getResourceAsStream("/res/" + name));
@@ -480,8 +482,11 @@ public class ResourceLoader {
                 Event ev = new Event(e, in.read4());
                 ev.object = o;
                 int actn = in.read4();
-                for (int a = 0; a < actn; a++)
-                    ev.addAction(loadAction(in));
+                for (int a = 0; a < actn; a++) {
+                    Action act = loadAction(in);
+                    if (act != null)
+                        ev.addAction(act);
+                }
                 indentEvent(ev);
                 e.addEvent(ev);
             }
@@ -630,6 +635,10 @@ public class ResourceLoader {
         int parentId = in.read4();
         int id = in.read4();
         LibAction a = LibManager.getLibAction(parentId, id);
+        if (a == null) {
+            System.err.println("Unknown action: parent " + parentId + ", id " + id);
+            return null;
+        }
         // Done of Lib stuff
         // Load Action
         Action act = new Action(a);
@@ -710,6 +719,8 @@ public class ResourceLoader {
     private void indentEvent(Event e) {
         for (int i = 0; i < e.actions.size(); i++) {
             Action a = e.actions.get(i);
+            if (a == null)
+                return;
             if (a.lib.question) {
                 questionIndent(e, i, a);
                 i = a.ifAction.actionEnd;

@@ -3,6 +3,7 @@ package org.gcreator.runero.gfx;
 import static org.lwjgl.opengl.GL11.*;
 
 import org.gcreator.runero.RuneroGame;
+import org.gcreator.runero.audio.RuneroSound;
 import org.gcreator.runero.gml.lib.KeyboardLibrary;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -76,6 +77,7 @@ public class RuneroDisplay {
             if (Display.isCloseRequested())
                 gameRunning = false;
         }
+        RuneroSound.shutdown();
         System.out.println("Game ended");
     }
 }
