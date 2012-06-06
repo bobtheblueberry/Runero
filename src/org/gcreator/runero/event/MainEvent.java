@@ -38,7 +38,7 @@ public class MainEvent implements Comparable<MainEvent> {
     }
 
     public String toString() {
-        return "Main Event (" + mainEvent + ") ";
+        return getEventName(mainEvent) + " Event";
     }
 
     public String getEventName(int i) {

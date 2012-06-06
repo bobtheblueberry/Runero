@@ -22,6 +22,7 @@ public class WAVPlayer extends AudioPlayer {
 
     public WAVPlayer(byte[] data, GameSound s, boolean loop)
         {
+            super(s.fileName);
             this.data = data;
             this.loop = loop;
             this.sound = s;

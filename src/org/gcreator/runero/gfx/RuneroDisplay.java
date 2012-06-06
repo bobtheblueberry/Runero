@@ -67,6 +67,7 @@ public class RuneroDisplay {
             // let subsystem paint
             game.update();
             game.render();
+            RuneroGame.room.animationEnd();
             // update window contents
             Display.update();
             

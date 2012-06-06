@@ -125,7 +125,7 @@ public class Instance implements Comparable<Instance> {
      * @param index  main event index
      */
     public void performEvent(Event event) {
-        if (isDead)
+        if (isDead || event == null)
             return;
         byte index = event.parent.mainEvent;
         if (index == MainEvent.EV_DRAW) {
@@ -212,8 +212,6 @@ public class Instance implements Comparable<Instance> {
         x += hspeed;
         y += vspeed;
         image_index += image_speed;
-        if (sprite_index >= 0)
-            image_index %= image_number;
     }
 
     public void draw(GraphicsLibrary g) {

@@ -1032,13 +1032,13 @@ public class ActionLibrary {
 
     private static void change_object(Action a, Instance instance, Instance other) {
         int id = a.arguments.get(0).resVal;
-        int performEvents = Integer.parseInt(a.arguments.get(1).val);
+        boolean performEvents = a.arguments.get(1).boolVal;
         GameObject g = RuneroGame.game.getObject(id);
         if (g == null) {
             System.out.println("unknown object " + id);
             return;
         }
-        RuneroGame.room.changeInstance(instance, g, performEvents == 1);
+        RuneroGame.room.changeInstance(instance, g, performEvents);
     }
 
     private static void kill_object(Action a, Instance instance, Instance other) {
@@ -1402,16 +1402,17 @@ public class ActionLibrary {
             System.out.println("Cannot draw sprite with no sub-images");
             return;
         }
-        int subImage = Integer.parseInt(a.arguments.get(3).val);
+        double subImage = GmlParser.getExpression(a.arguments.get(3).exprVal, instance, other);
         if (subImage == -1) {
             subImage = (int) Math.round(instance.sprite_index);
-        }
+        } else 
+            subImage = Math.round(subImage);
 
         if (a.relative) {
             x += instance.x;
             y += instance.y;
         }
-        Texture img = s.getTexture(subImage % s.subImages.size());
+        Texture img = s.getTexture((int)subImage % s.subImages.size());
         g.drawTexture(img, x, y, s.width, s.height, s.x, s.y);
     }
 
@@ -1576,7 +1577,7 @@ public class ActionLibrary {
     }
 
     private static void set_color(Action a, Instance instance, Instance other) {
-        Color c = GmlParser.convertGmColor(Integer.parseInt(a.arguments.get(0).val));
+        Color c = a.arguments.get(0).colorVal;
         g.setColor(c);
     }
 

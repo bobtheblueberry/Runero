@@ -1,9 +1,5 @@
 package org.gcreator.runero.audio;
 
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.AudioDevice;
-import javazoom.jl.player.FactoryRegistry;
-
 import org.gcreator.runero.RuneroGame;
 import org.gcreator.runero.res.GameSound;
 import org.gcreator.runero.res.GameSound.SoundKind;
@@ -56,10 +52,9 @@ public abstract class RuneroSound {
                 background = null;
             }
         }
-        MP3Player p = new MP3Player(s.getData(), s.fileName, loop);
-        Thread playerThread = new Thread(p, "MP3 Audio player thread");
+        MP3Player p = new MP3Player(s.getData(), s, loop);
         addPlayer(p, s.getId());
-        playerThread.start();
+        p.start();
         if (bg)
             background = p;
     }
@@ -74,9 +69,8 @@ public abstract class RuneroSound {
             }
         }
         WAVPlayer p = new WAVPlayer(s.getData(), s, loop);
-        Thread playerThread = new Thread(p, "WAV Audio player thread");
         addPlayer(p, s.getId());
-        playerThread.start();
+        p.start();
         if (bg)
             background = p;
     }
@@ -87,19 +81,4 @@ public abstract class RuneroSound {
             a.interrupt();
         players[id] = p;
     }
-
-    static AudioDevice dev;
-
-    static AudioDevice getAudioDevice() {
-        try {
-            if (dev == null)
-                dev = FactoryRegistry.systemRegistry().createAudioDevice();
-            return dev;
-        } catch (JavaLayerException e) {
-            System.err.println("Cannot get audio device");
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 }

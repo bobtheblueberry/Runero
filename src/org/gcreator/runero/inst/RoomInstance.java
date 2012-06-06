@@ -65,16 +65,16 @@ public class RoomInstance {
         if (game.em.hasCreateEvents)
             EventExecutor.executeEvent(game.em.create, this);
 
-        if (gameStart && game.em.otherGameStart != null) 
+        if (gameStart && game.em.otherGameStart != null)
             EventExecutor.executeEvent(game.em.otherGameStart, this);
 
         if (room.creation_code != null) {
             room.creation_code.getCode().execute(null, null);
         }
 
-        if (gameStart && game.em.otherRoomStart != null) 
+        if (gameStart && game.em.otherRoomStart != null)
             EventExecutor.executeEvent(game.em.otherRoomStart, this);
-        
+
         System.out.println("New room " + room.getName() + "(" + width + "," + height + ")");
         System.out.println("Instances: " + instance_count);
     }
@@ -403,16 +403,19 @@ public class RoomInstance {
 
         // Draw Foregrounds
         drawBackgrounds(g, true);
+    }
 
+    public void animationEnd() {
         // Animation end
         if (game.em.otherAnimationEnd != null)
             for (Event e : game.em.otherAnimationEnd)
                 for (ObjectGroup gr : instanceGroups)
                     if (gr.obj.getId() == e.object.getId())
                         for (Instance i : gr.instances)
-                            if (i.image_number > 0 && i.image_index >= i.image_number - 1)
+                            if (i.image_number > 0 && i.image_index >= i.image_number - 1) {
                                 i.performEvent(e);
-
+                                i.image_index %= i.image_number;
+                            }
     }
 
     private void drawBackgrounds(GraphicsLibrary g, boolean foreground) {

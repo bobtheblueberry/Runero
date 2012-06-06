@@ -82,6 +82,7 @@ public class EventQueue {
         public ChangeInstance(Instance i, int oldId)
             {
                 this.inst = i;
+                this.oldObjId = oldId;
             }
     }
 
